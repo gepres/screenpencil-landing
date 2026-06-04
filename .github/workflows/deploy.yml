@@ -1,0 +1,44 @@
+# Publica la landing (sitio estático) en GitHub Pages en cada push a main.
+# No hay build: se sube el contenido del repo tal cual.
+name: Deploy a GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}   # permite lanzarlo a mano desde la pestaña Actions
+
+# Permisos mínimos que necesita el deploy oficial de Pages.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Evita despliegues solapados; no cancela el que ya está en curso.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Pages
+        uses: actions/configure-pages@v5
+        with:
+          # Habilita Pages automáticamente la primera vez (si el repo lo permite).
+          enablement: true
+
+      - name: Subir artefacto del sitio
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .   # raíz del repo: index.html + assets/ + docs/
+
+      - name: Desplegar en Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

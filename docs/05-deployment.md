@@ -20,12 +20,18 @@ git push -u origin main
 
 ## Opciones de hosting
 
-### GitHub Pages (gratis)
-1. Sube esta carpeta a un repo (pasos de arriba), p. ej. `gepres/screenpencil-landing`.
-2. Settings → Pages → Source: `Deploy from a branch` → `main` / `root`.
-3. Tu sitio queda en `https://gepres.github.io/screenpencil-landing/`.
+### GitHub Pages con GitHub Actions (recomendado, ya configurado)
+El repo incluye `.github/workflows/deploy.yml`: en **cada push a `main`** publica el sitio en Pages.
 
-> Como las rutas son **relativas** (`assets/...`), funciona aunque el sitio cuelgue de un subdirectorio.
+1. Haz push a `main` (el workflow se dispara solo; también puedes lanzarlo desde la pestaña **Actions**).
+2. La primera vez, el workflow intenta **activar Pages** automáticamente (`configure-pages` con `enablement: true`).
+   Si fallara por permisos, ve una sola vez a **Settings → Pages → Build and deployment → Source: _GitHub Actions_**.
+3. Tu sitio queda en `https://gepres.github.io/screenpencil-landing/` (la URL exacta sale en el log del job).
+
+> Sube el repo **tal cual** (sin build). Como las rutas son **relativas** (`assets/...`), funciona aunque el sitio cuelgue de un subdirectorio.
+
+### GitHub Pages desde rama (alternativa sin workflow)
+Settings → Pages → Source: `Deploy from a branch` → `main` / `root`. Borra el workflow si usas esta vía.
 
 ### Netlify (gratis)
 - Arrastra la carpeta a [app.netlify.com/drop](https://app.netlify.com/drop), **o**
@@ -53,8 +59,21 @@ Apunta tu dominio (p. ej. `screenpencil.app`) al hosting elegido:
       mejores previews al compartir.
 - [ ] Ajusta `<title>` y `meta description` si cambia el posicionamiento.
 - [ ] (Opcional) añade `robots.txt` y `sitemap.xml`.
-- [ ] (Opcional) analítica respetuosa con la privacidad (Plausible, GoatCounter…), coherente con el
-      mensaje "sin telemetría intrusiva".
+- [ ] **Analítica:** pega el token de Cloudflare Web Analytics (ver sección siguiente).
+
+## Analítica de visitas (Cloudflare Web Analytics)
+
+Integrada en `index.html` (beacon antes de `</body>`). Es **sin cookies y sin banner** de
+consentimiento — coherente con el mensaje de privacidad del sitio — y no la frenan los adblockers.
+
+Para activarla:
+1. [dash.cloudflare.com](https://dash.cloudflare.com) → **Analytics & Logs → Web Analytics → Add a site**.
+2. Escribe `gepres.github.io/screenpencil-landing` (modo *beacon*/JS; no necesitas mover el dominio a Cloudflare).
+3. Copia el `token` del snippet y reemplaza `TU_TOKEN` en `index.html`. Commit + push → el workflow redepliega.
+
+> Mientras el token sea el placeholder `TU_TOKEN`, no se registra nada (no rompe el sitio).
+> ¿Prefieres otra herramienta? **GoatCounter** (open source, sin cookies, con eventos para medir clics de
+> descarga) o **GA4** (más detalle, pero usa cookies y requiere banner) son alternativas; basta cambiar el snippet.
 
 ## Rendimiento
 

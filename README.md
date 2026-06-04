@@ -2,6 +2,8 @@
 
 Sitio web de presentación de **ScreenPencil**, la app gratuita para **dibujar y anotar sobre toda tu pantalla** (Windows · macOS · Linux).
 
+**🌐 Sitio en vivo:** <https://gepres.github.io/screenpencil-landing/>
+
 > **Stack:** HTML + CSS + JavaScript **vanilla**. Sin framework, sin build, sin dependencias.
 > Se abre con doble clic en `index.html`. Despliega en cualquier hosting estático.
 >
@@ -20,6 +22,7 @@ Sitio web de presentación de **ScreenPencil**, la app gratuita para **dibujar y
 - **Demo interactiva**: una mini-pizarra real en `<canvas>` (lápiz, marcador, borrador, colores, grosor).
 - **Tabla de atajos** de teclado, **sección multiplataforma**, **bloque de precio** ($0, sin paywall), **donaciones** y **FAQ** acordeón.
 - **Roadmap** ("próximamente") con lo que viene.
+- **Analítica privacy-first** (Cloudflare Web Analytics, sin cookies) y **deploy automático** a GitHub Pages (Actions).
 - **100% responsive** y con soporte de `prefers-reduced-motion` (accesibilidad).
 
 ---
@@ -51,10 +54,13 @@ php -S localhost:8000
 
 ```
 screenpencil-landing/
-├── index.html              # Página única (todas las secciones, copy ES + data-en)
+├── index.html              # Página única (secciones + copy ES/data-en + beacon de analítica)
 ├── README.md
 ├── LICENSE                 # MIT
 ├── .gitignore
+├── .gitattributes          # normaliza finales de línea (LF)
+├── .github/workflows/
+│   └── deploy.yml          # publica en GitHub Pages vía Actions (en cada push a main)
 ├── assets/
 │   ├── css/styles.css      # Estilos + animaciones (tokens de diseño en :root)
 │   ├── js/main.js          # Interacciones, i18n ES/EN, reveal, contadores, showcase, demo
@@ -136,12 +142,25 @@ git push -u origin main
 > Con la CLI de GitHub puedes crear y subir en un paso:
 > `gh repo create gepres/screenpencil-landing --public --source=. --push`
 
-### 3. Activa GitHub Pages
+### 3. Publica en GitHub Pages (ya automatizado)
 
-En el repo: **Settings → Pages → Source: _Deploy from a branch_ → `main` / `/ (root)`**.
+El repo trae `.github/workflows/deploy.yml`: **cada push a `main` publica el sitio** en Pages.
+La primera vez activa Pages automáticamente; si fallara por permisos, ve una sola vez a
+**Settings → Pages → Build and deployment → Source: _GitHub Actions_**.
 El sitio queda en `https://gepres.github.io/screenpencil-landing/`.
 
-Otros hostings (Netlify, Vercel, Cloudflare Pages) sin paso de build: ver **`docs/05-deployment.md`**.
+Otros hostings (Netlify, Vercel, Cloudflare Pages) o el deploy desde rama: ver **`docs/05-deployment.md`**.
+
+---
+
+## 📊 Analítica de visitas
+
+Integrada **Cloudflare Web Analytics** (beacon antes de `</body>` en `index.html`): mide visitas,
+páginas y fuentes **sin cookies ni banner de consentimiento** y sin que la frenen los adblockers.
+
+Para activarla, crea el sitio en [Cloudflare → Web Analytics](https://dash.cloudflare.com) y reemplaza
+`TU_TOKEN` en `index.html` por tu token. Mientras tanto no registra nada (no rompe el sitio).
+Detalles y alternativas (GoatCounter / GA4) en **`docs/05-deployment.md`**.
 
 ---
 
@@ -160,10 +179,14 @@ Toda la documentación del proyecto está en [`docs/`](docs/00-INDEX.md):
 
 ---
 
-## 🔗 Relación con la app
+## 🔗 Enlaces del proyecto
 
-La app de escritorio vive en el repositorio hermano **`screenbrush-windown`**
-(codename interno `ScreenBrush`, nombre público **ScreenPencil**). Esta landing es solo el sitio de marketing.
+- **🌐 Sitio en vivo:** <https://gepres.github.io/screenpencil-landing/>
+- **📦 Repo de esta landing:** <https://github.com/gepres/screenpencil-landing>
+- **🖥️ Repo de la app de escritorio:** <https://github.com/gepres/screenpencil-app>
+
+La app de escritorio (codename interno `ScreenBrush`, nombre público **ScreenPencil**) vive en su
+**propio repositorio**; esta landing es solo el sitio de marketing.
 
 ## 📝 Licencia
 

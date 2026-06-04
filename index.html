@@ -606,5 +606,17 @@
   </footer>
 
   <script src="assets/js/main.js"></script>
+
+  <!-- ===== Analítica · Cloudflare Web Analytics (sin cookies, sin banner) =====
+       Mide visitas, páginas vistas, fuentes y países; respeta la privacidad.
+       CÓMO ACTIVARLA (1 min):
+         1. Entra a https://dash.cloudflare.com → Analytics & Logs → Web Analytics.
+         2. "Add a site" → escribe gepres.github.io/screenpencil-landing (no hace falta
+            tener el dominio en Cloudflare; usa el modo "beacon"/JS).
+         3. Copia el valor de "token" del snippet que te da y pégalo abajo en TU_TOKEN.
+       Mientras el token sea el placeholder, NO se registra nada (no rompe el sitio). -->
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon='{"token": "TU_TOKEN"}'></script>
+  <!-- ===== Fin analítica ===== -->
 </body>
 </html>
