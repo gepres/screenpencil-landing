@@ -194,16 +194,23 @@
   };
   $$('[data-download]').forEach((b) =>
     b.addEventListener('click', (e) => {
-      e.preventDefault();
       track('download/' + (b.dataset.download || 'app'), 'Click descargar: ' + (b.dataset.download || 'app'));
-      notify('🚧 La descarga estará disponible muy pronto. ¡Gracias por tu interés!');
+      const href = b.getAttribute('href');
+      if (!href || href === '#') {            // sin URL real todavía → aviso placeholder
+        e.preventDefault();
+        notify('🚧 La descarga estará disponible muy pronto. ¡Gracias por tu interés!');
+      }
+      // con href real, deja que el navegador descargue el instalador
     })
   );
   $$('[data-github]').forEach((b) =>
     b.addEventListener('click', (e) => {
-      e.preventDefault();
       track('github', 'Click GitHub');
-      notify('🔗 Conecta aquí tu repositorio de GitHub cuando esté público.');
+      const href = b.getAttribute('href');
+      if (!href || href === '#') {
+        e.preventDefault();
+        notify('🔗 Conecta aquí tu repositorio de GitHub cuando esté público.');
+      }
     })
   );
   // Donaciones (placeholder: reemplaza href="#" por tu URL real y quita data-donate)
