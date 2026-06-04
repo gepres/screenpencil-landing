@@ -153,14 +153,16 @@ Otros hostings (Netlify, Vercel, Cloudflare Pages) o el deploy desde rama: ver *
 
 ---
 
-## 📊 Analítica de visitas
+## 📊 Analítica (sin cookies)
 
-Integrada **Cloudflare Web Analytics** (beacon antes de `</body>` en `index.html`): mide visitas,
-páginas y fuentes **sin cookies ni banner de consentimiento** y sin que la frenen los adblockers.
+Dos capas, ambas sin cookies ni banner de consentimiento:
 
-Para activarla, crea el sitio en [Cloudflare → Web Analytics](https://dash.cloudflare.com) y reemplaza
-`TU_TOKEN` en `index.html` por tu token. Mientras tanto no registra nada (no rompe el sitio).
-Detalles y alternativas (GoatCounter / GA4) en **`docs/05-deployment.md`**.
+- **Tráfico — Cloudflare Web Analytics** (ya activo): visitas, páginas, fuentes y países.
+- **Clics y flujo — GoatCounter**: eventos de descarga, GitHub, donación, idioma, demo, showcase y
+  profundidad de scroll. La instrumentación vive en `main.js` (función `track()`, un único punto de
+  integración); se activa pegando tu código en `TU_CODIGO` (`index.html`).
+
+Pasos detallados, tabla de eventos y cómo migrar a GA4: **`docs/05-deployment.md`**.
 
 ---
 

@@ -14,6 +14,18 @@
   const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  /* ---------- Analítica de eventos (un solo punto de integración) ----------
+     Hoy usa GoatCounter (sin cookies). Para cambiar de proveedor (p. ej. GA4),
+     reescribe SOLO el cuerpo de track(); la instrumentación de abajo no cambia.
+     `name` es el identificador del evento (sale como "ruta" en el panel). */
+  const track = (name, title) => {
+    try {
+      if (window.goatcounter && typeof window.goatcounter.count === 'function') {
+        window.goatcounter.count({ path: name, title: title || name, event: true });
+      }
+    } catch (_) { /* la analítica nunca debe romper la UI */ }
+  };
+
   /* ---------- Año del footer ---------- */
   const yearEl = $('#year');
   if (yearEl) yearEl.textContent = String(new Date().getFullYear());
@@ -49,9 +61,11 @@
   let savedLang = null;
   try { savedLang = localStorage.getItem('sp-lang'); } catch (_) {}
   const initialLang = savedLang || ((navigator.language || 'es').toLowerCase().startsWith('en') ? 'en' : 'es');
-  $('#langToggle')?.addEventListener('click', () =>
-    applyLang(document.documentElement.lang === 'en' ? 'es' : 'en')
-  );
+  $('#langToggle')?.addEventListener('click', () => {
+    const next = document.documentElement.lang === 'en' ? 'es' : 'en';
+    applyLang(next);
+    track('lang/' + next, 'Cambio de idioma a ' + next);
+  });
   applyLang(initialLang);
 
   /* ---------- Nav: sticky + burger ---------- */
@@ -104,6 +118,22 @@
       { threshold: 0.12, rootMargin: '0px 0px -8% 0px' }
     );
     revealEls.forEach((el) => io.observe(el));
+  }
+
+  /* ---------- Flujo de usuario: hitos de scroll (se cuentan una sola vez) ---------- */
+  if ('IntersectionObserver' in window) {
+    const milestones = { features: 'flow/features', demo: 'flow/demo', download: 'flow/pricing', faq: 'flow/faq' };
+    const seenMs = new Set();
+    const msObs = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting && !seenMs.has(e.target.id)) {
+          seenMs.add(e.target.id);
+          track(milestones[e.target.id], 'Llegó a la sección: ' + e.target.id);
+          msObs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.4 });
+    Object.keys(milestones).forEach((id) => { const el = document.getElementById(id); if (el) msObs.observe(el); });
   }
 
   /* ---------- Contadores animados (hero) ---------- */
@@ -163,10 +193,18 @@
     setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(-50%) translateY(20px)'; setTimeout(() => t.remove(), 350); }, 2600);
   };
   $$('[data-download]').forEach((b) =>
-    b.addEventListener('click', (e) => { e.preventDefault(); notify('🚧 La descarga estará disponible muy pronto. ¡Gracias por tu interés!'); })
+    b.addEventListener('click', (e) => {
+      e.preventDefault();
+      track('download/' + (b.dataset.download || 'app'), 'Click descargar: ' + (b.dataset.download || 'app'));
+      notify('🚧 La descarga estará disponible muy pronto. ¡Gracias por tu interés!');
+    })
   );
   $$('[data-github]').forEach((b) =>
-    b.addEventListener('click', (e) => { e.preventDefault(); notify('🔗 Conecta aquí tu repositorio de GitHub cuando esté público.'); })
+    b.addEventListener('click', (e) => {
+      e.preventDefault();
+      track('github', 'Click GitHub');
+      notify('🔗 Conecta aquí tu repositorio de GitHub cuando esté público.');
+    })
   );
   // Donaciones (placeholder: reemplaza href="#" por tu URL real y quita data-donate)
   const donateMsg = {
@@ -178,8 +216,14 @@
   $$('[data-donate]').forEach((b) =>
     b.addEventListener('click', (e) => {
       e.preventDefault();
+      track('donate/' + b.dataset.donate, 'Click donar: ' + b.dataset.donate);
       notify(donateMsg[b.dataset.donate] || '💜 ¡Gracias por querer apoyar ScreenPencil!');
     })
+  );
+
+  // Intención de descarga: cualquier CTA que lleve a la sección de precio.
+  $$('a[href="#download"]').forEach((a) =>
+    a.addEventListener('click', () => track('cta/download-intent', 'CTA: ir a descargar'))
   );
 
   /* ============================================================
@@ -244,7 +288,7 @@
         t.setAttribute('aria-selected', String(on));
       });
     };
-    scTabs.forEach((t) => t.addEventListener('click', () => scSelect(t.dataset.sc)));
+    scTabs.forEach((t) => t.addEventListener('click', () => { scSelect(t.dataset.sc); track('showcase/' + t.dataset.sc, 'Showcase: ' + t.dataset.sc); }));
 
     // Clic en la imagen → ampliar (lightbox propio del showcase)
     const slb = document.createElement('div');
@@ -389,6 +433,7 @@
       if (firstStroke) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         firstStroke = false;
+        track('demo/used', 'Demo: primer trazo');
       }
     }, { once: false });
 

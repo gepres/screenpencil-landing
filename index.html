@@ -615,5 +615,18 @@
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js"
           data-cf-beacon='{"token": "957ed46bcd0745e5949a38d146448e08"}'></script>
   <!-- ===== Fin analítica ===== -->
+
+  <!-- ===== Eventos y flujo · GoatCounter (sin cookies, open source) =====
+       Mide pageviews + eventos: clics de descarga/GitHub/donación, cambio de idioma,
+       uso de la demo, showcase y profundidad de scroll. La instrumentación vive en
+       main.js (función track()); aquí solo se carga el contador.
+       CÓMO ACTIVARLO (1 min):
+         1. Crea una cuenta gratis en https://www.goatcounter.com y elige un código
+            (p. ej. "screenpencil"); tu panel quedará en https://screenpencil.goatcounter.com
+         2. Reemplaza TU_CODIGO abajo por ese código. Commit + push y listo.
+       Mientras sea el placeholder, no se registra nada (no rompe el sitio). -->
+  <script data-goatcounter="https://TU_CODIGO.goatcounter.com/count"
+          async src="//gc.zgo.at/count.js"></script>
+  <!-- ===== Fin eventos ===== -->
 </body>
 </html>
