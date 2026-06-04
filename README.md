@@ -67,11 +67,10 @@ screenpencil-landing/
 │   └── img/
 │       ├── favicon.svg
 │       ├── logo-white.png            # Logo blanco que usa la web (fondo oscuro)
-│       ├── logo.png                  # Logo a color (variante / Open Graph)
-│       ├── logo-original.png         # Original 1024px (apple-touch-icon / OG)
-│       ├── screenpincel-logo-blanco.png  # Original blanco 1024px (fuente)
-│       ├── hero-shot.png             # Captura del hero + showcase "anotar"
-│       └── fn-*.png                  # Capturas del showcase (figuras, texto, spotlight, lupa, pizarra)
+│       ├── logo.png                  # Logo a color (apple-touch-icon / variante)
+│       ├── logo-original.png         # Original 1024px (solo Open Graph)
+│       ├── hero-shot.webp            # Captura del hero + showcase "anotar"
+│       └── fn-*.webp                 # Capturas del showcase (figuras, texto, spotlight, lupa, pizarra)
 └── docs/                   # Documentación del proyecto (ver docs/00-INDEX.md)
 ```
 

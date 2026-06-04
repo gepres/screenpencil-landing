@@ -15,12 +15,15 @@
   <meta property="og:image" content="assets/img/logo-original.png" />
 
   <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg" />
-  <link rel="apple-touch-icon" href="assets/img/logo-original.png" />
+  <link rel="apple-touch-icon" href="assets/img/logo.png" />
 
   <!-- Tipografías -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <!-- Fuentes cargadas de forma asíncrona (no bloquean el primer render) -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" media="print" onload="this.media='all'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" /></noscript>
 
   <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
@@ -115,9 +118,9 @@
             <span class="window__title" data-en="lumina.app — Live panel">lumina.app — Panel en vivo</span>
           </div>
           <div class="window__body window__body--shot">
-            <img class="window__shot" src="assets/img/hero-shot.png"
+            <img class="window__shot" src="assets/img/hero-shot.webp"
                  alt="ScreenPencil anotando un panel web en vivo: resaltado sobre el titular, un círculo alrededor de un KPI y una flecha señalando el gráfico, con la barra de herramientas a la vista"
-                 width="1600" height="1000" decoding="async" />
+                 width="1600" height="1000" decoding="async" fetchpriority="high" />
           </div>
         </div>
         <div class="float-card float-card--1">🎯 Spotlight</div>
@@ -273,8 +276,8 @@
             <span class="window__title" id="scTitle">lumina.app</span>
           </div>
           <div class="window__body window__body--shot">
-            <img class="window__shot" id="scImg" src="assets/img/hero-shot.png"
-                 alt="ScreenPencil: resaltado, círculo y flecha sobre un panel web" width="1600" height="1000" decoding="async" />
+            <img class="window__shot" id="scImg" src="assets/img/hero-shot.webp"
+                 alt="ScreenPencil: resaltado, círculo y flecha sobre un panel web" width="1600" height="1000" decoding="async" loading="lazy" />
           </div>
         </div>
         <figcaption class="showcase__hint" data-en="↑ Tap a feature on the left · click the image to enlarge">↑ Pulsa una función a la izquierda · clic en la imagen para ampliar</figcaption>

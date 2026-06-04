@@ -270,12 +270,12 @@
   const scTitle = $('#scTitle');
   if (scTabs.length && scImg) {
     const SC = {
-      anotar:    { img: 'assets/img/hero-shot.png',    title: 'Anotar sobre cualquier app',     alt: 'ScreenPencil: resaltado, círculo y flecha sobre un panel web' },
-      figuras:   { img: 'assets/img/fn-figuras.png',   title: 'Figuras y flechas',              alt: 'ScreenPencil: rectángulo, elipse y flecha sobre un panel' },
-      texto:     { img: 'assets/img/fn-texto.png',     title: 'Texto y badges numerados',       alt: 'ScreenPencil: texto y badges numerados sobre un panel' },
-      spotlight: { img: 'assets/img/fn-spotlight.png', title: 'Spotlight — enfoca la atención', alt: 'ScreenPencil: spotlight oscureciendo todo menos un KPI' },
-      lupa:      { img: 'assets/img/fn-lupa.png',      title: 'Lupa con zoom',                  alt: 'ScreenPencil: lente de aumento sobre un detalle' },
-      pizarra:   { img: 'assets/img/fn-pizarra.png',   title: 'Pizarra en blanco',              alt: 'ScreenPencil: lienzo blanco con un boceto' }
+      anotar:    { img: 'assets/img/hero-shot.webp',    title: 'Anotar sobre cualquier app',     alt: 'ScreenPencil: resaltado, círculo y flecha sobre un panel web' },
+      figuras:   { img: 'assets/img/fn-figuras.webp',   title: 'Figuras y flechas',              alt: 'ScreenPencil: rectángulo, elipse y flecha sobre un panel' },
+      texto:     { img: 'assets/img/fn-texto.webp',     title: 'Texto y badges numerados',       alt: 'ScreenPencil: texto y badges numerados sobre un panel' },
+      spotlight: { img: 'assets/img/fn-spotlight.webp', title: 'Spotlight — enfoca la atención', alt: 'ScreenPencil: spotlight oscureciendo todo menos un KPI' },
+      lupa:      { img: 'assets/img/fn-lupa.webp',      title: 'Lupa con zoom',                  alt: 'ScreenPencil: lente de aumento sobre un detalle' },
+      pizarra:   { img: 'assets/img/fn-pizarra.webp',   title: 'Pizarra en blanco',              alt: 'ScreenPencil: lienzo blanco con un boceto' }
     };
     const scSelect = (key) => {
       const d = SC[key];

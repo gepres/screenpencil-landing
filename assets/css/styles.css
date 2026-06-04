@@ -309,8 +309,8 @@ ul, ol { list-style: none; }
 
 .float-card {
   position: absolute; padding: 0.6rem 1rem; border-radius: var(--r-sm);
-  background: rgba(15,20,36,0.85); border: 1px solid var(--border-strong);
-  backdrop-filter: blur(12px); font-size: 0.85rem; font-weight: 600;
+  background: rgba(15,20,36,0.94); border: 1px solid var(--border-strong);
+  font-size: 0.85rem; font-weight: 600;
   box-shadow: var(--shadow); animation: floaty 5s ease-in-out infinite;
 }
 .float-card--1 { top: 4%; right: -8%; animation-delay: 0.4s; }
