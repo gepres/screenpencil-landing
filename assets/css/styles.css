@@ -173,6 +173,18 @@ ul, ol { list-style: none; }
 .badge { font-size: 0.72rem; font-weight: 600; padding: 0.3rem 0.7rem; border-radius: 100px; letter-spacing: 0.02em; }
 .badge--free { background: rgba(34, 211, 238, 0.12); color: var(--cyan); border: 1px solid rgba(34,211,238,0.3); }
 
+/* Insignia de última versión (sección de precio) */
+.release-badge {
+  display: inline-flex; align-items: center; gap: 0.55rem;
+  margin-bottom: 1.2rem; padding: 0.42rem 0.95rem;
+  font-size: 0.84rem; font-weight: 600; color: var(--cyan);
+  background: rgba(34, 211, 238, 0.10); border: 1px solid rgba(34, 211, 238, 0.3);
+  border-radius: 100px; transition: 0.25s var(--ease);
+}
+.release-badge:hover { background: rgba(34, 211, 238, 0.18); border-color: var(--cyan); transform: translateY(-2px); }
+.release-badge strong { color: var(--text); font-weight: 700; }
+.release-badge__dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 8px #22c55e; flex-shrink: 0; }
+
 /* ---------- Botones ---------- */
 .btn {
   display: inline-flex; align-items: center; gap: 0.55rem;
@@ -638,6 +650,9 @@ kbd {
   .nav__links a { padding: 0.95rem 0; border-bottom: 1px solid var(--border); }
   .nav__links a:last-child { border-bottom: 0; }
   .nav__burger { display: flex; }
+  /* Reparte: marca a la izquierda, controles (idioma + descargar + menú) a la derecha */
+  .nav { justify-content: space-between; }
+  .nav__actions { margin-left: auto; }
   /* En el menú colapsado, "Donar" vive como enlace (Apóyanos); dejamos visible solo Descargar */
   .nav__actions .btn--donate { display: none; }
 }

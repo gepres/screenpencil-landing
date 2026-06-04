@@ -177,6 +177,24 @@
     });
   }
 
+  /* ---------- Última versión publicada (GitHub Releases) ----------
+     Rellena la insignia con el último tag y, de paso, apunta el botón de
+     descarga al .exe de esa versión (así no hay que tocar el HTML en cada release).
+     Si la API falla (rate limit / offline), queda el valor estático del HTML. */
+  const relTag = $('#releaseTag');
+  if (relTag && 'fetch' in window) {
+    fetch('https://api.github.com/repos/gepres/screenpencil-app/releases/latest', { headers: { Accept: 'application/vnd.github+json' } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((rel) => {
+        if (!rel || !rel.tag_name) return;
+        relTag.textContent = rel.tag_name;
+        const exe = (rel.assets || []).find((a) => /\.exe$/i.test(a.name));
+        const dl = $('[data-download="windows"]');
+        if (exe && dl) dl.setAttribute('href', exe.browser_download_url);
+      })
+      .catch(() => {});
+  }
+
   /* ---------- Aviso para botones de descarga / GitHub (placeholder) ---------- */
   const notify = (msg) => {
     const t = document.createElement('div');
