@@ -1,0 +1,58 @@
+/* ============================================================
+   Dashboard /admin — consume el backend (GET /analytics/summary)
+   Reutiliza los tokens de styles.css (paleta, .bg, .grad-text…)
+   ============================================================ */
+.dash { max-width: 1100px; margin: 0 auto; padding: clamp(4rem, 8vw, 5.5rem) clamp(1rem, 4vw, 2.5rem) 4rem; }
+.dash__top { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.6rem; }
+.dash__top h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(1.6rem, 3.5vw, 2.3rem); margin: 0.3rem 0 0; }
+.dash__controls { display: flex; gap: 0.6rem; align-items: center; }
+
+select, .icon-btn { background: var(--surface); border: 1px solid var(--border-strong); color: var(--text); border-radius: 10px; padding: 0.5rem 0.8rem; font: inherit; cursor: pointer; transition: 0.2s; }
+select:hover, .icon-btn:hover { border-color: var(--blue-bright); background: var(--surface-2); }
+.icon-btn { font-size: 1.05rem; line-height: 1; }
+
+.cfg { display: grid; gap: 0.8rem; max-width: 540px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-md); padding: 1.3rem; margin-bottom: 1.4rem; }
+.cfg label { display: grid; gap: 0.3rem; font-size: 0.85rem; color: var(--text-muted); }
+.cfg input { background: #0b1020; border: 1px solid var(--border-strong); border-radius: 8px; padding: 0.6rem 0.7rem; color: var(--text); font: inherit; }
+.cfg input:focus { outline: none; border-color: var(--blue-bright); }
+.cfg__note { font-size: 0.78rem; color: var(--text-dim); margin: 0; }
+
+.status { padding: 0.8rem 1rem; border-radius: 10px; font-size: 0.9rem; margin-bottom: 1.2rem; border: 1px solid var(--border); background: var(--surface); color: var(--text-muted); }
+.status--err { border-color: #ef4444; color: #fca5a5; background: rgba(239, 68, 68, 0.08); }
+.status--warn { border-color: var(--amber); color: #f6c98a; background: rgba(224, 160, 96, 0.08); }
+
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.4rem; }
+.kpi { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-md); padding: 1.1rem 1.2rem; display: flex; flex-direction: column; gap: 0.2rem; }
+.kpi__k { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--cyan); }
+.kpi__v { font-family: 'Space Grotesk', sans-serif; font-size: 1.9rem; font-weight: 700; }
+.kpi__s { font-size: 0.76rem; color: var(--text-dim); }
+.kpi--meta .kpi__k { color: var(--text-muted); }
+
+.badge { font-size: 0.64rem; padding: 0.12rem 0.5rem; border-radius: 100px; margin-left: 0.4rem; font-weight: 700; }
+.badge--ok { background: rgba(43, 213, 118, 0.15); color: #6ee7a8; }
+.badge--warn { background: rgba(224, 160, 96, 0.15); color: #f6c98a; }
+
+.panels { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.4rem; }
+.panel > h2 { font-family: 'Space Grotesk', sans-serif; font-size: 1.15rem; margin: 0 0 1rem; display: flex; align-items: center; gap: 0.5rem; }
+.panel h3 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); margin: 1.1rem 0 0.5rem; }
+.panel__totals { display: flex; gap: 1.6rem; }
+.panel__totals strong { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; display: block; }
+.panel__totals span { font-size: 0.74rem; color: var(--text-dim); }
+
+.barlist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.35rem; }
+.barlist li { display: grid; grid-template-columns: 1fr 90px auto; align-items: center; gap: 0.6rem; font-size: 0.82rem; }
+.barlist__lab { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-muted); }
+.barlist__bar { background: rgba(255, 255, 255, 0.06); border-radius: 100px; height: 7px; overflow: hidden; }
+.barlist__bar span { display: block; height: 100%; background: var(--grad-soft); border-radius: 100px; }
+.barlist__val { font-variant-numeric: tabular-nums; color: var(--text); font-weight: 600; }
+.muted { color: var(--text-dim); font-size: 0.85rem; }
+
+.dash__foot { margin-top: 2.2rem; padding-top: 1.2rem; border-top: 1px solid var(--border); display: flex; gap: 1.2rem; flex-wrap: wrap; font-size: 0.85rem; }
+.dash__foot a { color: var(--text-muted); }
+.dash__foot a:hover { color: var(--cyan); }
+
+@media (max-width: 760px) {
+  .kpis { grid-template-columns: 1fr 1fr; }
+  .panels { grid-template-columns: 1fr; }
+}
