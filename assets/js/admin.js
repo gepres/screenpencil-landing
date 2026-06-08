@@ -9,7 +9,8 @@
 
   const LS = { base: 'sp-admin-api-base', key: 'sp-admin-api-key', period: 'sp-admin-period' };
   const getCfg = () => ({
-    base: localStorage.getItem(LS.base) || 'http://localhost:3333',
+    // Por defecto apunta al backend en producción; para desarrollo local cámbialo en ⚙ a http://localhost:3333
+    base: localStorage.getItem(LS.base) || 'https://screenpencil-backend.onrender.com',
     key: localStorage.getItem(LS.key) || '',
   });
 
