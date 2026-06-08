@@ -22,7 +22,9 @@ Sitio web de presentación de **ScreenPencil**, la app gratuita para **dibujar y
 - **Demo interactiva**: una mini-pizarra real en `<canvas>` (lápiz, marcador, borrador, colores, grosor).
 - **Tabla de atajos** de teclado, **sección multiplataforma**, **bloque de precio** ($0, sin paywall), **donaciones** y **FAQ** acordeón.
 - **Roadmap** ("próximamente") con lo que viene.
-- **Analítica privacy-first** (Cloudflare Web Analytics, sin cookies) y **deploy automático** a GitHub Pages (Actions).
+- **Fullpage scroll** (escritorio): cada sección ocupa la pantalla con snap + puntos de navegación (CSS Scroll Snap, sin librerías). Ver [docs/03](docs/03-design-system.md).
+- **Panel `/admin`**: dashboard de analítica que consume el backend NestJS (GoatCounter + Cloudflare). Ver [docs/06](docs/06-admin-dashboard.md).
+- **Analítica privacy-first** (Cloudflare Web Analytics + GoatCounter, sin cookies) y **deploy automático** a GitHub Pages (Actions).
 - **100% responsive** y con soporte de `prefers-reduced-motion` (accesibilidad).
 
 ---
@@ -61,9 +63,14 @@ screenpencil-landing/
 ├── .gitattributes          # normaliza finales de línea (LF)
 ├── .github/workflows/
 │   └── deploy.yml          # publica en GitHub Pages vía Actions (en cada push a main)
+├── admin.html              # Panel admin de analítica (consume el backend NestJS)
 ├── assets/
 │   ├── css/styles.css      # Estilos + animaciones (tokens de diseño en :root)
+│   ├── css/fullpage.css    # Fullpage scroll (CSS Scroll Snap)
+│   ├── css/admin.css       # Estilos del panel /admin
 │   ├── js/main.js          # Interacciones, i18n ES/EN, reveal, contadores, showcase, demo
+│   ├── js/fullpage.js      # Puntos de navegación + sección activa del fullpage
+│   ├── js/admin.js         # Dashboard /admin (fetch al backend + gráficas)
 │   └── img/
 │       ├── favicon.svg
 │       ├── logo-white.png            # Logo blanco que usa la web (fondo oscuro)

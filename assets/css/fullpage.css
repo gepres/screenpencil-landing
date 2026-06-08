@@ -1,0 +1,100 @@
+/* ============================================================
+   Fullpage scroll (CSS Scroll Snap) — sin librerías ni licencias.
+   Cada sección ocupa la pantalla y el scroll "salta" entre ellas.
+   Solo en escritorio (≥900px) y si el usuario no pidió menos movimiento.
+   Para REVERTIR: quita en index.html el <link> de este archivo y el <script> de fullpage.js.
+   ============================================================ */
+@media (min-width: 900px) and (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-snap-type: y mandatory;
+    scroll-padding-top: 0;
+  }
+
+  /* Paneles: una pantalla cada uno, contenido centrado verticalmente. */
+  #hero,
+  #features,
+  #showcase,
+  #flow,
+  #demo,
+  #hotkeys,
+  #platforms,
+  #download,
+  #donate,
+  #faq,
+  #roadmap,
+  .finalcta {
+    min-height: 100vh;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* El padding original de .section es enorme; lo reducimos para que quepan mejor. */
+  #features,
+  #showcase,
+  #flow,
+  #demo,
+  #hotkeys,
+  #platforms,
+  #download,
+  #donate,
+  #faq,
+  #roadmap {
+    padding-block: clamp(4.5rem, 8vh, 6rem);
+  }
+
+  /* La barra de marca (trust) NO es panel: queda como interludio fino entre hero y funciones. */
+
+  /* ---- Navegación por puntos (derecha) ---- */
+  .fp-dots {
+    position: fixed;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 55;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .fp-dots button {
+    position: relative;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    padding: 0;
+    cursor: pointer;
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    transition: transform 0.25s var(--ease), background 0.25s, border-color 0.25s;
+  }
+  .fp-dots button:hover {
+    border-color: var(--blue-bright);
+  }
+  .fp-dots button.is-active {
+    background: var(--grad);
+    border-color: transparent;
+    transform: scale(1.35);
+  }
+  /* Etiqueta al pasar el cursor */
+  .fp-dots button::after {
+    content: attr(data-label);
+    position: absolute;
+    right: 22px;
+    top: 50%;
+    transform: translateY(-50%);
+    white-space: nowrap;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    background: rgba(15, 20, 36, 0.92);
+    border: 1px solid var(--border);
+    padding: 0.2rem 0.55rem;
+    border-radius: 7px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .fp-dots button:hover::after {
+    opacity: 1;
+  }
+}

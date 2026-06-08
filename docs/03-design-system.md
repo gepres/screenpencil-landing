@@ -74,3 +74,19 @@ botones primarios y números del flujo.
 - `≤ 980px`: hero a una columna, features a 2 columnas, footer apilado.
 - `≤ 760px`: menú hamburguesa, flujo/atajos/plataformas a 1 columna.
 - `≤ 480px`: features a 1 columna, se ocultan las float-cards del hero.
+
+## Fullpage scroll (CSS Scroll Snap)
+
+Cada sección ocupa la pantalla y el scroll "salta" entre ellas (efecto tipo *fullPage.js*, pero
+**nativo y sin librerías** — `fullPage.js` requiere licencia de pago).
+
+- **Archivos:** `assets/css/fullpage.css` + `assets/js/fullpage.js` (enlazados en `index.html`).
+- **Técnica:** `html { scroll-snap-type: y mandatory }` + paneles con `min-height:100vh`,
+  `scroll-snap-align:start` y contenido centrado (`flex`/`justify-center`).
+- **Paneles** (por `id`): `#hero, #features, #showcase, #flow, #demo, #hotkeys, #platforms, #download,
+  #donate, #faq, #roadmap` y `.finalcta`. La barra de marca (`#trust`) queda como interludio fino.
+- **JS:** puntos de navegación a la derecha (etiqueta al hover), resaltado de sección activa
+  (`IntersectionObserver`) y `PageDown`/`PageUp` para saltar de panel.
+- **Solo escritorio** (`≥ 900px`) y si no hay `prefers-reduced-motion`; en móvil queda scroll normal.
+- **Reversible:** quita los 2 enlaces (`fullpage.css` y `fullpage.js`) en `index.html`.
+- **Pendiente:** validar secciones largas (no caben en 100vh en pantallas bajas). Ver [NEXT-STEPS](NEXT-STEPS.md).

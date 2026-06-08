@@ -9,9 +9,11 @@ el porqué, el qué y el cómo del sitio. Mantén estos documentos **concisos y 
 |-----|----------|
 | [01 — Visión y alcance](01-overview.md) | Qué es ScreenPencil, a quién sirve la landing y sus objetivos. |
 | [02 — Estructura de contenido](02-content-structure.md) | Cada sección de la página, su mensaje y su orden. |
-| [03 — Sistema de diseño](03-design-system.md) | Paleta, tipografías, espaciado, componentes y animaciones. |
+| [03 — Sistema de diseño](03-design-system.md) | Paleta, tipografías, espaciado, componentes y animaciones (incl. fullpage scroll). |
 | [04 — Desarrollo](04-development.md) | Cómo correr, editar y extender el código (vanilla, sin build). |
 | [05 — Despliegue](05-deployment.md) | Publicar en GitHub Pages, Netlify, Vercel, etc. |
+| [06 — Panel admin (analytics)](06-admin-dashboard.md) | El `/admin` que consume el backend NestJS (GoatCounter + Cloudflare). |
+| [NEXT-STEPS](NEXT-STEPS.md) | **Mejoras pendientes** y notas para la próxima sesión. |
 
 ## Principios
 
@@ -20,6 +22,7 @@ el porqué, el qué y el cómo del sitio. Mantén estos documentos **concisos y 
 3. **Fiel al producto.** Las funciones y atajos mostrados reflejan la app real (ver repo `screenbrush-windown`).
 4. **Mensaje central.** *Gratis, sin trucos, para todos* — Windows, macOS y Linux.
 5. **Bilingüe ES/EN.** Español por defecto (público LATAM / España) + inglés vía `data-en`, con conmutador en el nav que autodetecta y recuerda el idioma.
+6. **Fullpage scroll** (escritorio): cada sección ocupa la pantalla y el scroll "salta" (CSS Scroll Snap, sin librerías). Ver [03](03-design-system.md) y [04](04-development.md).
 
 ## Glosario rápido
 

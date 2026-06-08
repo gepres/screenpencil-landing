@@ -105,6 +105,18 @@ Para activarlos:
 
 El botón **"Donar"** del nav y el enlace del footer apuntan al ancla `#donate`.
 
+### Activar / revertir el fullpage scroll
+El efecto vive en `assets/css/fullpage.css` + `assets/js/fullpage.js`, enlazados en `index.html`.
+- **Revertir:** elimina (o comenta) esas 2 líneas en `index.html` → vuelve a scroll normal.
+- **Ajustar paneles:** edita el selector de `id` en **ambos** archivos para que coincidan.
+- **Snap más suave:** en `fullpage.css`, `scroll-snap-type: y mandatory` → `… proximity`.
+- **Etiquetas de los puntos:** objeto `LABELS` en `fullpage.js`.
+- Solo en `≥ 900px` y sin `prefers-reduced-motion`. Ver [03 — Sistema de diseño](03-design-system.md).
+
+### Configurar el panel `/admin`
+`admin.html` consume el backend NestJS; la URL del backend y la API key se ponen en el ⚙ (se guardan
+en `localStorage`). Por defecto apunta a producción (Render). Ver [06 — Panel admin](06-admin-dashboard.md).
+
 ### Tocar la demo de canvas
 La lógica está en `main.js`, bloque *"DEMO DE DIBUJO EN CANVAS"*. Herramientas (`pen`/`marker`/`eraser`),
 colores (`.swatch[data-color]`), grosor (`#demoSize`) y limpiar (`#demoClear`). El lienzo se reescala
