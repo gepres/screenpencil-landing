@@ -11,8 +11,8 @@ producto y soporte remoto.
 - **Plataformas:** **Windows 10/11** disponible; **macOS** y **Linux** en desarrollo.
 - **Filosofía:** software libre y accesible para quien enseña, presenta o crea.
 
-> El nombre público es **ScreenPencil**. El codename interno del código de la app es `ScreenBrush`
-> (no confundir con la app de macOS homónima que inspiró la paridad de funciones).
+> El nombre del producto es **ScreenPencil** (no confundir con la app de macOS *ScreenBrush*,
+> de la que se tomó inspiración para la paridad de funciones).
 
 ## Qué es esta landing
 

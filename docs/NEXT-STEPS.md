@@ -39,4 +39,4 @@ cada sesión. Última actualización: **2026-06-08**.
 ## Repos
 - Landing: `github.com/gepres/screenpencil-landing` → `https://gepres.github.io/screenpencil-landing/`
 - Backend: `github.com/gepres/screenpencil-backend` → `https://screenpencil-backend.onrender.com`
-- App: `github.com/gepres/screenpencil-app` (codename interno `ScreenBrush`)
+- App: `github.com/gepres/screenpencil-app`

@@ -193,7 +193,7 @@ Toda la documentación del proyecto está en [`docs/`](docs/00-INDEX.md):
 - **📦 Repo de esta landing:** <https://github.com/gepres/screenpencil-landing>
 - **🖥️ Repo de la app de escritorio:** <https://github.com/gepres/screenpencil-app>
 
-La app de escritorio (codename interno `ScreenBrush`, nombre público **ScreenPencil**) vive en su
+La app de escritorio (**ScreenPencil**) vive en su
 **propio repositorio**; esta landing es solo el sitio de marketing.
 
 ## 📝 Licencia
