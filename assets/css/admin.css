@@ -48,6 +48,16 @@ select:hover, .icon-btn:hover { border-color: var(--blue-bright); background: va
 .barlist__val { font-variant-numeric: tabular-nums; color: var(--text); font-weight: 600; }
 .muted { color: var(--text-dim); font-size: 0.85rem; }
 
+/* Secciones anchas (gráfico, eventos) bajo los dos paneles */
+.panel--wide { margin-top: 1.2rem; }
+.chart { width: 100%; }
+.chart svg { width: 100%; height: auto; display: block; }
+.chart__empty { color: var(--text-dim); font-size: 0.85rem; padding: 1rem 0; }
+.chart__legend { display: flex; gap: 1.2rem; margin-top: 0.6rem; font-size: 0.8rem; color: var(--text-muted); }
+.chart__legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
+.chart__legend i { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+.chart__dot { font-size: 0.72rem; }
+
 .dash__foot { margin-top: 2.2rem; padding-top: 1.2rem; border-top: 1px solid var(--border); display: flex; gap: 1.2rem; flex-wrap: wrap; font-size: 0.85rem; }
 .dash__foot a { color: var(--text-muted); }
 .dash__foot a:hover { color: var(--cyan); }

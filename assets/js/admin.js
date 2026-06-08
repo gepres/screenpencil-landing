@@ -99,7 +99,64 @@
     $('#panel-cf .panel__body').innerHTML = providerPanel(d.cloudflare);
   }
 
+  // Gráfico de líneas SVG (sin dependencias) para la serie diaria.
+  function renderChart(ts) {
+    const el = $('#chart');
+    const legend = $('#chartLegend');
+    const series = [
+      { name: 'GoatCounter', color: '#22d3ee', data: (ts && ts.goatcounter) || [] },
+      { name: 'Cloudflare', color: '#3b82f6', data: (ts && ts.cloudflare) || [] },
+    ].filter((s) => s.data.length);
+
+    const dateSet = new Set();
+    series.forEach((s) => s.data.forEach((p) => dateSet.add(p.date)));
+    const dates = [...dateSet].sort();
+    if (!dates.length) {
+      el.innerHTML = '<p class="chart__empty">Sin datos de serie en este periodo.</p>';
+      legend.innerHTML = '';
+      return;
+    }
+    const maxY = Math.max(1, ...series.flatMap((s) => s.data.map((p) => p.views || 0)));
+    const W = 600, H = 200, padL = 6, padT = 10, padB = 18;
+    const x = (i) => (dates.length === 1 ? W / 2 : padL + (i * (W - padL * 2)) / (dates.length - 1));
+    const y = (v) => padT + (H - padT - padB) * (1 - v / maxY);
+    const poly = (s) => {
+      const m = new Map(s.data.map((p) => [p.date, p.views || 0]));
+      return dates.map((d, i) => `${x(i).toFixed(1)},${y(m.get(d) || 0).toFixed(1)}`).join(' ');
+    };
+    const lines = series
+      .map((s) => `<polyline fill="none" stroke="${s.color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" points="${poly(s)}"/>`)
+      .join('');
+    const labels = `<text x="${x(0)}" y="${H - 3}" fill="#5e6a86" font-size="11">${esc(dates[0])}</text>` +
+      `<text x="${x(dates.length - 1)}" y="${H - 3}" fill="#5e6a86" font-size="11" text-anchor="end">${esc(dates[dates.length - 1])}</text>`;
+    el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Tendencia diaria de páginas vistas">${lines}${labels}</svg>`;
+    legend.innerHTML = series
+      .map((s) => `<span><i style="background:${s.color}"></i>${s.name}</span>`)
+      .join('') + `<span class="chart__dot">máx/día: ${num(maxY)}</span>`;
+  }
+
+  function renderEvents(ev) {
+    const el = $('#eventsBody');
+    if (!ev || !ev.events || !ev.events.length) {
+      el.innerHTML = '<p class="muted">Sin eventos en este periodo.</p>';
+      return;
+    }
+    el.innerHTML = barlist(ev.events.map((e) => ({ label: e.name, views: e.count })));
+  }
+
   // --- Carga desde el backend ---
+  async function fetchJson(path, period, base, key) {
+    const url = `${base.replace(/\/+$/, '')}${path}?period=${encodeURIComponent(period)}`;
+    const res = await fetch(url, { headers: { 'x-api-key': key } });
+    if (res.status === 401) {
+      const err = new Error('401');
+      err.code = 401;
+      throw err;
+    }
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return res.json();
+  }
+
   async function load() {
     const { base, key } = getCfg();
     if (!key || !base) {
@@ -111,23 +168,26 @@
     setStatus('Cargando…');
     dashEl.hidden = true;
     try {
-      const url = `${base.replace(/\/+$/, '')}/analytics/summary?period=${encodeURIComponent(period)}`;
-      const res = await fetch(url, { headers: { 'x-api-key': key } });
-      if (res.status === 401) {
+      // Resumen primero (si falla, error global). Serie y eventos no bloquean.
+      const summary = await fetchJson('/analytics/summary', period, base, key);
+      render(summary);
+      dashEl.hidden = false;
+      const [ts, ev] = await Promise.allSettled([
+        fetchJson('/analytics/timeseries', period, base, key),
+        fetchJson('/analytics/events', period, base, key),
+      ]);
+      renderChart(ts.status === 'fulfilled' ? ts.value : null);
+      renderEvents(ev.status === 'fulfilled' ? ev.value : null);
+    } catch (e) {
+      if (e.code === 401) {
         setStatus('API key inválida (401). Revísala en ⚙.', 'err');
         showConfig(true);
-        return;
+      } else {
+        setStatus(
+          `No se pudo conectar a ${base}. ¿El backend está corriendo y permite CORS desde este origen? (${e.message})`,
+          'err',
+        );
       }
-      if (!res.ok) {
-        setStatus('El backend respondió con error HTTP ' + res.status + '.', 'err');
-        return;
-      }
-      render(await res.json());
-    } catch (e) {
-      setStatus(
-        `No se pudo conectar a ${base}. ¿El backend está corriendo y permite CORS desde este origen? (${e.message})`,
-        'err',
-      );
     }
   }
 
