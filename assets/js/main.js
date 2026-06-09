@@ -183,7 +183,7 @@
      Si la API falla (rate limit / offline), queda el valor estático del HTML. */
   const relTag = $('#releaseTag');
   if (relTag && 'fetch' in window) {
-    fetch('https://api.github.com/repos/gepres/screenpencil-app/releases/latest', { headers: { Accept: 'application/vnd.github+json' } })
+    fetch('https://api.github.com/repos/gepres/screenpencil-releases/releases/latest', { headers: { Accept: 'application/vnd.github+json' } })
       .then((r) => (r.ok ? r.json() : null))
       .then((rel) => {
         if (!rel || !rel.tag_name) return;
