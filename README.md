@@ -184,6 +184,8 @@ Toda la documentación del proyecto está en [`docs/`](docs/00-INDEX.md):
 | [03 — Sistema de diseño](docs/03-design-system.md) | Colores, tipografías, animaciones |
 | [04 — Desarrollo](docs/04-development.md) | Cómo trabajar el código (incl. i18n) |
 | [05 — Despliegue](docs/05-deployment.md) | Publicar el sitio (git + hosting) |
+| [06 — Panel admin](docs/06-admin-dashboard.md) | Dashboard `/admin` de analítica (consume el backend NestJS) |
+| [NEXT-STEPS](docs/NEXT-STEPS.md) | Estado del ecosistema y pendientes (landing + backend + app) |
 
 ---
 

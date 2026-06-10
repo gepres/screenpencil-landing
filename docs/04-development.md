@@ -61,10 +61,12 @@ Busca en `index.html` los atributos:
    URL real (`href` distinto de `#`), **registra el evento** en analítica y **deja navegar/descargar**;
    solo muestra el aviso *placeholder* cuando el `href` sigue siendo `#`.
 
-> Estado actual: `main.js` consulta `releases/latest` por la API de GitHub y apunta el botón
-> "Descargar para Windows" al `.exe` de la última versión automáticamente; el `index.html` mantiene un
-> *fallback* estático (hoy `…/releases/download/v0.2.0/ScreenPencil-Setup-0.2.0.exe`) por si la API falla.
-> Al sacar una versión nueva, actualiza ese fallback (tag e instalador) en `index.html`.
+> Estado actual: `main.js` consulta `releases/latest` de la API de GitHub del **repo público de vitrina
+> `gepres/screenpencil-releases`** y apunta el botón "Descargar para Windows" al `.exe` de la última
+> versión automáticamente; el `index.html` mantiene un *fallback* estático (hoy
+> `…/screenpencil-releases/releases/download/v0.2.1/ScreenPencil-Setup-0.2.1.exe`) por si la API falla.
+> El badge de versión (`#releaseBadge`/`#releaseTag`) apunta al mismo repo. Al sacar una versión nueva,
+> actualiza ese *fallback* (tag e instalador) en `index.html`.
 
 ### Cambiar las capturas del showcase interactivo (`#showcase`)
 El showcase tiene pestañas (`.sc-tab[data-sc]`) que cambian una imagen (`#scImg`) y un lightbox al hacer clic.

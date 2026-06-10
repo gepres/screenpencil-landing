@@ -45,7 +45,8 @@ Idiomas: **español** (principal, LATAM y España) e **inglés** (conmutador en 
 ## Fuera de alcance (de la landing)
 
 - No es la app ni su documentación técnica (eso vive en `screenbrush-windown/docs/`).
-- No gestiona descargas reales todavía: los botones son *placeholders* hasta tener releases
-  (ver [04 — Desarrollo](04-development.md) para conectarlos).
+- **Descargas conectadas:** el botón de Windows apunta al **release real** (v0.2.1, repo público de
+  vitrina `gepres/screenpencil-releases`); macOS y Linux figuran como *Próximamente*. Las donaciones
+  también están conectadas (PayPal/Coffee/GitHub Sponsors). Detalle en [04 — Desarrollo](04-development.md).
 - Incluye **i18n ES/EN** ligero (atributos `data-en` + JS), pero **no** blog ni más idiomas
   (si se necesitan más idiomas o contenido dinámico, evaluar migrar a un generador estático).
