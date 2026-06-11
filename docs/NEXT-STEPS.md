@@ -82,10 +82,12 @@ cada sesión. Última actualización: **2026-06-11**.
 - [x] ~~Serie temporal por evento~~ → **hecho**: `/panel/action-series` (GoatCounter `daily=true`),
       small-multiples con sparkline por acción. ⚠️ Verificar la forma de `stats[]` (daily vs hourly).
 - [x] ~~Donuts de dispositivos~~ → **hecho** (navegador y SO con conic-gradient + leyenda).
-- [ ] **Rango de fechas personalizado** (date picker). Pendiente: requiere aceptar `start`/`end` en los
-      6 endpoints (refactor backward-compatible de `period` → rango/clave). Valor medio (los presets cubren casi todo).
-- [ ] **Mapa mundial** de países. **Bloqueado sin un asset de geometría** (geojson/topojson): no se puede
-      dibujar a mano. Plan: incluir un topojson simplificado en `public/` y proyectarlo a SVG. Hoy hay barras + banderas.
+- [x] ~~Rango de fechas personalizado (date picker)~~ → **hecho**: los 6 endpoints aceptan `start`/`end`
+      (refactor backward-compatible: helper `resolve()` → clave de caché + rango); UI con opción "Personalizado".
+- [x] ~~Mapa mundial de países~~ → **hecho**: GeoJSON (CDN johan/world.geo.json) + proyección equirectangular
+      en SVG, coloreado por visitas, con aliases de nombres y tooltip. Sin librerías.
+- [x] ~~Refactor del panel~~ → **hecho**: `admin.ts` (716 líneas) dividido en entry slim (190) +
+      `src/scripts/admin/{types,format,charts,render}.ts` para legibilidad. Vite lo bundlea en un chunk.
 
 ## Repos
 - Landing: `github.com/gepres/screenpencil-landing` → `https://gepres.github.io/screenpencil-landing/`

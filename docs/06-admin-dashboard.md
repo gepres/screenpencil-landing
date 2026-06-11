@@ -6,7 +6,9 @@ solo en el navegador.
 
 ## Cómo funciona
 - **Archivos:** `src/pages/admin.astro` (página aislada, Tailwind + `global.css`) + `src/scripts/admin.ts`
-  (dependency-free; charts en SVG hechos a mano). `noindex,nofollow`.
+  (entry: config, fetch, `load()`, listeners) + `src/scripts/admin/` → `types.ts` (formas API),
+  `format.ts` (helpers puros), `charts.ts` (primitivas SVG), `render.ts` (un `render<Sección>()` por bloque).
+  Dependency-free; Vite lo bundlea en un solo chunk. `noindex,nofollow`.
 - **Acceso:** por URL directa `…/screenpencil-landing/admin` (no está enlazado en el nav público).
 - **Config (⚙):** URL del backend + API key (`x-api-key`), guardadas en `localStorage`
   (claves `sp-admin-*`). Por defecto `https://screenpencil-backend.onrender.com`.
