@@ -201,12 +201,13 @@ export async function renderMap(s: Summary) {
   el.innerHTML = `<p class="text-sm text-ink-dim">Cargando mapa…</p>`;
   try {
     if (!worldGeo) {
-      const r = await fetch("https://cdn.jsdelivr.net/gh/johan/world.geo.json@master/countries.geo.json");
+      // Geometría servida desde el mismo origen (public/assets) — no depende de CDN ni de adblockers.
+      const r = await fetch(`${import.meta.env.BASE_URL}assets/world.geo.json`);
       if (!r.ok) throw new Error("geojson " + r.status);
       worldGeo = (await r.json()) as GeoJson;
     }
   } catch {
-    el.innerHTML = placeholder("No se pudo cargar la geometría del mapa (CDN). Las barras de países de arriba siguen disponibles.");
+    el.innerHTML = placeholder("No se pudo cargar la geometría del mapa. Las barras de países de arriba siguen disponibles.");
     return;
   }
 

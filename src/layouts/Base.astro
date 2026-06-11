@@ -115,5 +115,21 @@ const jsonLd = {
     <script>
       import "../scripts/main.ts";
     </script>
+
+    <!-- Analítica sin cookies. is:inline para que Astro NO procese estos scripts de terceros. -->
+    <!-- Cloudflare Web Analytics (tráfico, países, Web Vitals/RUM). -->
+    <script
+      is:inline
+      defer
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon='{"token": "957ed46bcd0745e5949a38d146448e08"}'
+    ></script>
+    <!-- GoatCounter (eventos: descargas, scroll, secciones, demo, idioma…). track() en main.ts. -->
+    <script
+      is:inline
+      data-goatcounter="https://screenpencil.goatcounter.com/count"
+      async
+      src="//gc.zgo.at/count.js"
+    ></script>
   </body>
 </html>
