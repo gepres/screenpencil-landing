@@ -26,6 +26,8 @@ interface DeviceRow { name: string; count: number }
 interface Devices { browsers: DeviceRow[]; systems: DeviceRow[]; sizes: DeviceRow[]; partial: boolean }
 interface VitalMetric { p50: number; p75: number }
 interface Vitals { fcp: VitalMetric | null; loadTime: VitalMetric | null; partial: boolean }
+interface EventSeries { name: string; total: number; series: { date: string; count: number }[] }
+interface ActionSeries { events: EventSeries[]; partial: boolean }
 
 // --- Helpers DOM/formato ---
 const $ = <T extends Element = HTMLElement>(s: string): T | null => document.querySelector<T>(s);
@@ -483,6 +485,33 @@ function renderVitals(v: Vitals | null) {
   </div><p class="mt-3 text-xs text-ink-dim">Umbrales: verde = bueno · ámbar = mejorable · rojo = lento. Datos reales de usuarios (RUM).</p>`;
 }
 
+// --- Acciones en el tiempo (serie diaria por evento) ---
+function renderActionSeries(d: ActionSeries | null) {
+  const el = $("[data-actionseries]");
+  if (!el) return;
+  const events = d?.events ?? [];
+  if (!events.length) {
+    el.innerHTML = `<div class="sm:col-span-2 lg:col-span-4">${placeholder("Requiere <code class='text-ink-soft'>/panel/action-series</code> (GoatCounter daily). Si está desplegado y vacío, aún no hay eventos con serie diaria en este periodo.")}</div>`;
+    return;
+  }
+  const colorFor = (n: string) =>
+    n.startsWith("download") ? "#22c55e" :
+    n.startsWith("donate") ? "#8b5cf6" :
+    n.startsWith("demo") || n.startsWith("showcase") ? "#22d3ee" :
+    n.startsWith("section") || n.startsWith("scroll") ? "#3b82f6" : "#e0a060";
+  el.innerHTML = events.map((e) => {
+    const vals = e.series.map((s) => s.count);
+    const short = e.name.length > 22 ? e.name.slice(0, 21) + "…" : e.name;
+    return `<div class="rounded-xl border border-white/8 bg-white/[0.02] p-3">
+      <div class="flex items-center justify-between gap-2">
+        <span class="truncate text-xs text-ink-soft" title="${esc(e.name)}">${esc(short)}</span>
+        <b class="tabular-nums text-sm text-ink">${num(e.total)}</b>
+      </div>
+      <div class="mt-1">${sparkline(vals, colorFor(e.name)) || `<div class="h-8"></div>`}</div>
+    </div>`;
+  }).join("");
+}
+
 // --- Export CSV ---
 function toCsv(rows: (string | number)[][]): string {
   return rows.map((r) => r.map((c) => {
@@ -530,16 +559,18 @@ async function load() {
     // tumban cualquier URL con "analytics"/"events" (ERR_BLOCKED_BY_CLIENT).
     const summary = await fetchJson<Summary>("/panel/summary", period);
     if (!summary) throw new Error("summary vacío");
-    const [tsR, evR, dvR, vtR] = await Promise.allSettled([
+    const [tsR, evR, dvR, vtR, asR] = await Promise.allSettled([
       fetchJson<Timeseries>("/panel/timeseries", period),
       fetchJson<Events>("/panel/actions", period),
       fetchJson<Devices>("/panel/devices", period),
       fetchJson<Vitals>("/panel/vitals", period),
+      fetchJson<ActionSeries>("/panel/action-series", period),
     ]);
     const ts = tsR.status === "fulfilled" ? tsR.value : null;
     const ev = evR.status === "fulfilled" ? evR.value : null;
     const dv = dvR.status === "fulfilled" ? dvR.value : null;
     const vt = vtR.status === "fulfilled" ? vtR.value : null;
+    const as = asR.status === "fulfilled" ? asR.value : null;
     last = { summary, events: ev, ts, devices: dv };
 
     setStatus("");
@@ -557,6 +588,7 @@ async function load() {
     safe(() => renderTimePatterns(ts));
     safe(() => renderReadDepth(ev));
     safe(() => renderVitals(vt));
+    safe(() => renderActionSeries(as));
 
     const upd = (() => { try { return new Date(summary.updatedAt).toLocaleString("es-PE"); } catch { return summary.updatedAt; } })();
     setStatus(`Periodo ${summary.period} · ${summary.range.start} → ${summary.range.end} · actualizado ${upd}${summary.partial ? " · ⚠️ datos parciales" : ""}`, summary.partial ? "warn" : "info");
