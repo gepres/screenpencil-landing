@@ -1,7 +1,7 @@
 # 02 — Estructura de contenido
 
-Orden de las secciones en `index.html`, su mensaje y de dónde sale el copy.
-Si una función de la app cambia, actualiza aquí y en la página.
+Orden de las secciones en `src/pages/index.astro` (un componente Astro por sección), su mensaje y de
+dónde sale el copy. Si una función de la app cambia, actualiza aquí y en el componente correspondiente.
 
 ## Orden de la página
 
@@ -62,6 +62,6 @@ reales (ver [04 — Desarrollo](04-development.md)).
 - Enfatiza **gratis / sin trucos / para todos**.
 - Evita jerga técnica en el hero; los detalles técnicos van en FAQ y atajos.
 
-> **Bilingüe ES/EN:** cada texto lleva su traducción al inglés en `data-en`. El inglés debe sonar igual
-> de natural y conciso (no traducción literal). Si añades o cambias copy, actualiza **ambos** idiomas.
+> **Bilingüe ES/EN:** cada texto se escribe en ambos idiomas con `<T es="…" en="…" />`. El inglés debe
+> sonar igual de natural y conciso (no traducción literal). Si añades o cambias copy, actualiza **ambos**.
 > Mecánica del conmutador: ver [04 — Desarrollo](04-development.md#cambiar-textos-bilingüe-esen).

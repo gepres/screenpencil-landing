@@ -48,5 +48,6 @@ Idiomas: **español** (principal, LATAM y España) e **inglés** (conmutador en 
 - **Descargas conectadas:** el botón de Windows apunta al **release real** (v0.2.1, repo público de
   vitrina `gepres/screenpencil-releases`); macOS y Linux figuran como *Próximamente*. Las donaciones
   también están conectadas (PayPal/Coffee/GitHub Sponsors). Detalle en [04 — Desarrollo](04-development.md).
-- Incluye **i18n ES/EN** ligero (atributos `data-en` + JS), pero **no** blog ni más idiomas
-  (si se necesitan más idiomas o contenido dinámico, evaluar migrar a un generador estático).
+- Incluye **i18n ES/EN** ligero (componente `<T es en />` + CSS), pero **no** blog ni más idiomas.
+  El sitio ya está sobre **Astro** (migrado desde vanilla), así que añadir más idiomas, MDX o
+  contenido dinámico es directo si hiciera falta.

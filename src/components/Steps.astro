@@ -1,0 +1,31 @@
+---
+import SectionHead from "./SectionHead.astro";
+import T from "./T.astro";
+
+const steps = [
+  { n: "1", es: "Vive en la bandeja", en: "Lives in the tray", dEs: "ScreenPencil arranca silencioso en la bandeja del sistema. Tu pantalla sigue 100% usable: clic, scroll, todo pasa a través.", dEn: "ScreenPencil starts silently in the system tray. Your screen stays 100% usable: click, scroll, everything passes through.", kbd: "" },
+  { n: "2", es: "Activa el modo dibujo", en: "Turn on drawing mode", dEs: "Pulsa el atajo global y un overlay transparente cubre toda la pantalla. Ahora todo lo que dibujes queda encima.", dEn: "Press the global shortcut and a transparent overlay covers the whole screen. Now everything you draw stays on top.", kbd: "Ctrl·Alt·D" },
+  { n: "3", es: "Anota y enfoca", en: "Annotate and focus", dEs: "Elige una herramienta de la barra flotante: lápiz, flecha, texto, spotlight, lupa… Resalta lo importante en vivo.", dEn: "Pick a tool from the floating bar: pen, arrow, text, spotlight, magnifier… Highlight what matters, live.", kbd: "P A T L" },
+  { n: "4", es: "Captura o limpia", en: "Capture or clear", dEs: "Guarda un PNG con tus anotaciones, cópialo al portapapeles, o limpia y vuelve al trabajo. Tus trazos se conservan hasta que decidas.", dEn: "Save a PNG with your annotations, copy it to the clipboard, or clear and get back to work. Your strokes stay until you decide.", kbd: "Ctrl·Alt·S" },
+];
+---
+<section id="flow" class="cv-auto mx-auto max-w-6xl px-5 py-24">
+  <SectionHead
+    eyebrowEs="Cómo funciona" eyebrowEn="How it works"
+    titleEs="De la idea al trazo en <span class='grad-text'>cuatro pasos</span>"
+    titleEn="From idea to ink in <span class='grad-text'>four steps</span>"
+    subEs="Vive en la bandeja del sistema. No interrumpe tu trabajo hasta que lo necesitas."
+    subEn="It lives in the system tray. It doesn't interrupt your work until you need it."
+  />
+
+  <ol class="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    {steps.map((s, i) => (
+      <li class="reveal rounded-2xl border border-white/8 bg-white/[0.02] p-6" style={`--reveal-delay:${i * 60}ms`}>
+        <span class="grid size-9 place-items-center rounded-full border border-amber/30 bg-amber/10 font-display font-bold text-amber">{s.n}</span>
+        <h3 class="mt-4 font-display text-base font-semibold"><T es={s.es} en={s.en} /></h3>
+        <p class="mt-2 text-sm leading-relaxed text-ink-soft"><T es={s.dEs} en={s.dEn} /></p>
+        {s.kbd && <kbd class="mt-3 inline-block rounded-md border border-white/10 bg-white/5 px-2 py-1 font-mono text-xs text-ink-soft">{s.kbd}</kbd>}
+      </li>
+    ))}
+  </ol>
+</section>

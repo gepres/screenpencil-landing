@@ -1,0 +1,19 @@
+---
+/**
+ * Texto bilingüe. Renderiza ambos idiomas como hermanos; el CSS
+ * (`[data-lang]` en <html>) oculta el inactivo — sin parpadeo y sin JS.
+ * Acepta HTML inline en cada idioma (negritas, <span class="grad-text">…).
+ *
+ *   <T es="Hola <strong>mundo</strong>" en="Hi <strong>world</strong>" />
+ *
+ * `as` permite cambiar el wrapper (por defecto <span>, inline).
+ */
+interface Props {
+  es: string;
+  en: string;
+  as?: keyof HTMLElementTagNameMap;
+  class?: string;
+}
+const { es, en, as: Tag = "span", class: cls = "" } = Astro.props;
+---
+<Tag class={cls}><span data-i="es" set:html={es} /><span data-i="en" set:html={en} /></Tag>

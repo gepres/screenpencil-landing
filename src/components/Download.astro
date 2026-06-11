@@ -1,0 +1,87 @@
+---
+import Icon from "./Icon.astro";
+import T from "./T.astro";
+import { site } from "../data/site";
+
+const perks = [
+  { es: "Todas las herramientas desbloqueadas", en: "Every tool unlocked" },
+  { es: "Sin marca de agua en tus capturas", en: "No watermark on your captures" },
+  { es: "Sin cuenta ni registro", en: "No account or sign-up" },
+  { es: "Actualizaciones gratuitas", en: "Free updates" },
+  { es: "Código abierto y auditable", en: "Open source and auditable" },
+  { es: "Uso personal y comercial", en: "Personal and commercial use" },
+];
+---
+<section id="download" class="cv-auto mx-auto max-w-5xl px-5 py-24">
+  <div class="reveal relative overflow-hidden rounded-3xl border border-white/10 bg-bg-1 p-8 sm:p-12">
+    <div class="pointer-events-none absolute -top-24 left-1/2 size-72 -translate-x-1/2 rounded-full bg-amber/10 blur-3xl"></div>
+
+    <div class="relative grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:items-center">
+      <div>
+        <span class="font-display text-sm font-semibold uppercase tracking-[0.18em] text-amber">
+          <T es="Precio" en="Pricing" />
+        </span>
+        <h2 class="mt-3 text-4xl font-bold sm:text-5xl">
+          <T es="$0. Hoy, mañana y <span class='grad-text'>siempre</span>." en="$0. Today, tomorrow and <span class='grad-text'>always</span>." />
+        </h2>
+        <p class="mt-4 max-w-md text-ink-soft">
+          <T es="Sin pruebas que caducan, sin funciones bloqueadas, sin tarjeta de crédito. Cada herramienta incluida." en="No trials that expire, no locked features, no credit card. Every tool included." />
+        </p>
+
+        <ul class="mt-6 grid gap-2.5 sm:grid-cols-2">
+          {perks.map((p) => (
+            <li class="flex items-start gap-2 text-sm text-ink-soft">
+              <Icon name="check" class="mt-0.5 size-4 shrink-0 text-emerald-400" />
+              <T es={p.es} en={p.en} />
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="flex flex-col gap-4">
+        <a
+          href={site.releasesLatest}
+          target="_blank"
+          rel="noopener"
+          data-release-link
+          class="inline-flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-ink-soft transition hover:border-white/25"
+        >
+          <span class="size-1.5 animate-pulse rounded-full bg-emerald-400"></span>
+          <T es="Última versión" en="Latest version" />
+          <strong class="text-ink" data-release-tag>{site.version}</strong>
+        </a>
+
+        <a
+          href={site.downloadWindows}
+          data-download="windows"
+          class="inline-flex items-center justify-center gap-2 rounded-full bg-amber px-6 py-3.5 font-semibold text-bg-0 transition hover:bg-amber/90"
+        >
+          <Icon name="windows" class="size-5" />
+          <T es="Descargar para Windows" en="Download for Windows" />
+        </a>
+
+        <a
+          href={site.releasesRepo}
+          target="_blank"
+          rel="noopener"
+          data-github
+          class="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 px-6 py-3.5 font-semibold text-ink transition hover:border-white/30 hover:bg-white/5"
+        >
+          <Icon name="github" class="size-5" />
+          <T es="Ver en GitHub" en="View on GitHub" />
+        </a>
+
+        <div class="mt-1 flex items-center justify-center gap-4 text-xs text-ink-dim">
+          <span class="inline-flex items-center gap-1.5"><Icon name="apple" class="size-3.5" /> macOS <T es="· pronto" en="· soon" /></span>
+          <span class="inline-flex items-center gap-1.5"><Icon name="linux" class="size-3.5" /> Linux <T es="· pronto" en="· soon" /></span>
+        </div>
+        <p class="text-center text-xs text-ink-dim">
+          <T
+            es="¿Otra plataforma? macOS y Linux están en camino — <a href='#faq' class='text-ink-soft underline underline-offset-2 hover:text-ink'>entérate aquí</a>."
+            en="Another platform? macOS and Linux are on the way — <a href='#faq' class='text-ink-soft underline underline-offset-2 hover:text-ink'>find out here</a>."
+          />
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

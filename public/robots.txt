@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+
+Sitemap: https://gepres.github.io/screenpencil-landing/sitemap.xml

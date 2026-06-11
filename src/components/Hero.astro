@@ -1,0 +1,90 @@
+---
+import Icon from "./Icon.astro";
+import T from "./T.astro";
+const base = import.meta.env.BASE_URL;
+---
+<section id="top" class="relative mx-auto max-w-6xl px-5 pb-20 pt-28 md:pt-36">
+  <div class="grid items-center gap-14 lg:grid-cols-[1.05fr_1fr]">
+    <!-- Copy -->
+    <div class="reveal">
+      <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-ink-soft">
+        <span class="size-1.5 rounded-full bg-amber"></span>
+        <T es="Software libre · sin paywall · sin marca de agua" en="Free software · no paywall · no watermark" />
+      </span>
+
+      <h1 class="mt-6 text-balance text-4xl font-bold leading-[1.05] sm:text-5xl md:text-6xl">
+        <T es="Dibuja sobre <span class='grad-text'>toda tu pantalla</span> en un instante." en="Draw over <span class='grad-text'>your entire screen</span> in an instant." />
+      </h1>
+
+      <p class="mt-6 max-w-xl text-lg leading-relaxed text-ink-soft">
+        <T
+          es="ScreenPencil convierte tu escritorio en una pizarra. Resalta, dibuja flechas, escribe, haz zoom y captura — encima de <strong class='text-ink'>cualquier app</strong>, en tus presentaciones, clases y demos en vivo."
+          en="ScreenPencil turns your desktop into a whiteboard. Highlight, draw arrows, type, zoom and capture — over <strong class='text-ink'>any app</strong>, during your live presentations, classes and demos."
+        />
+      </p>
+
+      <div class="mt-8 flex flex-wrap items-center gap-3">
+        <a href="#download" class="inline-flex items-center gap-2 rounded-full bg-amber px-6 py-3 font-semibold text-bg-0 transition hover:bg-amber/90">
+          <Icon name="download" class="size-5" />
+          <T es="Descargar gratis" en="Download free" />
+        </a>
+        <a href="#demo" class="inline-flex items-center gap-2 rounded-full border border-white/15 px-6 py-3 font-semibold text-ink transition hover:border-white/30 hover:bg-white/5">
+          <Icon name="play" class="size-4" />
+          <T es="Probar en el navegador" en="Try in your browser" />
+        </a>
+      </div>
+
+      <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-ink-dim">
+        <span class="inline-flex items-center gap-2"><Icon name="windows" class="size-4" /> Windows 10/11</span>
+        <span class="inline-flex items-center gap-2 opacity-70"><Icon name="apple" class="size-4" /> macOS <T es="(pronto)" en="(soon)" /></span>
+        <span class="inline-flex items-center gap-2 opacity-70"><Icon name="linux" class="size-4" /> Linux <T es="(pronto)" en="(soon)" /></span>
+      </div>
+
+      <dl class="mt-10 flex flex-wrap gap-x-10 gap-y-4 border-t border-white/8 pt-7">
+        <div>
+          <dt class="font-display text-2xl font-bold text-ink" data-metric data-count="100" data-suffix="%">0%</dt>
+          <dd class="text-sm text-ink-dim"><T es="Gratis, siempre" en="Free, forever" /></dd>
+        </div>
+        <div>
+          <dt class="font-display text-2xl font-bold text-ink" data-metric data-count="0" data-prefix="$">$0</dt>
+          <dd class="text-sm text-ink-dim"><T es="Sin suscripción" en="No subscription" /></dd>
+        </div>
+        <div>
+          <dt class="font-display text-2xl font-bold text-ink" data-metric data-count="15" data-suffix="+">0+</dt>
+          <dd class="text-sm text-ink-dim"><T es="Herramientas" en="Tools" /></dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- Mockup: ventana flotante con tilt 3D (efectos de la v1) -->
+    <div class="reveal" style="--reveal-delay:120ms">
+      <div class="hero-art">
+        <figure class="hero-window m-0 bg-gradient-to-br from-[#141a2e] to-[#0c1120]">
+          <div class="flex items-center gap-2 border-b border-white/5 px-4 py-3">
+            <span class="size-3 rounded-full bg-red-400/80"></span>
+            <span class="size-3 rounded-full bg-amber/80"></span>
+            <span class="size-3 rounded-full bg-emerald-400/80"></span>
+            <span class="ml-2 text-xs text-ink-dim">lumina.app — <T es="Panel en vivo" en="Live panel" /></span>
+          </div>
+          <img
+            src={`${base}assets/img/hero-shot.webp`}
+            width="1600"
+            height="1000"
+            decoding="async"
+            fetchpriority="high"
+            alt="ScreenPencil anotando un panel web en vivo: resaltado sobre el titular, un círculo alrededor de un KPI y una flecha señalando el gráfico"
+            class="w-full"
+          />
+        </figure>
+        <span class="float-card float-card--1">🎯 Spotlight</span>
+        <span class="float-card float-card--2">🔍 Zoom</span>
+        <span class="float-card float-card--3">⌨️ Ctrl·Alt·D</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Indicador de scroll (animación de la v1) -->
+  <div class="mt-16 hidden justify-center md:flex">
+    <a href="#features" class="hero-scroll" aria-label="Desplázate"><span></span></a>
+  </div>
+</section>

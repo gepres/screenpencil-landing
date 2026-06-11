@@ -1,0 +1,63 @@
+---
+import SectionHead from "./SectionHead.astro";
+import Icon from "./Icon.astro";
+import T from "./T.astro";
+
+const platforms = [
+  {
+    icon: "windows" as const,
+    name: "Windows 10 / 11",
+    dEs: "Compilación nativa con .NET y WPF. Per-monitor DPI, multi-monitor y bandeja del sistema.",
+    dEn: "Native build with .NET and WPF. Per-monitor DPI, multi-monitor and system tray.",
+    tagEs: "Disponible", tagEn: "Available", available: true,
+  },
+  {
+    icon: "apple" as const,
+    name: "macOS",
+    dEs: "La experiencia de anotación que inspiró el proyecto, ahora abierta y gratuita.",
+    dEn: "The annotation experience that inspired the project, now open and free.",
+    tagEs: "Próximamente", tagEn: "Coming soon", available: false,
+  },
+  {
+    icon: "linux" as const,
+    name: "Linux",
+    dEs: "Para creadores y educadores en GNOME, KDE y más. Wayland y X11 en el horizonte.",
+    dEn: "For creators and educators on GNOME, KDE and more. Wayland and X11 on the horizon.",
+    tagEs: "Próximamente", tagEn: "Coming soon", available: false,
+  },
+];
+---
+<section id="platforms" class="cv-auto mx-auto max-w-6xl px-5 py-24">
+  <SectionHead
+    eyebrowEs="Multiplataforma" eyebrowEn="Cross-platform"
+    titleEs="Funciona donde <span class='grad-text'>trabajas tú</span>"
+    titleEn="Works where <span class='grad-text'>you work</span>"
+    subEs="El mismo lienzo, la misma sensación, en tus tres sistemas favoritos."
+    subEn="The same canvas, the same feel, on your three favorite systems."
+  />
+
+  <div class="mt-14 grid gap-4 md:grid-cols-3">
+    {platforms.map((p, i) => (
+      <article
+        class="reveal flex flex-col rounded-2xl border border-white/8 bg-white/[0.02] p-7"
+        class:list={[{ "opacity-80": !p.available }]}
+        style={`--reveal-delay:${i * 70}ms`}
+      >
+        <div class="grid size-12 place-items-center rounded-xl border border-white/8 bg-white/5 text-ink">
+          <Icon name={p.icon} class="size-6" />
+        </div>
+        <h3 class="mt-5 font-display text-xl font-semibold">{p.name}</h3>
+        <p class="mt-2 flex-1 text-sm leading-relaxed text-ink-soft"><T es={p.dEs} en={p.dEn} /></p>
+        <span
+          class:list={[
+            "mt-5 inline-flex w-fit items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium",
+            p.available ? "border border-emerald-400/30 bg-emerald-400/10 text-emerald-300" : "border border-white/10 bg-white/5 text-ink-dim",
+          ]}
+        >
+          {p.available && <span class="size-1.5 rounded-full bg-emerald-400"></span>}
+          <T es={p.tagEs} en={p.tagEn} />
+        </span>
+      </article>
+    ))}
+  </div>
+</section>

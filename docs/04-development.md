@@ -1,144 +1,101 @@
 # 04 — Desarrollo
 
-Cómo trabajar el código de la landing. **No hay build ni dependencias**: es HTML + CSS + JS vanilla.
+Cómo trabajar el código de la landing. Desde la migración, el stack es **Astro 5 + Tailwind CSS v4**
+(antes era HTML/CSS/JS vanilla sin build).
 
 ## Correr en local
 
 ```bash
-# Opción 1: doble clic en index.html (funciona sin servidor)
-
-# Opción 2: servidor estático (recomendado, evita restricciones de file://)
-python -m http.server 8000      # → http://localhost:8000
-npx serve .                     # alternativa con Node
-php -S localhost:8000           # alternativa con PHP
+pnpm install      # primera vez
+pnpm dev          # → http://localhost:4321 (hot reload)
+pnpm build        # genera dist/
+pnpm preview      # sirve dist/ como en producción
 ```
 
-> Algunas APIs (p. ej. `canvas.toDataURL` al redimensionar) funcionan mejor servidas por HTTP
-> que abriendo `file://`. Para desarrollo, usa un servidor local.
+> Requiere Node ≥ 20 y pnpm 10. El sitio es **estático** (output `static`): `dist/` se publica tal cual.
 
 ## Mapa de archivos
 
-| Archivo | Responsabilidad |
-|---------|-----------------|
-| `index.html` | Estructura y **todo el copy** (una sola página). Español en el elemento, inglés en `data-en`. |
-| `assets/css/styles.css` | Estilos, tokens en `:root`, animaciones, responsive. |
-| `assets/js/main.js` | **i18n ES/EN**, nav, reveal, contadores, brillo de cards, **showcase**, **demo de canvas**, avisos. |
-| `assets/img/logo-white.png` | Logo del pincel (blanco, el que usa la web). |
-| `assets/img/hero-shot.png`, `fn-*.png` | Capturas reales del hero y del showcase. |
-| `assets/img/favicon.svg` | Favicon. |
+| Ruta | Responsabilidad |
+|------|-----------------|
+| `src/pages/index.astro` | Ensambla las secciones de la landing en orden. |
+| `src/pages/admin.astro` | Panel de analítica (`/admin`), **aislado**: usa su CSS/JS heredado en `public/assets`. |
+| `src/layouts/Base.astro` | `<head>` (SEO, OG, JSON-LD, fuentes), glow ambiental, script i18n pre-render. |
+| `src/components/*.astro` | Una sección por componente: `Nav`, `Hero`, `Trust`, `Features`, `Showcase`, `Steps`, `Demo`, `Shortcuts`, `Platforms`, `Download`, `Donate`, `Faq`, `Roadmap`, `Footer`. |
+| `src/components/T.astro` | Texto bilingüe `<T es="…" en="…" />` (soporta HTML inline). |
+| `src/components/Icon.astro` | Iconos SVG inline (sin dependencias). |
+| `src/components/SectionHead.astro` | Encabezado de sección (eyebrow + título + subtítulo). |
+| `src/scripts/main.ts` | reveal on scroll · toggle de idioma · analítica (`track()`) · badge de versión. |
+| `src/data/site.ts` | **Único punto de verdad**: versión, URLs de descarga/GitHub/donación, API del backend. |
+| `src/styles/global.css` | Tailwind v4 + tokens de marca (`@theme`) + utilidades (`grad-text`, `ambient`, `reveal`, i18n). |
+| `public/assets/img/` | Imágenes WebP, logos, favicon, banner OG. |
+| `public/assets/{css,js}/` | CSS/JS del `/admin` heredado (no se usan en el sitio de marketing). |
 
 ## Tareas frecuentes
 
 ### Cambiar textos (bilingüe ES/EN)
-Edita `index.html` directamente. Está organizado por secciones con comentarios `<!-- ===== SECCIÓN ===== -->`.
+Edita el componente de la sección. Cada texto usa `<T>`:
 
-- El **español** es el texto visible en el elemento.
-- El **inglés** va en el atributo `data-en` del mismo elemento. Si lleva markup, escápalo:
-  `data-en="Draw over &lt;span class='grad-text'&gt;your screen&lt;/span&gt;"`.
-- Pon `data-en` solo en **elementos hoja** (sin otro `data-en` anidado), o el swap deja nodos huérfanos.
-
-El conmutador `#langToggle` y `applyLang()` (en `main.js`) hacen el resto: alternan, actualizan
-`<title>`/`meta description`/`<html lang>`, guardan la preferencia en `localStorage` y autodetectan
-el idioma del navegador en la primera visita.
-
-### Cambiar colores / fuentes
-Edita las variables en `:root` de `styles.css` (ver [03 — Sistema de diseño](03-design-system.md)).
-
-### Añadir una función a la grid
-Duplica un `<article class="card reveal" style="--d:N">…</article>` en `#features` e incrementa `--d`
-(controla el escalonado del reveal).
-
-### Conectar la descarga real
-Busca en `index.html` los atributos:
-
-```html
-<a href="#" class="btn btn--primary btn--lg" data-download="windows"> … </a>
-<a href="#" data-github> … </a>
+```astro
+<T es="Descargar gratis" en="Download free" />
+<T es="Dibuja sobre <span class='grad-text'>tu pantalla</span>"
+   en="Draw over <span class='grad-text'>your screen</span>" />
 ```
 
-1. Sustituye `href="#"` por la URL real (release de GitHub, instalador, etc.).
-2. **Mantén** el atributo `data-download` / `data-github`: el handler de `main.js` detecta que ya hay
-   URL real (`href` distinto de `#`), **registra el evento** en analítica y **deja navegar/descargar**;
-   solo muestra el aviso *placeholder* cuando el `href` sigue siendo `#`.
+`T` renderiza **ambos idiomas** como hermanos; el CSS (`[data-lang]` en `<html>`) oculta el inactivo
+→ soporta markup sin parpadeo y sin nodos huérfanos (a diferencia del viejo `data-en`). El toggle
+del nav (`[data-lang-toggle]`) y `setLang()` en `main.ts` actualizan `<title>`/`meta description`,
+guardan en `localStorage` y autodetectan el idioma en la primera visita.
 
-> Estado actual: `main.js` consulta `releases/latest` de la API de GitHub del **repo público de vitrina
-> `gepres/screenpencil-releases`** y apunta el botón "Descargar para Windows" al `.exe` de la última
-> versión automáticamente; el `index.html` mantiene un *fallback* estático (hoy
-> `…/screenpencil-releases/releases/download/v0.2.1/ScreenPencil-Setup-0.2.1.exe`) por si la API falla.
-> El badge de versión (`#releaseBadge`/`#releaseTag`) apunta al mismo repo. Al sacar una versión nueva,
-> actualiza ese *fallback* (tag e instalador) en `index.html`.
+### Cambiar colores / fuentes
+Edita los tokens `@theme` al inicio de `src/styles/global.css` (ver [03 — Sistema de diseño](03-design-system.md)).
 
-### Cambiar las capturas del showcase interactivo (`#showcase`)
-El showcase tiene pestañas (`.sc-tab[data-sc]`) que cambian una imagen (`#scImg`) y un lightbox al hacer clic.
-El mapeo pestaña → imagen vive en el objeto `SC` del bloque *"SHOWCASE INTERACTIVO"* de `main.js`:
+### Añadir una función a la grid
+Añade un objeto al array `cards` en `src/components/Features.astro` (`{ ic, es, en, dEs, dEn }`).
+El escalonado del reveal se calcula solo.
 
-```js
-const SC = {
-  anotar:    { img: 'assets/img/hero-shot.png',    title: '…', alt: '…' },
-  figuras:   { img: 'assets/img/fn-figuras.png',   title: '…', alt: '…' },
-  // texto, spotlight, lupa, pizarra…
+### Conectar descarga / GitHub / donaciones / versión
+Todo vive en `src/data/site.ts` (no hay que tocar el markup):
+
+```ts
+export const site = {
+  version: "v0.2.1",
+  downloadWindows: "https://github.com/gepres/screenpencil-releases/releases/download/v0.2.1/…exe",
+  releasesRepo: "https://github.com/gepres/screenpencil-releases",
+  coffee: "…", sponsors: "…", paypal: "…",
+  analyticsApi: "https://screenpencil-backend.onrender.com",
 };
 ```
 
-Para refrescarlas:
-1. Genera las capturas con la **propia app**: dibuja sobre algo real y pulsa `Ctrl+Alt+S`
-   (salen limpias, con las anotaciones, sin marca de agua).
-2. Copia los PNG a `assets/img/` reusando los nombres (`hero-shot.png`, `fn-figuras.png`, `fn-texto.png`,
-   `fn-spotlight.png`, `fn-lupa.png`, `fn-pizarra.png`) o ajusta los `img` del objeto `SC`.
-3. ¿Otra pestaña? Añade un `<button class="sc-tab" data-sc="clave">…</button>` en `#showcase` y su
-   entrada en `SC`. Recuerda el `data-en` del texto de la pestaña.
+Al sacar versión nueva, actualiza `version` y `downloadWindows`. El badge además consulta
+`releases/latest` de la API de GitHub en `main.ts` y sobreescribe el tag si responde.
 
-> Formato recomendado: PNG/WebP, proporción ~16:10, ≥ 1600 px de ancho.
-
-### Conectar los enlaces de donación
-En la sección `#donate` hay 4 botones con `href="#"` y `data-donate="..."`:
-
-```html
-<a href="#" class="donate__btn donate__btn--coffee" data-donate="coffee"> … </a>
-<a href="#" class="donate__btn donate__btn--kofi"   data-donate="kofi">   … </a>
-<a href="#" class="donate__btn donate__btn--gh"     data-donate="github"> … </a>
-<a href="#" class="donate__btn donate__btn--paypal" data-donate="paypal"> … </a>
-```
-
-Para activarlos:
-1. Pon tu URL real en `href` (ej. `https://buymeacoffee.com/tuusuario`).
-2. Quita el atributo `data-donate` para que el clic **abra el enlace** en vez del aviso *placeholder*
-   (el handler está en `main.js`). Añade `target="_blank" rel="noopener"` si quieres abrir en pestaña nueva.
-3. ¿No usas alguna plataforma? Borra ese `<a>` — la grid se reacomoda sola.
-
-El botón **"Donar"** del nav y el enlace del footer apuntan al ancla `#donate`.
-
-### Activar / revertir el fullpage scroll
-El efecto vive en `assets/css/fullpage.css` + `assets/js/fullpage.js`, enlazados en `index.html`.
-- **Revertir:** elimina (o comenta) esas 2 líneas en `index.html` → vuelve a scroll normal.
-- **Ajustar paneles:** edita el selector de `id` en **ambos** archivos para que coincidan.
-- **Snap más suave:** en `fullpage.css`, `scroll-snap-type: y mandatory` → `… proximity`.
-- **Etiquetas de los puntos:** objeto `LABELS` en `fullpage.js`.
-- Solo en `≥ 900px` y sin `prefers-reduced-motion`. Ver [03 — Sistema de diseño](03-design-system.md).
-
-### Configurar el panel `/admin`
-`admin.html` consume el backend NestJS; la URL del backend y la API key se ponen en el ⚙ (se guardan
-en `localStorage`). Por defecto apunta a producción (Render). Ver [06 — Panel admin](06-admin-dashboard.md).
+### Cambiar las capturas del showcase
+El mapeo pestaña → imagen es el array `tabs` en `src/components/Showcase.astro`
+(`{ id, ic, img, title, es, en, … }`). Genera las capturas con la **propia app** (`Ctrl+Alt+S`,
+salen limpias) y déjalas en `public/assets/img/` reusando los nombres (`hero-shot.webp`, `fn-*.webp`).
 
 ### Tocar la demo de canvas
-La lógica está en `main.js`, bloque *"DEMO DE DIBUJO EN CANVAS"*. Herramientas (`pen`/`marker`/`eraser`),
-colores (`.swatch[data-color]`), grosor (`#demoSize`) y limpiar (`#demoClear`). El lienzo se reescala
-a HiDPI conservando el dibujo.
+Lógica en el `<script>` de `src/components/Demo.astro`: herramientas (`pen`/`marker`/`eraser`),
+colores, grosor y limpiar. El lienzo se reescala a HiDPI conservando el dibujo.
+
+### Configurar el panel `/admin`
+`src/pages/admin.astro` consume el backend NestJS; la URL y la API key se ponen en el ⚙ (se guardan
+en `localStorage`). Ver [06 — Panel admin](06-admin-dashboard.md).
 
 ## Convenciones
 
-- **Comentarios en español**; copy en español en el elemento + traducción en `data-en`; identificadores JS/CSS en inglés (coherente con el repo de la app).
-- Mantener **0 dependencias**. Si algo "necesita" una librería, evaluar si se puede con CSS/JS nativo.
+- **Comentarios en español**; copy con `<T es en />`; identificadores TS/CSS en inglés.
+- Mantener **~0 JS** en el sitio de marketing: solo islas necesarias (demo, showcase, toggle, reveal).
 - Respetar `prefers-reduced-motion` en cualquier animación nueva.
-- Mobile-first razonable: probar a `375px`, `768px`, `1280px`.
+- Mobile-first: probar a `375px`, `768px`, `1280px`.
 
 ## Checklist antes de publicar
 
-- [ ] Abre sin errores en consola (F12).
-- [ ] El conmutador **ES/EN** cambia todos los textos y los recuerda al recargar (sin nodos huérfanos).
-- [ ] Reveal y contadores funcionan al hacer scroll.
-- [ ] La demo dibuja con ratón **y** con dedo (touch).
+- [ ] `pnpm build` sin errores ni warnings.
+- [ ] El conmutador **ES/EN** cambia todos los textos y los recuerda al recargar.
+- [ ] Reveal funciona al hacer scroll; la demo dibuja con ratón **y** táctil.
 - [ ] Menú hamburguesa abre/cierra en móvil.
-- [ ] Enlaces de descarga/GitHub apuntan a destinos reales (o avisan claramente).
-- [ ] `<title>`, `meta description` y Open Graph correctos.
+- [ ] Enlaces de descarga/GitHub/donación correctos (revisar `src/data/site.ts`).
+- [ ] `<title>`, `meta description`, canonical y Open Graph correctos.
 - [ ] Lighthouse: Performance / Accesibilidad / SEO en verde.

@@ -1,203 +1,96 @@
-# ScreenPencil — Landing page
+# ScreenPencil — Landing
 
-Sitio web de presentación de **ScreenPencil**, la app gratuita para **dibujar y anotar sobre toda tu pantalla** (Windows · macOS · Linux).
+Sitio de presentación de **ScreenPencil**, la app gratuita para **dibujar y anotar sobre toda tu
+pantalla** (Windows · macOS · Linux). Diseño minimalista, **calmado y componetizado**.
 
 **🌐 Sitio en vivo:** <https://gepres.github.io/screenpencil-landing/>
 
-> **Stack:** HTML + CSS + JavaScript **vanilla**. Sin framework, sin build, sin dependencias.
-> Se abre con doble clic en `index.html`. Despliega en cualquier hosting estático.
->
-> **Bilingüe 🇪🇸 / 🇬🇧** — español por defecto e inglés con un conmutador en el nav (autodetecta el idioma del navegador y recuerda la elección).
+> **Stack:** [Astro](https://astro.build) 5 + [Tailwind CSS](https://tailwindcss.com) v4.
+> Estático, **~0 JS** salvo las islas que lo necesitan (demo canvas, showcase, toggle i18n).
+> **Bilingüe ES/EN** sin recargar y sin parpadeo (idioma inactivo oculto por CSS).
 
----
+## Migración desde la versión vanilla
 
-## ✨ Qué incluye
+Esta landing nació como un `index.html` monolítico (HTML/CSS/JS vanilla, sin build) y se **migró a
+Astro** para mejorarla. El minimalismo está en el **diseño** (calma, espacio, un solo acento, sin
+fondo ruidoso ni fullpage forzado), **no en recortar contenido**: está todo.
 
-- **Bilingüe ES/EN** sin recargar: el español vive en el DOM y el inglés en atributos `data-en`; un botón en el nav alterna y persiste la preferencia (`localStorage`).
-- **Hero** con una ventana flotante que muestra una captura real del producto.
-- **Fondo dinámico** (mesh de gradientes + grid + blobs en movimiento).
-- **Grid de funciones** (15 tarjetas) con efecto de brillo que sigue al cursor.
-- **Showcase interactivo**: pestañas que cambian capturas reales de cada función (anotar, figuras, texto/badges, spotlight, lupa, pizarra) + lightbox para ampliar.
-- **Sección "Cómo funciona"** (flujo en 4 pasos).
-- **Demo interactiva**: una mini-pizarra real en `<canvas>` (lápiz, marcador, borrador, colores, grosor).
-- **Tabla de atajos** de teclado, **sección multiplataforma**, **bloque de precio** ($0, sin paywall), **donaciones** y **FAQ** acordeón.
-- **Roadmap** ("próximamente") con lo que viene.
-- **Fullpage scroll** (escritorio): cada sección ocupa la pantalla con snap + puntos de navegación (CSS Scroll Snap, sin librerías). Ver [docs/03](docs/03-design-system.md).
-- **Panel `/admin`**: dashboard de analítica que consume el backend NestJS (GoatCounter + Cloudflare). Ver [docs/06](docs/06-admin-dashboard.md).
-- **Analítica privacy-first** (Cloudflare Web Analytics + GoatCounter, sin cookies) y **deploy automático** a GitHub Pages (Actions).
-- **100% responsive** y con soporte de `prefers-reduced-motion` (accesibilidad).
+| Antes (vanilla) | Ahora (Astro) |
+|---|---|
+| Fullpage scroll forzado (no cabía en algunas pantallas) | scroll normal, secciones que respiran |
+| Fondo con mesh + grid + blobs en movimiento | un único glow ambiental sutil |
+| Brillo que sigue al cursor en 15 tarjetas | grid calmado (las 15 funciones intactas) |
+| `data-en` escapado en el HTML | componente `<T es en />` + CSS (soporta markup) |
+| Un `index.html` de 689 líneas | componentes Astro reutilizables |
+| 2.7 MB de PNG sin usar en el repo | solo se conservan los assets necesarios |
+| Deploy: subir la raíz tal cual | Deploy: build de Astro en GitHub Actions |
 
----
+**Contenido completo:** hero (con métricas), tira de confianza (8 sellos), 15 funciones, showcase
+(6 capturas), 4 pasos, demo canvas, tabla de atajos (20), 3 plataformas, precio/descarga,
+donaciones, FAQ (7) y roadmap (6).
 
-## 🚀 Cómo verlo en local
-
-### Opción A — doble clic (lo más simple)
-Abre `index.html` en tu navegador. Funciona sin servidor.
-
-### Opción B — servidor local (recomendado para desarrollo)
-Cualquiera de estos sirve la carpeta en `http://localhost:8000`:
+## Desarrollo
 
 ```bash
-# Python 3
-python -m http.server 8000
-
-# Node (npx, sin instalar nada permanente)
-npx serve .
-
-# PHP
-php -S localhost:8000
+pnpm install
+pnpm dev        # http://localhost:4321
+pnpm build      # genera dist/
+pnpm preview    # sirve dist/ en local
 ```
 
-> Algunas APIs (p. ej. `canvas.toDataURL` al redimensionar) van mejor servidas por HTTP que con `file://`.
-
----
-
-## 📁 Estructura
+## Estructura
 
 ```
-screenpencil-landing/
-├── index.html              # Página única (secciones + copy ES/data-en + beacon de analítica)
-├── README.md
-├── LICENSE                 # MIT
-├── .gitignore
-├── .gitattributes          # normaliza finales de línea (LF)
-├── .github/workflows/
-│   └── deploy.yml          # publica en GitHub Pages vía Actions (en cada push a main)
-├── admin.html              # Panel admin de analítica (consume el backend NestJS)
-├── assets/
-│   ├── css/styles.css      # Estilos + animaciones (tokens de diseño en :root)
-│   ├── css/fullpage.css    # Fullpage scroll (CSS Scroll Snap)
-│   ├── css/admin.css       # Estilos del panel /admin
-│   ├── js/main.js          # Interacciones, i18n ES/EN, reveal, contadores, showcase, demo
-│   ├── js/fullpage.js      # Puntos de navegación + sección activa del fullpage
-│   ├── js/admin.js         # Dashboard /admin (fetch al backend + gráficas)
-│   └── img/
-│       ├── favicon.svg
-│       ├── logo-white.png            # Logo blanco que usa la web (fondo oscuro)
-│       ├── logo.png                  # Logo a color (apple-touch-icon / variante)
-│       ├── logo-original.png         # Original 1024px (solo Open Graph)
-│       ├── hero-shot.webp            # Captura del hero + showcase "anotar"
-│       └── fn-*.webp                 # Capturas del showcase (figuras, texto, spotlight, lupa, pizarra)
-└── docs/                   # Documentación del proyecto (ver docs/00-INDEX.md)
+src/
+├── layouts/Base.astro        # <head> (SEO, OG, JSON-LD, fuentes), glow, script i18n pre-render
+├── components/
+│   ├── T.astro               # texto bilingüe (es/en) sin parpadeo
+│   ├── Icon.astro            # iconos SVG inline
+│   ├── SectionHead.astro     # encabezado de sección (eyebrow + título + sub)
+│   ├── Nav.astro  Hero.astro  Features.astro  Showcase.astro
+│   ├── Steps.astro  Demo.astro  Download.astro  Donate.astro  Faq.astro  Footer.astro
+├── pages/
+│   ├── index.astro           # landing
+│   └── admin.astro           # panel de analítica (noindex, aislado: usa assets/css|js propios)
+├── scripts/main.ts           # reveal on scroll · toggle i18n · analítica · badge de versión
+├── data/site.ts              # versión, URLs de descarga/donación, API del backend
+└── styles/global.css         # Tailwind v4 + tokens de marca (@theme)
+public/assets/                # imágenes WebP, logos, favicon, OG; CSS/JS del /admin heredado
 ```
 
----
+## i18n
 
-## 🌍 Idiomas (i18n)
+Cada texto se escribe en los dos idiomas y el CSS oculta el inactivo según `data-lang` en `<html>`:
 
-No hay framework: el sistema bilingüe es ~30 líneas en `main.js`.
-
-- El **español** es el texto por defecto en el HTML.
-- El **inglés** va en un atributo `data-en` sobre el mismo elemento. Si el texto lleva markup, va **escapado** dentro del atributo:
-
-  ```html
-  <h2 data-en="What's coming &lt;span class='grad-text'&gt;next&lt;/span&gt;">
-    Lo que viene <span class="grad-text">próximamente</span>
-  </h2>
-  ```
-
-- Regla de oro: pon `data-en` solo en **elementos hoja** (sin otro `data-en` anidado dentro), o el intercambio dejaría nodos huérfanos.
-- El botón `#langToggle` del nav alterna; `applyLang()` actualiza `<title>`, `meta description`, `<html lang>` y guarda la preferencia en `localStorage`. La primera visita autodetecta con `navigator.language`.
-
-Para **añadir un texto traducible**: escribe el español en el elemento y añade su `data-en`. Listo.
-
----
-
-## 🎨 Personalización rápida
-
-Casi todo el aspecto vive en **variables CSS** al inicio de `assets/css/styles.css`:
-
-```css
-:root {
-  --bg-0: #060912;     /* fondo principal      */
-  --blue: #3b82f6;     /* azul de marca        */
-  --cyan: #22d3ee;     /* cian (acentos)       */
-  --amber: #e0a060;    /* ámbar del logo       */
-  /* ... */
-}
+```astro
+<T es="Descargar gratis" en="Download free" />
+<T es="Dibuja sobre <span class='grad-text'>tu pantalla</span>" en="Draw over <span class='grad-text'>your screen</span>" />
 ```
 
-- **Textos:** edita `index.html` (español en el elemento, inglés en `data-en` — ver sección Idiomas).
-- **Enlaces de descarga / GitHub / donación:** busca `data-download`, `data-github` y `data-donate` en
-  `index.html` y reemplázalos por las URLs reales (ver `docs/04-development.md`).
+El idioma se detecta del navegador en la primera visita, se aplica **antes del primer pintado**
+(sin flash) y se recuerda en `localStorage`. El botón del nav lo alterna.
 
----
+## Personalización
 
-## 🐙 Subir a un repositorio (GitHub) y publicar
+- **Colores / tipografía:** tokens `@theme` al inicio de `src/styles/global.css`.
+- **Enlaces y versión:** `src/data/site.ts` (descarga, GitHub, donaciones, API de analítica).
+- **Textos:** en cada componente con `<T es en />`.
 
-El sitio es **estático** y las rutas son **relativas**, así que funciona tal cual desde un subdirectorio
-(ideal para GitHub Pages de proyecto).
+## Despliegue
 
-### 1. Inicializa y haz el primer commit
+Sitio **estático**: cualquier hosting sirve `dist/`.
 
-```bash
-cd screenpencil-landing
-git init -b main
-git add .
-git commit -m "ScreenPencil landing: sitio bilingüe ES/EN"
-```
+- **GitHub Pages:** `.github/workflows/deploy.yml` publica en cada push a `main` y fija el `base`
+  automáticamente al nombre del repo (Pages de proyecto).
+- **Vercel / Cloudflare Pages / dominio propio (raíz):** deja `BASE_PATH=/` (valor por defecto).
+- `SITE_URL` y `BASE_PATH` son variables de entorno leídas en `astro.config.mjs`.
 
-### 2. Conecta el repo remoto y sube
+## Analítica (sin cookies)
 
-```bash
-# Crea el repo vacío en GitHub primero (sin README, para no chocar), p. ej. gepres/screenpencil-landing
-git remote add origin https://github.com/gepres/screenpencil-landing.git
-git push -u origin main
-```
+Mismo modelo que la v1: GoatCounter (eventos) + Cloudflare (tráfico). La instrumentación vive en
+`src/scripts/main.ts` (`track()`, único punto de integración). El panel **`/admin`** consume el
+backend NestJS (`screenpencil-backend`).
 
-> Con la CLI de GitHub puedes crear y subir en un paso:
-> `gh repo create gepres/screenpencil-landing --public --source=. --push`
+## Licencia
 
-### 3. Publica en GitHub Pages (ya automatizado)
-
-El repo trae `.github/workflows/deploy.yml`: **cada push a `main` publica el sitio** en Pages.
-La primera vez activa Pages automáticamente; si fallara por permisos, ve una sola vez a
-**Settings → Pages → Build and deployment → Source: _GitHub Actions_**.
-El sitio queda en `https://gepres.github.io/screenpencil-landing/`.
-
-Otros hostings (Netlify, Vercel, Cloudflare Pages) o el deploy desde rama: ver **`docs/05-deployment.md`**.
-
----
-
-## 📊 Analítica (sin cookies)
-
-Dos capas, ambas sin cookies ni banner de consentimiento:
-
-- **Tráfico — Cloudflare Web Analytics** (ya activo): visitas, páginas, fuentes y países.
-- **Clics y flujo — GoatCounter**: eventos de descarga, GitHub, donación, idioma, demo, showcase y
-  profundidad de scroll. La instrumentación vive en `main.js` (función `track()`, un único punto de
-  integración); se activa pegando tu código en `TU_CODIGO` (`index.html`).
-
-Pasos detallados, tabla de eventos y cómo migrar a GA4: **`docs/05-deployment.md`**.
-
----
-
-## 📚 Documentación
-
-Toda la documentación del proyecto está en [`docs/`](docs/00-INDEX.md):
-
-| Doc | Contenido |
-|-----|-----------|
-| [00 — Índice](docs/00-INDEX.md) | Mapa de la documentación |
-| [01 — Visión](docs/01-overview.md) | Qué es y a quién sirve |
-| [02 — Estructura de contenido](docs/02-content-structure.md) | Secciones y copy |
-| [03 — Sistema de diseño](docs/03-design-system.md) | Colores, tipografías, animaciones |
-| [04 — Desarrollo](docs/04-development.md) | Cómo trabajar el código (incl. i18n) |
-| [05 — Despliegue](docs/05-deployment.md) | Publicar el sitio (git + hosting) |
-| [06 — Panel admin](docs/06-admin-dashboard.md) | Dashboard `/admin` de analítica (consume el backend NestJS) |
-| [NEXT-STEPS](docs/NEXT-STEPS.md) | Estado del ecosistema y pendientes (landing + backend + app) |
-
----
-
-## 🔗 Enlaces del proyecto
-
-- **🌐 Sitio en vivo:** <https://gepres.github.io/screenpencil-landing/>
-- **📦 Repo de esta landing:** <https://github.com/gepres/screenpencil-landing>
-- **🖥️ Repo de la app de escritorio:** <https://github.com/gepres/screenpencil-app>
-
-La app de escritorio (**ScreenPencil**) vive en su
-**propio repositorio**; esta landing es solo el sitio de marketing.
-
-## 📝 Licencia
-
-Publicado bajo licencia **MIT** — ver [`LICENSE`](LICENSE).
+MIT.

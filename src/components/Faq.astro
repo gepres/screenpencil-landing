@@ -1,0 +1,35 @@
+---
+import SectionHead from "./SectionHead.astro";
+import T from "./T.astro";
+
+const faqs = [
+  { qEs: "¿De verdad es gratis? ¿Cuál es el truco?", qEn: "Is it really free? What's the catch?", aEs: "Sí, completamente gratis y sin truco. No hay versión 'Pro', ni suscripción, ni funciones bloqueadas. Es un proyecto de código abierto para educadores, creadores y equipos que presentan a diario.", aEn: "Yes, completely free and no catch. There's no 'Pro' version, no subscription, no locked features. It's an open-source project for educators, creators and teams who present every day." },
+  { qEs: "¿En qué sistemas funciona?", qEn: "Which systems does it run on?", aEs: "La versión para <strong class='text-ink'>Windows 10/11</strong> está disponible. <strong class='text-ink'>macOS</strong> y <strong class='text-ink'>Linux</strong> están en desarrollo; sigue el repositorio para enterarte del lanzamiento.", aEn: "The <strong class='text-ink'>Windows 10/11</strong> version is available. <strong class='text-ink'>macOS</strong> and <strong class='text-ink'>Linux</strong> are in development; follow the repository to hear about the launch." },
+  { qEs: "¿Mis capturas llevan marca de agua?", qEn: "Do my captures have a watermark?", aEs: "Nunca. Las capturas PNG salen limpias, exactamente como ves la pantalla con tus anotaciones. Puedes guardarlas o copiarlas al portapapeles.", aEn: "Never. PNG captures come out clean, exactly as you see the screen with your annotations. You can save them or copy them to the clipboard." },
+  { qEs: "¿Interfiere con mi trabajo cuando no dibujo?", qEn: "Does it interfere when I'm not drawing?", aEs: "No. En reposo el overlay es <em>click-through</em>: el ratón pasa a través como si la app no existiera. Solo al activar el modo dibujo la pantalla se vuelve un lienzo.", aEn: "No. At rest the overlay is <em>click-through</em>: the mouse passes through as if the app didn't exist. Only when you turn on drawing mode does the screen become a canvas." },
+  { qEs: "¿Funciona con varios monitores y pantallas 4K?", qEn: "Does it work with multiple monitors and 4K?", aEs: "Sí. Un overlay por pantalla con historial y deshacer compartidos, y soporte per-monitor DPI para que los trazos se vean nítidos en HiDPI / 4K.", aEn: "Yes. One overlay per screen with shared history and undo, plus per-monitor DPI so strokes look crisp on HiDPI / 4K." },
+  { qEs: "¿Puedo cambiar los atajos de teclado?", qEn: "Can I change the keyboard shortcuts?", aEs: "Todos los atajos globales son reasignables desde Ajustes → Teclas de acceso rápido, y se guardan en tu perfil. Pensado para teclados en español / LATAM.", aEn: "All global shortcuts are reassignable from Settings → Keyboard shortcuts, and they're saved to your profile. Designed for Spanish / LATAM keyboards." },
+  { qEs: "¿Puedo usarlo en clases o en mi empresa?", qEn: "Can I use it in classes or at my company?", aEs: "Por supuesto. Uso personal, educativo y comercial, sin restricciones ni licencias que comprar.", aEn: "Absolutely. Personal, educational and commercial use, with no restrictions or licenses to buy." },
+];
+---
+<section id="faq" class="cv-auto mx-auto max-w-3xl px-5 py-24">
+  <SectionHead
+    eyebrowEs="Preguntas frecuentes" eyebrowEn="FAQ"
+    titleEs="Lo que la gente <span class='grad-text'>suele preguntar</span>"
+    titleEn="What people <span class='grad-text'>usually ask</span>"
+  />
+
+  <div class="reveal mt-12 divide-y divide-white/8 overflow-hidden rounded-2xl border border-white/8 bg-white/[0.02]">
+    {faqs.map((f) => (
+      <details class="group px-6">
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 font-medium marker:hidden">
+          <span><T es={f.qEs} en={f.qEn} /></span>
+          <span class="grid size-6 shrink-0 place-items-center rounded-full border border-white/15 text-ink-dim transition group-open:rotate-45">+</span>
+        </summary>
+        <p class="-mt-1 pb-5 pr-10 text-sm leading-relaxed text-ink-soft">
+          <T es={f.aEs} en={f.aEn} />
+        </p>
+      </details>
+    ))}
+  </div>
+</section>

@@ -1,0 +1,119 @@
+---
+import "../styles/global.css";
+import { site } from "../data/site";
+
+interface Props {
+  title?: string;
+  titleEn?: string;
+  description?: string;
+  descriptionEn?: string;
+  /** Oculta nav/footer (p. ej. en /admin) */
+  bare?: boolean;
+}
+
+const {
+  title = "ScreenPencil — Dibuja sobre toda tu pantalla. Gratis.",
+  titleEn = "ScreenPencil — Draw over your entire screen. Free.",
+  description = "Anota y dibuja sobre toda tu pantalla en presentaciones, clases y demos. App gratis para Windows — sin cuenta, sin marca de agua. macOS y Linux en camino.",
+  descriptionEn = "Annotate and draw over your entire screen during presentations, classes and demos. Free app for Windows — no account, no watermark. macOS and Linux on the way.",
+} = Astro.props;
+
+const base = import.meta.env.BASE_URL;
+const ogImage = new URL(`${base}assets/img/og-banner.png`, site.url).href;
+const canonical = new URL(Astro.url.pathname, site.url).href;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "ScreenPencil",
+  description,
+  url: site.url,
+  applicationCategory: "DesignApplication",
+  operatingSystem: "Windows 10, Windows 11, macOS, Linux",
+  softwareVersion: site.version,
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  author: { "@type": "Organization", name: "gepres", url: "https://github.com/gepres" },
+};
+---
+<!doctype html>
+<html lang="es" data-lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content="gepres — https://github.com/gepres" />
+    <meta name="theme-color" content="#08090d" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+    <link rel="canonical" href={canonical} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ScreenPencil" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="2400" />
+    <meta property="og:image:height" content="1260" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:locale:alternate" content="en_US" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <link rel="icon" type="image/svg+xml" href={`${base}assets/img/favicon.svg`} />
+    <link rel="apple-touch-icon" href={`${base}assets/img/logo.png`} />
+
+    <!-- Fuentes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+    <!-- i18n: aplica el idioma ANTES del primer pintado para evitar parpadeo -->
+    <script is:inline define:vars={{ title, titleEn, description, descriptionEn }}>
+      window.__spI18n = {
+        es: { title: title, desc: description },
+        en: { title: titleEn, desc: descriptionEn },
+      };
+      (function () {
+        try {
+          var saved = localStorage.getItem("sp-lang");
+          var lang = saved || ((navigator.language || "es").toLowerCase().startsWith("en") ? "en" : "es");
+          var el = document.documentElement;
+          el.setAttribute("data-lang", lang);
+          el.setAttribute("lang", lang);
+          var meta = window.__spI18n[lang];
+          if (meta) {
+            document.title = meta.title;
+            var d = document.querySelector('meta[name="description"]');
+            if (d) d.setAttribute("content", meta.desc);
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <!-- Fondo animado (v1): mesh de gradientes + grid con máscara + blobs a la deriva -->
+    <div class="bg" aria-hidden="true">
+      <div class="bg__grid"></div>
+      <div class="bg__blob bg__blob--1"></div>
+      <div class="bg__blob bg__blob--2"></div>
+      <div class="bg__blob bg__blob--3"></div>
+    </div>
+    <slot />
+
+    <!-- Comportamiento global: reveal on scroll + toggle de idioma -->
+    <script>
+      import "../scripts/main.ts";
+    </script>
+  </body>
+</html>

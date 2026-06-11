@@ -1,0 +1,53 @@
+---
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+import Hero from "../components/Hero.astro";
+import Trust from "../components/Trust.astro";
+import Features from "../components/Features.astro";
+import Showcase from "../components/Showcase.astro";
+import Steps from "../components/Steps.astro";
+import Demo from "../components/Demo.astro";
+import Shortcuts from "../components/Shortcuts.astro";
+import Platforms from "../components/Platforms.astro";
+import Download from "../components/Download.astro";
+import Donate from "../components/Donate.astro";
+import Faq from "../components/Faq.astro";
+import Roadmap from "../components/Roadmap.astro";
+import Footer from "../components/Footer.astro";
+import T from "../components/T.astro";
+import Icon from "../components/Icon.astro";
+---
+<Base>
+  <Nav />
+  <main>
+    <Hero />
+    <Trust />
+    <Features />
+    <Showcase />
+    <Steps />
+    <Demo />
+    <Shortcuts />
+    <Platforms />
+    <Download />
+    <Donate />
+    <Faq />
+    <Roadmap />
+
+    <!-- CTA final -->
+    <section class="mx-auto max-w-4xl px-5 pb-28">
+      <div class="reveal rounded-3xl border border-amber/20 bg-gradient-to-b from-amber/[0.06] to-transparent p-10 text-center sm:p-14">
+        <h2 class="text-3xl font-bold sm:text-4xl">
+          <T es="Tu próxima presentación <span class='grad-text'>se explica sola</span>." en="Your next presentation <span class='grad-text'>explains itself</span>." />
+        </h2>
+        <p class="mx-auto mt-4 max-w-md text-ink-soft">
+          <T es="Descarga ScreenPencil y empieza a dibujar sobre tu pantalla en menos de un minuto." en="Download ScreenPencil and start drawing over your screen in under a minute." />
+        </p>
+        <a href="#download" class="mt-7 inline-flex items-center gap-2 rounded-full bg-amber px-7 py-3.5 font-semibold text-bg-0 transition hover:bg-amber/90">
+          <Icon name="download" class="size-5" />
+          <T es="Descargar gratis" en="Download free" />
+        </a>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Base>

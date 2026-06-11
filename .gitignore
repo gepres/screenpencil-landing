@@ -9,10 +9,11 @@ desktop.ini
 *.swp
 *~
 
-# Dependencias (no usadas hoy; por si se añaden tooling/servidores locales)
+# Dependencias y build (Astro)
 node_modules/
 .cache/
 dist/
+.astro/
 
 # Entorno / secretos
 .env

@@ -4,11 +4,14 @@ Estado y pendientes del **ecosistema ScreenPencil** (landing + backend + app). A
 cada sesión. Última actualización: **2026-06-10**.
 
 ## Estado actual (hecho)
-- **Landing** (`screenpencil-landing`, GitHub Pages): bilingüe ES/EN, hero con captura real, showcase
-  con pestañas, donaciones conectadas (PayPal/Coffee/GitHub Sponsors), capturas en WebP, analítica
-  (Cloudflare + GoatCounter), **panel `/admin`** conectado al backend, **fullpage scroll** (CSS snap),
-  **SEO** (structured data, canonical, OG/Twitter, sitemap, robots) y **banner social** propio (`og-banner.png`).
-  **Descargas conectadas:** botón de Windows → release real **v0.2.1**; badge de versión vía API de GitHub.
+- **Landing** (`screenpencil-landing`, GitHub Pages): **migrada a Astro 5 + Tailwind v4** (antes
+  HTML/CSS/JS vanilla) con rediseño minimalista — todo el contenido intacto (15 funciones, 20 atajos,
+  3 plataformas, FAQ, roadmap). Bilingüe ES/EN (componente `<T>`), hero con captura real, showcase con
+  pestañas, donaciones conectadas (PayPal/Coffee/GitHub Sponsors), capturas WebP, analítica (Cloudflare
+  + GoatCounter), **panel `/admin`** conectado al backend, **SEO** (structured data, canonical, OG/Twitter,
+  sitemap, robots) y **banner social** propio (`og-banner.png`). **Descargas conectadas:** botón de
+  Windows → release real **v0.2.1**; badge de versión vía API de GitHub. **Deploy con build de Astro en
+  GitHub Actions** (base path automático de Pages).
 - **Backend** (`screenpencil-backend`, NestJS + Neon + Prisma): **desplegado en Render**
   (`https://screenpencil-backend.onrender.com`). Endpoints `/health`, `/analytics/summary|events|timeseries`
   con API key, agregación GoatCounter + Cloudflare y caché en Postgres. `partial:false` con datos reales.
@@ -18,15 +21,17 @@ cada sesión. Última actualización: **2026-06-10**.
   funcional** (`ScreenPencil.Mac`, Avalonia + AppKit): bienvenida, toolbar, herramientas, hotkeys, captura.
 
 ## Pendientes — Landing
-- [ ] **Validar el fullpage scroll** en distintas alturas de pantalla. Secciones largas (12
-      funciones, atajos 3 columnas, FAQ) pueden no caber en 100vh → revisar recorte / contenido bajo el nav.
-  - Ajustes posibles: `scroll-padding-top` para el nav; `mandatory` → `proximity` si se siente brusco;
-    reducir contenido por panel (menos funciones/atajos por pantalla).
-  - Archivos: `assets/css/fullpage.css`, `assets/js/fullpage.js` (reversibles: quitar sus 2 enlaces en `index.html`).
-- [ ] Coherencia "Funciones" vs **"Herramientas"**: el tooltip del punto ya dice "Herramientas";
-      decidir si renombrar también el enlace del nav y el título de la sección `#features`.
 - [ ] **Optimizar fuentes** (self-host `.woff2`) para no depender de Google Fonts.
-- [ ] Cuando exista build de **macOS/Linux**, activar sus botones de descarga (hoy *Próximamente*).
+- [ ] **Recomprimir `og-banner.png`** (hoy ~1.2 MB) a < 300 KB para previews sociales más rápidos.
+- [ ] Cuando exista build de **macOS/Linux**, activar sus botones de descarga (hoy *Próximamente*)
+      en `src/components/Download.astro` / `Hero.astro` y `src/data/site.ts`.
+- [ ] **Revisar densidad visual** ahora que está todo el contenido en una sola página (que no se sienta larga).
+- [ ] (Opcional) borrar la carpeta prototipo `screenpencil-landing-v2` (ya migrada aquí).
+- [x] ~~Pase de rendimiento (jank de runtime)~~ → **hecho**: nav `backdrop-blur` xl→md sobre fondo animado,
+      blobs `blur` 64→44px + `contain:layout paint`, quitado `backdrop-filter` de float-cards,
+      glow del cursor con rect cacheado + rAF (sin reflujo), `content-visibility:auto` en 9 secciones.
+- [x] ~~Migrar a Astro + adaptar GitHub Actions con build~~ → **hecho**.
+- [x] ~~Fullpage scroll~~ → **retirado** en el rediseño (scroll normal, secciones que respiran).
 - [x] ~~Botones de **Descargar** del hero/precio~~ → **conectados** al release v0.2.1 (`screenpencil-releases`).
 - [x] ~~Imagen Open Graph 1200×630 propia~~ → **hecha** (`og-banner.png`).
 

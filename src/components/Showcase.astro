@@ -1,0 +1,96 @@
+---
+import SectionHead from "./SectionHead.astro";
+import T from "./T.astro";
+const base = import.meta.env.BASE_URL;
+
+const tabs = [
+  { id: "anotar", ic: "✏️", img: "hero-shot.webp", title: "lumina.app", es: "Anotar sobre apps", en: "Annotate over apps", sEs: "Resalta, flechas y círculos encima de todo", sEn: "Highlight, arrows and circles over everything" },
+  { id: "figuras", ic: "🔺", img: "fn-figuras.webp", title: "lumina.app — figuras", es: "Figuras y flechas", en: "Shapes & arrows", sEs: "Líneas, flechas, rectángulos y elipses", sEn: "Lines, arrows, rectangles and ellipses" },
+  { id: "texto", ic: "🔢", img: "fn-texto.webp", title: "lumina.app — texto", es: "Texto y badges", en: "Text & badges", sEs: "Escribe y numera los pasos", sEn: "Type and number the steps" },
+  { id: "spotlight", ic: "🔦", img: "fn-spotlight.webp", title: "lumina.app — spotlight", es: "Spotlight", en: "Spotlight", sEs: "Oscurece todo menos una zona", sEn: "Dim everything except one area" },
+  { id: "lupa", ic: "🔍", img: "fn-lupa.webp", title: "lumina.app — lupa", es: "Lupa con zoom", en: "Magnifier", sEs: "Amplía cualquier detalle", sEn: "Magnify any detail" },
+  { id: "pizarra", ic: "📋", img: "fn-pizarra.webp", title: "Pizarra", es: "Pizarra", en: "Whiteboard", sEs: "Un lienzo en blanco para explicar", sEn: "A blank canvas to explain" },
+];
+---
+<section id="showcase" class="cv-auto mx-auto max-w-6xl px-5 py-24">
+  <SectionHead
+    eyebrowEs="En acción" eyebrowEn="In action"
+    titleEs="Cada función, <span class='grad-text'>en vivo</span>"
+    titleEn="Every feature, <span class='grad-text'>live</span>"
+    subEs="Pulsa una herramienta y mira una muestra <strong class='text-ink'>real</strong> hecha con la app."
+    subEn="Tap a tool and see a <strong class='text-ink'>real</strong> sample made with the app."
+  />
+
+  <div class="reveal mt-14 grid gap-6 lg:grid-cols-[300px_1fr]">
+    <!-- Pestañas -->
+    <div role="tablist" aria-label="Funciones" class="flex flex-col gap-2" data-sc-tabs>
+      {tabs.map((t, i) => (
+        <button
+          role="tab"
+          data-sc-tab={t.id}
+          data-img={`${base}assets/img/${t.img}`}
+          data-title={t.title}
+          aria-selected={i === 0 ? "true" : "false"}
+          class="flex items-center gap-3 rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3 text-left transition aria-selected:border-amber/40 aria-selected:bg-amber/5 hover:border-white/20"
+        >
+          <span class="text-lg">{t.ic}</span>
+          <span class="min-w-0">
+            <b class="block text-sm font-semibold"><T es={t.es} en={t.en} /></b>
+            <i class="block truncate text-xs not-italic text-ink-dim"><T es={t.sEs} en={t.sEn} /></i>
+          </span>
+        </button>
+      ))}
+    </div>
+
+    <!-- Escenario -->
+    <figure class="m-0">
+      <div class="overflow-hidden rounded-2xl border border-white/10 bg-bg-2 shadow-[0_30px_80px_-30px_rgba(0,0,0,0.8)]">
+        <div class="flex items-center gap-2 border-b border-white/5 px-4 py-3">
+          <span class="size-3 rounded-full bg-red-400/80"></span>
+          <span class="size-3 rounded-full bg-amber/80"></span>
+          <span class="size-3 rounded-full bg-emerald-400/80"></span>
+          <span class="ml-2 text-xs text-ink-dim" data-sc-title>lumina.app</span>
+        </div>
+        <button data-sc-zoom class="block w-full cursor-zoom-in" aria-label="Ampliar imagen">
+          <img data-sc-img src={`${base}assets/img/hero-shot.webp`} width="1600" height="1000" loading="lazy" decoding="async" alt="Muestra real de ScreenPencil" class="w-full" />
+        </button>
+      </div>
+      <figcaption class="mt-3 text-center text-sm text-ink-dim">
+        <T es="↑ Pulsa una función · clic en la imagen para ampliar" en="↑ Tap a feature · click the image to enlarge" />
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- Lightbox -->
+<dialog data-sc-lightbox class="m-auto max-w-[92vw] bg-transparent p-0 backdrop:bg-black/80 backdrop:backdrop-blur-sm">
+  <img data-sc-lightbox-img src="" alt="" class="max-h-[88vh] w-auto rounded-xl" />
+</dialog>
+
+<script>
+  const root = document.querySelector("[data-sc-tabs]");
+  const img = document.querySelector<HTMLImageElement>("[data-sc-img]");
+  const title = document.querySelector<HTMLElement>("[data-sc-title]");
+  const zoom = document.querySelector<HTMLButtonElement>("[data-sc-zoom]");
+  const dialog = document.querySelector<HTMLDialogElement>("[data-sc-lightbox]");
+  const dialogImg = document.querySelector<HTMLImageElement>("[data-sc-lightbox-img]");
+
+  if (root && img && title) {
+    root.querySelectorAll<HTMLButtonElement>("[data-sc-tab]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        root.querySelectorAll("[data-sc-tab]").forEach((b) => b.setAttribute("aria-selected", "false"));
+        btn.setAttribute("aria-selected", "true");
+        img.src = btn.dataset.img || img.src;
+        title.textContent = btn.dataset.title || "";
+      });
+    });
+  }
+
+  if (zoom && dialog && dialogImg && img) {
+    zoom.addEventListener("click", () => {
+      dialogImg.src = img.src;
+      dialog.showModal();
+    });
+    dialog.addEventListener("click", () => dialog.close());
+  }
+</script>

@@ -1,0 +1,85 @@
+---
+import SectionHead from "./SectionHead.astro";
+import T from "./T.astro";
+
+type Row = { keys: string[]; es: string; en: string };
+const groups: { titleEs: string; titleEn: string; rows: Row[] }[] = [
+  {
+    titleEs: "Globales",
+    titleEn: "Global",
+    rows: [
+      { keys: ["Ctrl", "Alt", "D"], es: "Modo dibujo / reposo", en: "Drawing / idle mode" },
+      { keys: ["Ctrl", "Alt", "S"], es: "Captura a PNG", en: "Capture to PNG" },
+      { keys: ["Ctrl", "Alt", "X"], es: "Copiar al portapapeles", en: "Copy to clipboard" },
+      { keys: ["Ctrl", "Alt", "W"], es: "Pizarra", en: "Whiteboard" },
+      { keys: ["Ctrl", "Alt", "L"], es: "Spotlight", en: "Spotlight" },
+      { keys: ["Ctrl", "Alt", "F"], es: "Freeze", en: "Freeze" },
+    ],
+  },
+  {
+    titleEs: "Herramientas",
+    titleEn: "Tools",
+    rows: [
+      { keys: ["P"], es: "Lápiz", en: "Pen" },
+      { keys: ["H"], es: "Marcador", en: "Highlighter" },
+      { keys: ["A"], es: "Flecha", en: "Arrow" },
+      { keys: ["L"], es: "Línea", en: "Line" },
+      { keys: ["R"], es: "Rectángulo", en: "Rectangle" },
+      { keys: ["O"], es: "Elipse", en: "Ellipse" },
+      { keys: ["T"], es: "Texto", en: "Text" },
+      { keys: ["E"], es: "Borrador", en: "Eraser" },
+    ],
+  },
+  {
+    titleEs: "Edición",
+    titleEn: "Editing",
+    rows: [
+      { keys: ["Ctrl", "Z"], es: "Deshacer", en: "Undo" },
+      { keys: ["Ctrl", "Y"], es: "Rehacer", en: "Redo" },
+      { keys: ["↑", "↓"], es: "Grosor", en: "Thickness" },
+      { keys: ["1", "…", "6"], es: "Color rápido", en: "Quick color" },
+      { keys: ["Tab"], es: "Última herramienta", en: "Last tool" },
+      { keys: ["Esc"], es: "Salir del modo dibujo", en: "Exit drawing mode" },
+    ],
+  },
+];
+---
+<section id="hotkeys" class="cv-auto mx-auto max-w-6xl px-5 py-24">
+  <SectionHead
+    eyebrowEs="Atajos" eyebrowEn="Shortcuts"
+    titleEs="Pensado para la <span class='grad-text'>velocidad</span>"
+    titleEn="Built for <span class='grad-text'>speed</span>"
+    subEs="Atajos globales reasignables y una tecla por herramienta. Sin tocar el ratón."
+    subEn="Reassignable global shortcuts and one key per tool. Without touching the mouse."
+  />
+
+  <div class="mt-14 grid gap-4 md:grid-cols-3">
+    {groups.map((g, gi) => (
+      <div class="reveal rounded-2xl border border-white/8 bg-white/[0.02] p-6" style={`--reveal-delay:${gi * 70}ms`}>
+        <h3 class="font-display text-sm font-semibold uppercase tracking-[0.18em] text-amber">
+          <T es={g.titleEs} en={g.titleEn} />
+        </h3>
+        <ul class="mt-4 space-y-2.5">
+          {g.rows.map((r) => (
+            <li class="flex items-center justify-between gap-4">
+              <span class="flex items-center gap-1">
+                {r.keys.map((k) => (
+                  <kbd class="grid min-w-6 place-items-center rounded-md border border-white/12 bg-white/5 px-1.5 py-0.5 font-mono text-xs text-ink">{k}</kbd>
+                ))}
+              </span>
+              <span class="text-right text-sm text-ink-soft"><T es={r.es} en={r.en} /></span>
+            </li>
+          ))}
+        </ul>
+        {gi === 2 && (
+          <p class="mt-4 border-t border-white/8 pt-3 text-xs text-ink-dim">
+            <T
+              es="Todos los atajos globales son <strong class='text-ink-soft'>reasignables</strong> desde Ajustes."
+              en="All global shortcuts are <strong class='text-ink-soft'>reassignable</strong> from Settings."
+            />
+          </p>
+        )}
+      </div>
+    ))}
+  </div>
+</section>

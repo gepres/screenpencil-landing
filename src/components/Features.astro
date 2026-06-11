@@ -1,0 +1,45 @@
+---
+import SectionHead from "./SectionHead.astro";
+import T from "./T.astro";
+
+const cards = [
+  { ic: "✏️", es: "Lápiz y marcador", en: "Pen & highlighter", dEs: "Trazo libre con presión de stylus y marcador translúcido para resaltar sin tapar.", dEn: "Free-hand strokes with stylus pressure, plus a translucent highlighter that emphasizes without covering." },
+  { ic: "➶", es: "Figuras y flechas", en: "Shapes & arrows", dEs: "Líneas, flechas, rectángulos y elipses con vista previa. Edítalas después de crearlas.", dEn: "Lines, arrows, rectangles and ellipses with live preview. Edit them after you draw them." },
+  { ic: "🅣", es: "Texto y badges", en: "Text & badges", dEs: "Escribe encima de la pantalla con fuente y contorno, y numera pasos con badges.", dEn: "Type over the screen with font and outline, and number steps with badges." },
+  { ic: "🔦", es: "Spotlight", en: "Spotlight", dEs: "Oscurece todo menos una zona — círculo o rectángulo con borde suave — para enfocar la atención.", dEn: "Dim everything except one area — circle or rectangle with a soft edge — to focus attention." },
+  { ic: "🔍", es: "Lupa con zoom", en: "Magnifier", dEs: "Una lente que amplía cualquier detalle. Ajusta el zoom con la rueda del ratón.", dEn: "A lens that magnifies any detail. Adjust the zoom with the mouse wheel." },
+  { ic: "📋", es: "Pizarra", en: "Whiteboard", dEs: "Cambia a un lienzo opaco cuando necesites partir de cero, sin perder tus trazos.", dEn: "Switch to an opaque canvas when you need a clean start, without losing your strokes." },
+  { ic: "❄️", es: "Freeze", en: "Freeze", dEs: "Congela la pantalla para anotar sobre algo en movimiento (un vídeo, una animación).", dEn: "Freeze the screen to annotate over something moving (a video, an animation)." },
+  { ic: "🖥️", es: "Multi-monitor", en: "Multi-monitor", dEs: "Un overlay por pantalla con undo e historial compartidos. HiDPI y 4K nativos.", dEn: "One overlay per screen with shared undo and history. Native HiDPI and 4K." },
+  { ic: "📸", es: "Captura y copia", en: "Capture & copy", dEs: "Exporta a PNG con tus anotaciones o cópialas al portapapeles con un atajo.", dEn: "Export a PNG with your annotations or copy them to the clipboard with a shortcut." },
+  { ic: "🎨", es: "Color y grosor", en: "Color & thickness", dEs: "Paleta rápida, selector HSV, opacidad y grosor — recordados por herramienta.", dEn: "Quick palette, HSV picker, opacity and thickness — remembered per tool." },
+  { ic: "↩️", es: "Deshacer / rehacer", en: "Undo / redo", dEs: "Historial unificado de todos tus trazos y figuras. Limpia todo con una sola acción.", dEn: "Unified history of all your strokes and shapes. Clear everything with a single action." },
+  { ic: "⌨️", es: "Atajos globales", en: "Global shortcuts", dEs: "Activa el modo dibujo o cualquier herramienta sin tocar la app. Todos reasignables.", dEn: "Trigger drawing mode or any tool without touching the app. All reassignable." },
+  { ic: "🌍", es: "En 7 idiomas", en: "In 7 languages", dEs: "Interfaz en español, inglés, portugués, chino, ruso, italiano y francés — cambia al vuelo.", dEn: "Interface in Spanish, English, Portuguese, Chinese, Russian, Italian and French — switch on the fly." },
+  { ic: "🛡️", es: "Invisible al grabar", en: "Invisible while recording", dEs: "La barra de herramientas se oculta de las grabaciones y de la pantalla compartida: tus anotaciones se ven, la interfaz no.", dEn: "The toolbar hides from screen recordings and screen sharing: your annotations show, the UI doesn't." },
+  { ic: "👻", es: "Modo presentación", en: "Presenter mode", dEs: "Ghost (los clics atraviesan), trazo efímero (se desvanece solo) y un halo para resaltar el cursor.", dEn: "Ghost (clicks pass through), ephemeral ink (it fades on its own) and a halo to highlight the cursor." },
+];
+---
+<section id="features" class="cv-auto mx-auto max-w-6xl px-5 py-24">
+  <SectionHead
+    eyebrowEs="Funciones" eyebrowEn="Features"
+    titleEs="Todo lo que necesitas para <span class='grad-text'>explicar mejor</span>"
+    titleEn="Everything you need to <span class='grad-text'>explain better</span>"
+    subEs="Un conjunto completo de herramientas de anotación, sin esconder nada detrás de un muro de pago."
+    subEn="A complete set of annotation tools, with nothing hidden behind a paywall."
+  />
+
+  <div class="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    {cards.map((c, i) => (
+      <article
+        data-glow
+        class="glow-card reveal rounded-2xl border border-white/8 bg-white/[0.02] p-6 transition duration-300 hover:-translate-y-1 hover:border-white/15 hover:bg-white/[0.06]"
+        style={`--reveal-delay:${(i % 3) * 60}ms`}
+      >
+        <div class="relative z-10 grid size-11 place-items-center rounded-xl border border-white/8 bg-white/5 text-xl">{c.ic}</div>
+        <h3 class="relative z-10 mt-4 font-display text-lg font-semibold"><T es={c.es} en={c.en} /></h3>
+        <p class="relative z-10 mt-2 text-sm leading-relaxed text-ink-soft"><T es={c.dEs} en={c.dEn} /></p>
+      </article>
+    ))}
+  </div>
+</section>

@@ -1,11 +1,10 @@
-# Publica la landing (sitio estático) en GitHub Pages en cada push a main.
-# No hay build: se sube el contenido del repo tal cual.
+# Compila la landing (Astro) y la publica en GitHub Pages en cada push a main.
 name: Deploy a GitHub Pages
 
 on:
   push:
     branches: [main]
-  workflow_dispatch: {}   # permite lanzarlo a mano desde la pestaña Actions
+  workflow_dispatch: {} # permite lanzarlo a mano desde la pestaña Actions
 
 # Permisos mínimos que necesita el deploy oficial de Pages.
 permissions:
@@ -19,26 +18,51 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Instalar pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Configurar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Configurar Pages
+        id: pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true # habilita Pages la primera vez (si el repo lo permite)
+
+      - name: Compilar (Astro)
+        # base = ruta de Pages del repo → /screenpencil-landing/ (Pages de proyecto).
+        # Para dominio propio en la raíz, cambia a BASE_PATH=/
+        env:
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
+        run: pnpm build
+
+      - name: Subir artefacto del sitio
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
   deploy:
+    needs: build
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Configurar Pages
-        uses: actions/configure-pages@v5
-        with:
-          # Habilita Pages automáticamente la primera vez (si el repo lo permite).
-          enablement: true
-
-      - name: Subir artefacto del sitio
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: .   # raíz del repo: index.html + assets/ + docs/
-
       - name: Desplegar en Pages
         id: deployment
         uses: actions/deploy-pages@v4

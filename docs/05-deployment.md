@@ -1,108 +1,83 @@
 # 05 — Despliegue
 
-La landing es **estática**: no requiere build ni servidor de aplicación. Sube los archivos tal cual.
+La landing es un sitio **Astro** con output **estático**: `pnpm build` genera `dist/`, que se publica
+tal cual. El deploy a GitHub Pages está **automatizado con GitHub Actions** (build incluido).
 
-## Subir el repo a GitHub
+## Hosting recomendado: GitHub Pages con Actions (ya configurado)
 
-```bash
-cd screenpencil-landing
-git init -b main
-git add .
-git commit -m "ScreenPencil landing: sitio bilingüe ES/EN"
+El repo incluye `.github/workflows/deploy.yml`. En **cada push a `main`** (o a mano desde la pestaña
+**Actions**):
 
-# Repo remoto (créalo vacío en GitHub primero, sin README)
-git remote add origin https://github.com/gepres/screenpencil-landing.git
-git push -u origin main
-```
+1. Instala dependencias con pnpm, **compila Astro** y sube `dist/` como artefacto de Pages.
+2. El `base` se toma automáticamente de Pages (`configure-pages` → `base_path`), así que las rutas
+   quedan bajo `/screenpencil-landing/` sin tocar nada.
+3. La primera vez intenta **activar Pages** solo (`enablement: true`). Si fallara por permisos, ve una
+   vez a **Settings → Pages → Build and deployment → Source: _GitHub Actions_**.
+4. El sitio queda en `https://gepres.github.io/screenpencil-landing/` (la URL exacta sale en el log).
 
-> Atajo con la CLI de GitHub (crea el repo y sube en un paso):
-> `gh repo create gepres/screenpencil-landing --public --source=. --push`
+> **Importante:** ahora el Source de Pages debe ser **GitHub Actions** (no "Deploy from a branch"):
+> el sitio se **compila**, ya no se sirve la raíz del repo.
 
-## Opciones de hosting
+## Otros hostings
 
-### GitHub Pages con GitHub Actions (recomendado, ya configurado)
-El repo incluye `.github/workflows/deploy.yml`: en **cada push a `main`** publica el sitio en Pages.
+Todos sirven el directorio `dist/` tras `pnpm build`:
 
-1. Haz push a `main` (el workflow se dispara solo; también puedes lanzarlo desde la pestaña **Actions**).
-2. La primera vez, el workflow intenta **activar Pages** automáticamente (`configure-pages` con `enablement: true`).
-   Si fallara por permisos, ve una sola vez a **Settings → Pages → Build and deployment → Source: _GitHub Actions_**.
-3. Tu sitio queda en `https://gepres.github.io/screenpencil-landing/` (la URL exacta sale en el log del job).
+| Host | Build command | Output |
+|------|---------------|--------|
+| **Vercel** | `pnpm build` (detecta Astro) | `dist` |
+| **Netlify** | `pnpm build` | `dist` |
+| **Cloudflare Pages** | `pnpm build` | `dist` |
 
-> Sube el repo **tal cual** (sin build). Como las rutas son **relativas** (`assets/...`), funciona aunque el sitio cuelgue de un subdirectorio.
+Para deploy en la **raíz** de un dominio (no en un subdirectorio), compila con `BASE_PATH=/`
+(es el valor por defecto si no se define la variable).
 
-### GitHub Pages desde rama (alternativa sin workflow)
-Settings → Pages → Source: `Deploy from a branch` → `main` / `root`. Borra el workflow si usas esta vía.
+## Variables de entorno (`astro.config.mjs`)
 
-### Netlify (gratis)
-- Arrastra la carpeta a [app.netlify.com/drop](https://app.netlify.com/drop), **o**
-- Conecta el repo. **Build command:** *(vacío)*. **Publish directory:** `.` (raíz).
-
-### Vercel (gratis)
-- `vercel` en la carpeta, o importa el repo. Framework preset: **Other**. Sin build.
-
-### Cloudflare Pages (gratis)
-- Conecta el repo. Build command vacío. Output directory: `/`.
-
-### Cualquier hosting / FTP
-- Sube `index.html` + `assets/` (+ `docs/` si quieres publicarla). Listo.
+- `SITE_URL` — dominio público (canonical, OG, sitemap). Por defecto `https://gepres.github.io`.
+- `BASE_PATH` — prefijo de ruta. `/screenpencil-landing/` en Pages de proyecto; `/` en raíz.
 
 ## Dominio personalizado
 
-Apunta tu dominio (p. ej. `screenpencil.app`) al hosting elegido:
-- **GitHub Pages:** añade `CNAME` + registros DNS según su guía.
-- **Netlify/Vercel/Cloudflare:** panel → *Domains* → seguir asistente (HTTPS automático).
+Apunta tu dominio (p. ej. `screenpencil.app`) al hosting y compila con `BASE_PATH=/`:
+- **GitHub Pages:** añade `public/CNAME` con el dominio + registros DNS según su guía.
+- **Vercel/Cloudflare/Netlify:** panel → *Domains* → asistente (HTTPS automático).
 
 ## Antes de publicar (producción)
 
-- [ ] Conecta los botones de **descarga** y **GitHub** (ver [04 — Desarrollo](04-development.md)).
-- [ ] Reemplaza la imagen Open Graph (`assets/img/logo.png`) por una imagen social 1200×630 si quieres
-      mejores previews al compartir.
-- [ ] Ajusta `<title>` y `meta description` si cambia el posicionamiento.
-- [ ] (Opcional) añade `robots.txt` y `sitemap.xml`.
-- [ ] **Analítica:** pega el token de Cloudflare Web Analytics (ver sección siguiente).
+- [ ] `pnpm build` sin errores.
+- [ ] Enlaces de **descarga / GitHub / donación** y **versión** correctos (`src/data/site.ts`).
+- [ ] `<title>`, `meta description`, canonical y Open Graph correctos.
+- [ ] Banner OG (`public/assets/img/og-banner.png`) recomprimido a < 300 KB si quieres afinar.
+- [ ] **Analítica:** token de Cloudflare y código de GoatCounter conectados (ver abajo).
 
 ## Analítica
 
-Dos capas, ambas **sin cookies ni banner** de consentimiento (coherentes con el mensaje de privacidad)
-e integradas en `index.html` antes de `</body>`.
+Dos capas, ambas **sin cookies ni banner** de consentimiento. La instrumentación de eventos vive en
+`src/scripts/main.ts`, función `track()` — un único punto de integración.
 
-### 1. Tráfico — Cloudflare Web Analytics (ya activo)
-Mide visitas, páginas, fuentes y países.
-- Cloudflare registra por **hostname** (dominio), no por subcarpeta: el sitio es **`gepres.github.io`**.
-  En el panel, filtra por *Path* = `/screenpencil-landing/` para aislar esta landing.
-- Para cambiar de cuenta, reemplaza el `token` del beacon en `index.html`.
+### 1. Tráfico — Cloudflare Web Analytics
+Mide visitas, páginas, fuentes y países. Registra por **hostname** (`gepres.github.io`): en el panel,
+filtra por *Path* = `/screenpencil-landing/` para aislar esta landing. El beacon se añade en
+`Base.astro` (pendiente de pegar el token cuando se quiera activar).
 
-### 2. Clics y flujo de usuario — GoatCounter
-Mide **eventos** (la instrumentación está en `main.js`, función `track()` — un único punto de integración):
+### 2. Clics y flujo — GoatCounter
 
 | Evento | `path` en el panel |
 |--------|--------------------|
-| Clic en Descargar (intención / botón real) | `cta/download-intent`, `download/<plataforma>` |
+| Clic en Descargar | `download/<plataforma>` |
 | Clic en GitHub | `github` |
 | Clic en donación | `donate/<plataforma>` |
 | Cambio de idioma | `lang/es`, `lang/en` |
 | Uso de la demo (primer trazo) | `demo/used` |
-| Showcase explorado | `showcase/<función>` |
-| Flujo de scroll (hitos) | `flow/features`, `flow/demo`, `flow/pricing`, `flow/faq` |
 
-Para activarlo:
-1. Crea una cuenta gratis en [goatcounter.com](https://www.goatcounter.com) y elige un código (p. ej. `screenpencil`).
-2. Reemplaza `TU_CODIGO` en el script de `index.html` por ese código → commit + push (el workflow redepliega).
+`track()` llama a `window.goatcounter.count(...)` si el script de GoatCounter está cargado. Para
+activarlo, añade el snippet de tu cuenta y los eventos empezarán a registrarse. El panel **`/admin`**
+agrega ambas fuentes vía el backend NestJS.
 
-> Mientras los placeholders (`TU_TOKEN`, `TU_CODIGO`) no se sustituyan, esa capa no registra (no rompe el sitio).
-> **¿Prefieres GA4?** Da embudos/rutas más ricos pero usa cookies (requiere banner). Para migrar, reescribe
-> solo el **cuerpo de `track()`** y cambia el snippet; la instrumentación de eventos no cambia.
+> **¿Prefieres GA4?** Reescribe solo el **cuerpo de `track()`**; la instrumentación no cambia.
 
 ## Rendimiento
 
-Ya es ligero (0 KB de framework). Para exprimir:
+- Astro envía **~0 JS** salvo las islas (demo, showcase, toggle). CSS minificado por Vite.
 - Sirve con **gzip/brotli** (los hosts anteriores lo hacen por defecto).
-- Considera **self-host de fuentes** (`.woff2` en `assets/fonts/`) para evitar la latencia de Google Fonts.
-- **Logo ya optimizado:** `logo.png` se redujo de 1024px (1.46 MB) a 160px (~8 KB) para mostrarse a 32-38px.
-  El original de alta resolución se conserva como `logo-original.png` (usado solo en Open Graph / apple-touch-icon).
-  Si cambias el logo, repite el proceso (ver `tools` o reusa el script de PowerShell del historial).
-
-## Caché / actualizaciones
-
-Al ser estático, basta con re-subir los archivos cambiados. Si usas CDN, purga la caché de
-`index.html`, `styles.css` y `main.js` tras cada deploy.
+- (Pendiente) **self-host de fuentes** (`.woff2`) para evitar la latencia de Google Fonts.

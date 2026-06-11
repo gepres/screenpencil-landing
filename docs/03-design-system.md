@@ -1,7 +1,10 @@
 # 03 — Sistema de diseño
 
-Todo el aspecto se controla con **variables CSS** en `:root` (inicio de `assets/css/styles.css`).
-Cambia ahí y se propaga a toda la página.
+Todo el aspecto se controla con **tokens `@theme`** al inicio de `src/styles/global.css` (Tailwind v4).
+Cambia ahí y se propaga a toda la página. La **paleta, los colores, los efectos y las animaciones de la
+primera versión se conservan** (portados a Astro): fondo animado (mesh de gradientes + grid + blobs a la
+deriva), ventana del hero con tilt 3D y flotación, float-cards, brillo que sigue al cursor en las
+tarjetas y contadores animados. Lo único que **no** volvió es el *fullpage scroll* (ver abajo).
 
 ## Paleta
 
@@ -38,29 +41,35 @@ botones primarios y números del flujo.
 
 ## Componentes
 
-| Clase | Qué es |
-|-------|--------|
-| `.btn` `.btn--primary` `.btn--ghost` `.btn--sm/--lg` | Botones (primario con barrido de brillo). |
-| `.pill` `.badge` `.eyebrow` | Etiquetas pequeñas. |
-| `.card` | Tarjeta de función (brillo que sigue al cursor vía `--mx/--my`). |
-| `.flow__step` `.flow__num` | Pasos del flujo. |
-| `.keys__col` `kbd` `.combo` | Tabla de atajos. |
-| `.platcard` | Tarjeta de plataforma. |
-| `.faq__item` (`<details>`) | Acordeón nativo accesible. |
-| `.window` + `.ink` | Mockup del hero con animación de trazo SVG. |
+Cada sección es un componente `.astro` estilizado con Tailwind; los botones, tarjetas, pills, tabla de
+atajos, etc. son utilidades de Tailwind. Solo unas pocas **clases CSS propias** (en `global.css`) llevan
+los efectos de la v1 que no son utilidades:
+
+| Clase propia | Qué es |
+|--------------|--------|
+| `.grad-text` | Texto con el gradiente de marca (azul→cian→ámbar). |
+| `.bg` `.bg__grid` `.bg__blob--1/2/3` | Fondo animado (mesh + grid + blobs), en `Base.astro`. |
+| `.hero-art` `.hero-window` `.float-card` | Mockup del hero con tilt 3D, flotación y badges flotantes. |
+| `.glow-card` (`[data-glow]`) | Tarjeta de función con brillo que sigue al cursor (`--mx/--my`). |
+| `.hero-scroll` | Indicador de scroll animado del hero. |
+| `.reveal` | Aparición al hacer scroll (`IntersectionObserver`). |
+| `<details>` (FAQ) | Acordeón nativo accesible. |
 
 ## Animaciones
 
+Las animaciones de la primera versión se **conservan** (portadas a `src/styles/global.css` + `src/scripts/main.ts`).
+Ver el detalle en **Animaciones (Astro)** más abajo.
+
 | Animación | Dónde | Cómo |
 |-----------|-------|------|
-| **Blobs a la deriva** | Fondo (`.bg__blob`) | `@keyframes drift1/2/3`, blur. |
+| **Blobs a la deriva** | Fondo (`.bg__blob--1/2/3`) | `@keyframes drift1/2/3`, `blur(64px)`. |
 | **Grid con máscara** | Fondo (`.bg__grid`) | gradiente + `mask-image` radial. |
-| **Trazo que se dibuja** | Hero (`.ink__draw`) | `stroke-dasharray/offset` + `@keyframes draw`. |
-| **Mockup flotante + tilt** | Hero (`.window`) | `@keyframes floaty` + `transform` 3D en hover. |
-| **Marquee** | Trust strip | `@keyframes marquee`, pausa en hover. |
-| **Reveal al scroll** | `.reveal` | `IntersectionObserver` añade `.is-visible`. `--d` escalona. |
-| **Contadores** | Hero métricas | `requestAnimationFrame` easeOutCubic (en `main.js`). |
-| **Brillo en cards** | `.card::before` | `--mx/--my` actualizadas en `pointermove`. |
+| **Ventana flotante + tilt** | Hero (`.hero-window`) | `@keyframes floaty` + `rotateX/Y` 3D, se endereza en hover. |
+| **Float-cards** | Hero (`.float-card`) | `floaty` con `animation-delay` escalonado. |
+| **Marquee** | Trust strip | scroll CSS, pausa en hover, estático en `reduced-motion`. |
+| **Reveal al scroll** | `.reveal` | `IntersectionObserver` añade `.is-in`; `--reveal-delay` escalona. |
+| **Contadores** | Hero métricas (`[data-metric]`) | `requestAnimationFrame` easeOutCubic (en `main.ts`). |
+| **Brillo en cards** | `.glow-card::before` | `--mx/--my` actualizadas en `pointermove` (`[data-glow]`). |
 
 ## Accesibilidad
 
@@ -75,18 +84,9 @@ botones primarios y números del flujo.
 - `≤ 760px`: menú hamburguesa, flujo/atajos/plataformas a 1 columna.
 - `≤ 480px`: features a 1 columna, se ocultan las float-cards del hero.
 
-## Fullpage scroll (CSS Scroll Snap)
+## Fullpage scroll — retirado
 
-Cada sección ocupa la pantalla y el scroll "salta" entre ellas (efecto tipo *fullPage.js*, pero
-**nativo y sin librerías** — `fullPage.js` requiere licencia de pago).
-
-- **Archivos:** `assets/css/fullpage.css` + `assets/js/fullpage.js` (enlazados en `index.html`).
-- **Técnica:** `html { scroll-snap-type: y mandatory }` + paneles con `min-height:100vh`,
-  `scroll-snap-align:start` y contenido centrado (`flex`/`justify-center`).
-- **Paneles** (por `id`): `#hero, #features, #showcase, #flow, #demo, #hotkeys, #platforms, #download,
-  #donate, #faq, #roadmap` y `.finalcta`. La barra de marca (`#trust`) queda como interludio fino.
-- **JS:** puntos de navegación a la derecha (etiqueta al hover), resaltado de sección activa
-  (`IntersectionObserver`) y `PageDown`/`PageUp` para saltar de panel.
-- **Solo escritorio** (`≥ 900px`) y si no hay `prefers-reduced-motion`; en móvil queda scroll normal.
-- **Reversible:** quita los 2 enlaces (`fullpage.css` y `fullpage.js`) en `index.html`.
-- **Pendiente:** validar secciones largas (no caben en 100vh en pantallas bajas). Ver [NEXT-STEPS](NEXT-STEPS.md).
+El **fullpage scroll** (CSS Scroll Snap, cada sección a 100vh) de la versión vanilla se **eliminó** en
+la migración a Astro: causaba recorte de las secciones largas (15 funciones, atajos, FAQ) en pantallas
+bajas y reñía con el objetivo minimalista. Ahora es **scroll normal** con secciones que respiran
+(`py-24`, anclas `id` por sección y `scroll-padding-top` para el nav fijo).

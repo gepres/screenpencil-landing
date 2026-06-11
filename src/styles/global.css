@@ -1,0 +1,244 @@
+@import "tailwindcss";
+
+/* ============================================================
+   ScreenPencil — Landing (Astro + Tailwind v4)
+   Paleta, colores, efectos y animaciones portados de la
+   primera versión (vanilla): fondo animado (mesh + grid + blobs),
+   brillo que sigue al cursor, ventana flotante con tilt, etc.
+   ============================================================ */
+
+@theme {
+  /* Fondos — valores exactos de la v1 */
+  --color-bg-0: #060912;
+  --color-bg-1: #0a0e1c;
+  --color-bg-2: #0f1424;
+
+  /* Texto */
+  --color-ink: #e8edf7;
+  --color-ink-soft: #93a0bd;
+  --color-ink-dim: #5e6a86;
+
+  /* Marca */
+  --color-blue: #3b82f6;
+  --color-blue-bright: #60a5fa;
+  --color-cyan: #22d3ee;
+  --color-amber: #e0a060;
+  --color-amber-deep: #c8864f;
+  --color-violet: #8b5cf6;
+
+  /* Bordes (como color para usar con /opacity) */
+  --color-line: #ffffff;
+
+  /* Tipografía */
+  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* Easing y radios */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+}
+
+/* Tokens auxiliares (no-Tailwind) reutilizados por los efectos de la v1 */
+:root {
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --grad: linear-gradient(120deg, var(--color-blue) 0%, var(--color-cyan) 55%, var(--color-amber) 110%);
+  --shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.7);
+  --shadow-glow: 0 0 60px -10px rgba(59, 130, 246, 0.5);
+}
+
+/* ---------- Base ---------- */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    background-color: var(--color-bg-0);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+
+  ::selection {
+    background-color: color-mix(in oklab, var(--color-amber) 35%, transparent);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-amber);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+}
+
+/* ---------- Texto con gradiente de marca (v1) ---------- */
+.grad-text {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* ============================================================
+   FONDO ANIMADO (portado de la v1): mesh de gradientes + grid
+   con máscara + 3 blobs a la deriva.
+   ============================================================ */
+.bg {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+  /* Aísla el repintado de los blobs del resto de la página (perf) */
+  contain: layout paint;
+  background:
+    radial-gradient(1200px 700px at 70% -10%, #11213f 0%, transparent 60%),
+    radial-gradient(900px 600px at 10% 10%, #16122e 0%, transparent 55%),
+    var(--color-bg-0);
+}
+.bg__grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(circle at 50% 30%, #000 0%, transparent 75%);
+  mask-image: radial-gradient(circle at 50% 30%, #000 0%, transparent 75%);
+}
+.bg__blob {
+  position: absolute;
+  border-radius: 50%;
+  /* 44px en vez de 64px: en blobs de ~400px casi no cambia el look y abarata
+     mucho la rasterización GPU. La capa se promueve y solo se transforma. */
+  filter: blur(44px);
+  opacity: 0.45;
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+.bg__blob--1 { width: 460px; height: 460px; background: var(--color-blue); top: -120px; left: -80px; animation: drift1 26s var(--ease) infinite alternate; }
+.bg__blob--2 { width: 400px; height: 400px; background: var(--color-violet); top: 30%; right: -120px; animation: drift2 30s var(--ease) infinite alternate; }
+.bg__blob--3 { width: 360px; height: 360px; background: var(--color-cyan); bottom: -120px; left: 40%; animation: drift3 34s var(--ease) infinite alternate; opacity: 0.32; }
+@keyframes drift1 { to { transform: translate(120px, 80px) scale(1.15); } }
+@keyframes drift2 { to { transform: translate(-90px, 60px) scale(1.1); } }
+@keyframes drift3 { to { transform: translate(60px, -70px) scale(1.2); } }
+
+/* ============================================================
+   MOCKUP DEL HERO: ventana con tilt 3D + flotación, float-cards.
+   ============================================================ */
+.hero-art { position: relative; perspective: 1400px; }
+.hero-window {
+  position: relative;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow), var(--shadow-glow);
+  transform: rotateY(-12deg) rotateX(6deg) rotateZ(1deg);
+  transition: transform 0.5s var(--ease);
+  animation: floaty 6s ease-in-out infinite;
+}
+.hero-art:hover .hero-window { transform: rotateY(-4deg) rotateX(2deg); }
+@keyframes floaty { 0%, 100% { translate: 0 0; } 50% { translate: 0 -14px; } }
+
+.float-card {
+  position: absolute;
+  padding: 0.55rem 0.9rem;
+  border-radius: 0.7rem;
+  background: rgba(15, 20, 36, 0.94);
+  border: 1px solid var(--border-strong);
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: var(--shadow);
+  animation: floaty 5s ease-in-out infinite;
+}
+.float-card--1 { top: 6%; right: -7%; animation-delay: 0.4s; }
+.float-card--2 { top: 46%; left: -10%; animation-delay: 1.2s; }
+.float-card--3 { bottom: -5%; right: 6%; animation-delay: 0.8s; }
+
+/* Hero mockup en móvil/tablet (cuando se apila): aplana el tilt 3D —cuya caja
+   rotada es más ancha que el contenedor—, centra y acota el ancho. */
+@media (max-width: 1023px) {
+  .hero-art {
+    max-width: 440px;
+    margin-inline: auto;
+    perspective: none;
+  }
+  .hero-window {
+    transform: none;
+    animation: none; /* sin flotación lateral en pantallas chicas */
+  }
+}
+/* En móvil oculta las float-cards: con offsets negativos sobresalen y descuadran. */
+@media (max-width: 639px) {
+  .float-card { display: none; }
+}
+
+/* Indicador de scroll del hero */
+.hero-scroll { position: relative; width: 26px; height: 42px; border: 2px solid var(--border-strong); border-radius: 100px; }
+.hero-scroll span { position: absolute; left: 50%; top: 8px; translate: -50% 0; width: 4px; height: 8px; border-radius: 4px; background: var(--color-cyan); animation: scrolldot 1.8s infinite; }
+@keyframes scrolldot { 0% { opacity: 0; top: 8px; } 40% { opacity: 1; } 80% { opacity: 0; top: 22px; } 100% { opacity: 0; } }
+
+/* ============================================================
+   TARJETAS CON BRILLO QUE SIGUE AL CURSOR (features)
+   ============================================================ */
+.glow-card { position: relative; overflow: hidden; }
+.glow-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.3s;
+  background: radial-gradient(380px circle at var(--mx, 50%) var(--my, 0%), rgba(59, 130, 246, 0.16), transparent 60%);
+  pointer-events: none;
+}
+.glow-card:hover::before { opacity: 1; }
+
+/* ---------- Reveal on scroll ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.7s var(--ease-out-soft), transform 0.7s var(--ease-out-soft);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.reveal.is-in { opacity: 1; transform: none; }
+
+/* ---------- Perf: no renderizar secciones fuera de pantalla ----------
+   El navegador salta layout/paint del contenido offscreen y recuerda su
+   tamaño real tras el primer render (la estimación 600px solo es inicial). */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;
+}
+
+/* ---------- i18n: oculta el idioma inactivo sin parpadeo ---------- */
+[data-lang="en"] [data-i="es"],
+[data-lang="es"] [data-i="en"] {
+  display: none;
+}
+
+/* ---------- Accesibilidad: reduce el movimiento ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .hero-window { transform: none; }
+}

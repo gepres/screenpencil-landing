@@ -1,0 +1,155 @@
+---
+import SectionHead from "./SectionHead.astro";
+import T from "./T.astro";
+
+const colors = [
+  { c: "#e0a060", n: "Ámbar" },
+  { c: "#22d3ee", n: "Cian" },
+  { c: "#3b82f6", n: "Azul" },
+  { c: "#ef4444", n: "Rojo" },
+  { c: "#22c55e", n: "Verde" },
+  { c: "#f8fafc", n: "Blanco" },
+];
+---
+<section id="demo" class="mx-auto max-w-5xl px-5 py-24">
+  <SectionHead
+    eyebrowEs="Pruébalo aquí mismo" eyebrowEn="Try it right here"
+    titleEs="Dibuja en esta <span class='grad-text'>mini pizarra</span>"
+    titleEn="Draw on this <span class='grad-text'>mini whiteboard</span>"
+    subEs="Una muestra de la sensación de trazo. La app real funciona igual… pero sobre toda tu pantalla."
+    subEn="A taste of how the strokes feel. The real app works the same… but over your entire screen."
+  />
+
+  <div class="reveal mt-12 overflow-hidden rounded-2xl border border-white/10 bg-bg-1">
+    <div class="flex flex-wrap items-center gap-2 border-b border-white/8 bg-white/[0.02] px-4 py-3" role="toolbar" aria-label="Herramientas de la demo" data-demo-toolbar>
+      <button data-tool="pen" class="grid size-9 place-items-center rounded-lg border border-white/10 text-lg aria-pressed:border-amber aria-pressed:bg-amber/15" aria-pressed="true" title="Lápiz">✏️</button>
+      <button data-tool="marker" class="grid size-9 place-items-center rounded-lg border border-white/10 text-lg aria-pressed:border-amber aria-pressed:bg-amber/15" aria-pressed="false" title="Marcador">🖊️</button>
+      <button data-tool="eraser" class="grid size-9 place-items-center rounded-lg border border-white/10 text-lg aria-pressed:border-amber aria-pressed:bg-amber/15" aria-pressed="false" title="Borrador">🧽</button>
+
+      <span class="mx-1 h-6 w-px bg-white/10"></span>
+
+      {colors.map((s, i) => (
+        <button
+          data-color={s.c}
+          class="size-7 rounded-full border-2 border-transparent transition aria-pressed:border-white"
+          style={`background:${s.c}`}
+          aria-pressed={i === 0 ? "true" : "false"}
+          title={s.n}
+        ></button>
+      ))}
+
+      <span class="mx-1 h-6 w-px bg-white/10"></span>
+
+      <input type="range" min="2" max="28" value="6" data-demo-size class="w-28 accent-amber" title="Grosor" />
+      <button data-demo-clear class="ml-auto rounded-lg border border-white/10 px-3 py-1.5 text-sm text-ink-soft transition hover:border-white/25 hover:text-ink">
+        <T es="Limpiar" en="Clear" />
+      </button>
+    </div>
+
+    <canvas data-demo-canvas class="block h-[320px] w-full touch-none bg-[#0d1018] sm:h-[420px]" aria-label="Lienzo de dibujo"></canvas>
+  </div>
+  <p class="reveal mt-4 text-center text-sm text-ink-dim">
+    <T es="✦ Mantén pulsado y arrastra para dibujar" en="✦ Press and drag to draw" />
+  </p>
+</section>
+
+<script>
+  const canvas = document.querySelector<HTMLCanvasElement>("[data-demo-canvas]");
+  const toolbar = document.querySelector<HTMLElement>("[data-demo-toolbar]");
+  if (canvas && toolbar) {
+    const ctx = canvas.getContext("2d")!;
+    let tool: "pen" | "marker" | "eraser" = "pen";
+    let color = "#e0a060";
+    let size = 6;
+    let drawing = false;
+    let last: { x: number; y: number } | null = null;
+    let used = false;
+
+    function resize() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const rect = canvas!.getBoundingClientRect();
+      // Preserva el dibujo al redimensionar
+      const prev = ctx.getImageData ? canvas!.toDataURL() : null;
+      canvas!.width = Math.round(rect.width * dpr);
+      canvas!.height = Math.round(rect.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      if (prev) {
+        const img = new Image();
+        img.onload = () => ctx.drawImage(img, 0, 0, rect.width, rect.height);
+        img.src = prev;
+      }
+    }
+    resize();
+    let rt: number | undefined;
+    window.addEventListener("resize", () => {
+      clearTimeout(rt);
+      rt = window.setTimeout(resize, 150);
+    });
+
+    function pos(e: PointerEvent) {
+      const r = canvas!.getBoundingClientRect();
+      return { x: e.clientX - r.left, y: e.clientY - r.top };
+    }
+
+    function start(e: PointerEvent) {
+      drawing = true;
+      last = pos(e);
+      canvas!.setPointerCapture(e.pointerId);
+      if (!used) {
+        used = true;
+        try {
+          (window as any).goatcounter?.count({ path: "demo/used", title: "Demo: primer trazo", event: true });
+        } catch {}
+      }
+    }
+    function move(e: PointerEvent) {
+      if (!drawing || !last) return;
+      const p = pos(e);
+      ctx.globalCompositeOperation = tool === "eraser" ? "destination-out" : "source-over";
+      ctx.strokeStyle = color;
+      ctx.lineWidth = tool === "marker" ? size * 2.2 : tool === "eraser" ? size * 2.6 : size;
+      ctx.globalAlpha = tool === "marker" ? 0.35 : 1;
+      ctx.beginPath();
+      ctx.moveTo(last.x, last.y);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+      last = p;
+    }
+    function end() {
+      drawing = false;
+      last = null;
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = "source-over";
+    }
+
+    canvas.addEventListener("pointerdown", start);
+    canvas.addEventListener("pointermove", move);
+    canvas.addEventListener("pointerup", end);
+    canvas.addEventListener("pointerleave", end);
+
+    toolbar.querySelectorAll<HTMLButtonElement>("[data-tool]").forEach((b) =>
+      b.addEventListener("click", () => {
+        tool = b.dataset.tool as typeof tool;
+        toolbar.querySelectorAll("[data-tool]").forEach((x) => x.setAttribute("aria-pressed", "false"));
+        b.setAttribute("aria-pressed", "true");
+      }),
+    );
+    toolbar.querySelectorAll<HTMLButtonElement>("[data-color]").forEach((b) =>
+      b.addEventListener("click", () => {
+        color = b.dataset.color!;
+        if (tool === "eraser") tool = "pen";
+        toolbar.querySelectorAll("[data-tool]").forEach((x) => x.setAttribute("aria-pressed", String(x.getAttribute("data-tool") === "pen")));
+        toolbar.querySelectorAll("[data-color]").forEach((x) => x.setAttribute("aria-pressed", "false"));
+        b.setAttribute("aria-pressed", "true");
+      }),
+    );
+    toolbar.querySelector<HTMLInputElement>("[data-demo-size]")?.addEventListener("input", (e) => {
+      size = Number((e.target as HTMLInputElement).value);
+    });
+    toolbar.querySelector("[data-demo-clear]")?.addEventListener("click", () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    });
+  }
+</script>

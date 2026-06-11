@@ -1,0 +1,34 @@
+---
+import SectionHead from "./SectionHead.astro";
+import T from "./T.astro";
+
+const items = [
+  { ic: "⌨️", es: "Atajos Ctrl+1…0", en: "Ctrl+1…0 badges", dEs: "Coloca un badge con un número concreto justo bajo el cursor.", dEn: "Drop a badge with a specific number right under the cursor." },
+  { ic: "↔️", es: "Barra horizontal", en: "Horizontal toolbar", dEs: "Elige la orientación de la barra de herramientas.", dEn: "Choose the orientation of the toolbar." },
+  { ic: "🖥️", es: "Captura multi-monitor", en: "Multi-monitor capture", dEs: "Exporta o copia la pantalla activa o todas a la vez.", dEn: "Export or copy the active screen or all of them at once." },
+  { ic: "📄", es: "Snapshots + PDF", en: "Snapshots + PDF", dEs: "Junta varias capturas y expórtalas a un PDF.", dEn: "Combine several captures and export them to a PDF." },
+  { ic: "🔤", es: "Editar texto creado", en: "Edit created text", dEs: "Doble clic para reescribir, mover o cambiar el tamaño.", dEn: "Double-click to rewrite, move or resize it." },
+  { ic: "🎯", es: "Rueda de herramientas", en: "Tool wheel", dEs: "Selector radial rápido bajo el cursor.", dEn: "A quick radial picker under the cursor." },
+];
+---
+<section id="roadmap" class="cv-auto mx-auto max-w-6xl px-5 py-24">
+  <SectionHead
+    eyebrowEs="En camino" eyebrowEn="On the way"
+    titleEs="Lo que viene <span class='grad-text'>próximamente</span>"
+    titleEn="What's coming <span class='grad-text'>next</span>"
+    subEs="El núcleo ya está completo y es gratis. Seguimos puliendo — esto es lo siguiente."
+    subEn="The core is already complete and free. We keep polishing — here's what's next."
+  />
+
+  <ul class="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    {items.map((it, i) => (
+      <li class="reveal flex gap-4 rounded-2xl border border-dashed border-white/12 bg-white/[0.015] p-5" style={`--reveal-delay:${(i % 3) * 60}ms`}>
+        <span class="text-2xl leading-none">{it.ic}</span>
+        <div>
+          <b class="font-display text-base font-semibold"><T es={it.es} en={it.en} /></b>
+          <p class="mt-1 text-sm leading-relaxed text-ink-soft"><T es={it.dEs} en={it.dEn} /></p>
+        </div>
+      </li>
+    ))}
+  </ul>
+</section>

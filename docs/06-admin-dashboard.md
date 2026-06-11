@@ -1,12 +1,13 @@
 # 06 — Panel admin (analytics)
 
-`admin.html` es un **dashboard interno** que muestra la analítica del sitio consumiendo el
+El panel **`/admin`** es un **dashboard interno** que muestra la analítica del sitio consumiendo el
 **backend NestJS** (`screenpencil-backend`). No contiene tokens: pide la API key y la guarda
 solo en el navegador.
 
 ## Cómo funciona
-- **Archivos:** `admin.html` + `assets/css/admin.css` + `assets/js/admin.js`.
-- **Acceso:** por URL directa `…/admin.html` (no está enlazado en el nav público). `noindex,nofollow`.
+- **Archivos:** `src/pages/admin.astro` (página aislada) + `public/assets/css/{admin,styles}.css` +
+  `public/assets/js/admin.js` (heredados de la versión vanilla; el sitio de marketing no los carga).
+- **Acceso:** por URL directa `…/screenpencil-landing/admin` (no está enlazado en el nav público). `noindex,nofollow`.
 - **Config (⚙):** URL del backend + API key (`x-api-key`), guardadas en `localStorage`.
   - URL por defecto: `https://screenpencil-backend.onrender.com` (producción).
   - Para desarrollo local del backend, cámbiala a `http://localhost:3333`.

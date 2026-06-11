@@ -1,0 +1,59 @@
+---
+import T from "./T.astro";
+
+const seals = [
+  { es: "Sin cuentas", en: "No accounts" },
+  { es: "Sin marca de agua", en: "No watermark" },
+  { es: "Sin anuncios", en: "No ads" },
+  { es: "Sin telemetría intrusiva", en: "No intrusive telemetry" },
+  { es: "Multi-monitor", en: "Multi-monitor" },
+  { es: "HiDPI / 4K", en: "HiDPI / 4K" },
+  { es: "Código abierto", en: "Open source" },
+  { es: "Para siempre gratis", en: "Free forever" },
+];
+---
+<section aria-label="Garantías" class="border-y border-white/8 bg-white/[0.015] py-5">
+  <div class="trust-mask">
+    <div class="trust-track">
+      {[0, 1].map(() =>
+        seals.map((s) => (
+          <span class="inline-flex items-center gap-2 px-6 text-sm text-ink-soft" aria-hidden={false}>
+            <span class="text-amber">✦</span>
+            <T es={s.es} en={s.en} />
+          </span>
+        )),
+      )}
+    </div>
+  </div>
+</section>
+
+<style>
+  .trust-mask {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+  .trust-track {
+    display: flex;
+    width: max-content;
+    white-space: nowrap;
+    animation: trust-scroll 38s linear infinite;
+  }
+  .trust-track:hover {
+    animation-play-state: paused;
+  }
+  @keyframes trust-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .trust-track {
+      animation: none;
+      flex-wrap: wrap;
+      width: 100%;
+      justify-content: center;
+      white-space: normal;
+      gap: 0.5rem;
+    }
+  }
+</style>

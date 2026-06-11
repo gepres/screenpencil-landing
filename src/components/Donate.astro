@@ -1,0 +1,36 @@
+---
+import Icon from "./Icon.astro";
+import T from "./T.astro";
+import { site } from "../data/site";
+---
+<section id="donate" class="cv-auto mx-auto max-w-4xl px-5 py-24">
+  <div class="reveal rounded-3xl border border-white/8 bg-white/[0.02] p-8 text-center sm:p-12">
+    <div class="mx-auto grid size-12 place-items-center rounded-full border border-amber/30 bg-amber/10 text-amber">
+      <Icon name="heart" class="size-6" />
+    </div>
+    <h2 class="mt-5 text-3xl font-bold sm:text-4xl">
+      <T es="Es gratis, pero no <span class='grad-text'>sin esfuerzo</span>." en="It's free, but not <span class='grad-text'>effortless</span>." />
+    </h2>
+    <p class="mx-auto mt-4 max-w-xl text-ink-soft">
+      <T
+        es="ScreenPencil seguirá siendo 100% gratis y sin paywall. Si te ahorra tiempo en tus clases, demos o presentaciones, una donación nos ayuda a mantenerlo y traerlo a más plataformas. <strong class='text-ink'>Cada café cuenta</strong> ☕."
+        en="ScreenPencil will stay 100% free and paywall-free. If it saves you time in your classes, demos or presentations, a donation helps us maintain it and bring it to more platforms. <strong class='text-ink'>Every coffee counts</strong> ☕."
+      />
+    </p>
+
+    <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+      <a href={site.coffee} target="_blank" rel="noopener" data-donate="coffee" class="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/5 px-5 py-3 font-medium transition hover:border-amber/40 hover:bg-amber/5">
+        <span>☕</span> <T es="Invítame un café" en="Buy me a coffee" />
+      </a>
+      <a href={site.sponsors} target="_blank" rel="noopener" data-donate="github" class="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/5 px-5 py-3 font-medium transition hover:border-amber/40 hover:bg-amber/5">
+        <Icon name="github" class="size-5" /> GitHub Sponsors
+      </a>
+      <a href={site.paypal} target="_blank" rel="noopener" data-donate="paypal" class="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/5 px-5 py-3 font-medium transition hover:border-amber/40 hover:bg-amber/5">
+        <span>🅿️</span> PayPal
+      </a>
+    </div>
+    <p class="mt-6 text-sm text-ink-dim">
+      <T es="Sin presión: usar y compartir ScreenPencil también es una gran forma de apoyar 💜" en="No pressure: using and sharing ScreenPencil is also a great way to support 💜" />
+    </p>
+  </div>
+</section>
