@@ -38,6 +38,17 @@ const fmtShort = (n: number): string => {
 };
 const pct = (n: number, d: number): number => (d ? Math.round((n / d) * 100) : 0);
 const avg = (a: number[]): number => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : 0);
+/** Bandera emoji desde código ISO 3166-1 alpha-2 ("PE" → 🇵🇪). */
+const flag = (code?: string): string => {
+  const cc = (code || "").toUpperCase();
+  if (!/^[A-Z]{2}$/.test(cc)) return "";
+  return String.fromCodePoint(...[...cc].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65)) + " ";
+};
+
+/** Datos del último fetch (para exportar a CSV). */
+let last: { summary: Summary | null; events: Events | null; ts: Timeseries | null; devices: Devices | null } = {
+  summary: null, events: null, ts: null, devices: null,
+};
 
 const LS = { base: "sp-admin-api-base", key: "sp-admin-api-key", period: "sp-admin-period" };
 const cfg = () => ({
@@ -85,6 +96,7 @@ cfgForm?.addEventListener("submit", (e) => {
 });
 $("[data-config-btn]")?.addEventListener("click", () => showConfig(cfgForm?.classList.contains("hidden") ?? true));
 $("[data-refresh]")?.addEventListener("click", () => load());
+$("[data-export]")?.addEventListener("click", () => exportCsv());
 periodSel?.addEventListener("change", () => {
   localStorage.setItem(LS.period, periodSel.value);
   load();
@@ -306,8 +318,10 @@ function renderCompare(s: Summary) {
 // --- Países / Fuentes (prefiere Cloudflare, cae a GoatCounter) ---
 function renderGeo(s: Summary) {
   const src = s.cloudflare ?? s.goatcounter;
+  // Para países prefiere la fuente con código ISO (GoatCounter) → permite banderas.
+  const countrySrc = s.goatcounter?.countries?.length ? s.goatcounter : src;
   const cEl = $("[data-countries]"), rEl = $("[data-referrers]");
-  if (cEl) cEl.innerHTML = barList((src?.countries ?? []).map((c) => ({ label: c.name || c.code || "?", views: c.views })));
+  if (cEl) cEl.innerHTML = barList((countrySrc?.countries ?? []).map((c) => ({ label: flag(c.code) + (c.name || c.code || "?"), views: c.views })));
   if (rEl) rEl.innerHTML = barList((src?.referrers ?? []).map((r) => ({ label: r.host || "(directo)", views: r.views })));
 }
 
@@ -372,6 +386,77 @@ function renderHeatmap(ts: Timeseries | null) {
     <p class="mt-2 text-xs text-ink-dim">Páginas vistas por hora (últimos ${Math.min(days.length, 14)} días). Más claro = más tráfico.</p>`;
 }
 
+// --- Gráfico de columnas (vertical) ---
+function columns(items: { label: string; value: number }[], color = "#22d3ee"): string {
+  if (!items.length || items.every((i) => i.value === 0)) return `<p class="text-sm text-ink-dim">Sin datos.</p>`;
+  const max = Math.max(...items.map((i) => i.value), 1);
+  return `<div class="flex items-end gap-1" style="height:120px">` +
+    items.map((i) => {
+      const a = i.value / max;
+      return `<div class="flex flex-1 flex-col items-center justify-end gap-1" style="height:120px" title="${esc(i.label)}: ${num(i.value)}">
+        <div class="w-full rounded-t" style="height:${Math.max(2, Math.round(a * 96))}px;background:${color};opacity:${(0.35 + 0.65 * a).toFixed(2)}"></div>
+        <span class="text-[9px] text-ink-dim">${esc(i.label)}</span>
+      </div>`;
+    }).join("") + `</div>`;
+}
+
+// --- Patrones de tiempo (hora del día + día de la semana) ---
+function renderTimePatterns(ts: Timeseries | null) {
+  const gc = ts?.goatcounter ?? [];
+  const hourEl = $("[data-hourdist]");
+  if (hourEl) {
+    const days = gc.filter((p) => Array.isArray(p.hourly) && p.hourly!.length === 24);
+    if (!days.length) hourEl.innerHTML = placeholder("Requiere el campo <code class='text-ink-soft'>hourly</code> del backend.");
+    else {
+      const byHour = Array.from({ length: 24 }, (_, h) => days.reduce((acc, d) => acc + (d.hourly![h] || 0), 0));
+      hourEl.innerHTML = columns(byHour.map((v, h) => ({ label: h % 3 === 0 ? String(h) : "", value: v }))) +
+        `<p class="mt-2 text-xs text-ink-dim">Suma del periodo (GoatCounter). Pico = horas de más tráfico.</p>`;
+    }
+  }
+  const wdEl = $("[data-weekday]");
+  if (wdEl) {
+    const src = gc.length ? gc : (ts?.cloudflare ?? []);
+    if (!src.length) wdEl.innerHTML = placeholder("Sin serie temporal en este periodo.");
+    else {
+      const acc = [0, 0, 0, 0, 0, 0, 0];
+      for (const p of src) {
+        const d = new Date(p.date + "T00:00:00");
+        if (!isNaN(d.getTime())) acc[d.getDay()] += p.views;
+      }
+      const order = [1, 2, 3, 4, 5, 6, 0];
+      const labels = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+      wdEl.innerHTML = columns(order.map((wd, i) => ({ label: labels[i], value: acc[wd] })), "#3b82f6") +
+        `<p class="mt-2 text-xs text-ink-dim">Páginas vistas acumuladas por día de la semana.</p>`;
+    }
+  }
+}
+
+// --- Export CSV ---
+function toCsv(rows: (string | number)[][]): string {
+  return rows.map((r) => r.map((c) => {
+    const s = String(c ?? "");
+    return /[",\n;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  }).join(",")).join("\n");
+}
+function exportCsv() {
+  if (!last.summary) { setStatus("Carga datos antes de exportar.", "warn"); return; }
+  const src = last.summary.cloudflare ?? last.summary.goatcounter;
+  const rows: (string | number)[][] = [["seccion", "etiqueta", "valor"]];
+  (src?.topPages ?? []).forEach((p) => rows.push(["pagina", p.path, p.views]));
+  (src?.countries ?? []).forEach((c) => rows.push(["pais", c.name || c.code || "?", c.views]));
+  (src?.referrers ?? []).forEach((r) => rows.push(["fuente", r.host || "(directo)", r.views]));
+  (last.events?.events ?? []).forEach((e) => rows.push(["accion", e.name, e.count]));
+  (last.devices?.browsers ?? []).forEach((d) => rows.push(["navegador", d.name, d.count]));
+  (last.devices?.systems ?? []).forEach((d) => rows.push(["sistema", d.name, d.count]));
+  (last.devices?.sizes ?? []).forEach((d) => rows.push(["pantalla", d.name, d.count]));
+  const blob = new Blob(["﻿" + toCsv(rows)], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `screenpencil-analytics-${last.summary.period}-${last.summary.range.end}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
 // --- Carga ---
 async function fetchJson<T>(path: string, period: string): Promise<T | null> {
   const { base, key } = cfg();
@@ -401,6 +486,7 @@ async function load() {
     const ts = tsR.status === "fulfilled" ? tsR.value : null;
     const ev = evR.status === "fulfilled" ? evR.value : null;
     const dv = dvR.status === "fulfilled" ? dvR.value : null;
+    last = { summary, events: ev, ts, devices: dv };
 
     setStatus("");
     if (dashEl) { dashEl.classList.remove("hidden"); dashEl.classList.add("flex"); }
@@ -414,6 +500,7 @@ async function load() {
     safe(() => renderEvents(ev));
     safe(() => renderDevices(dv));
     safe(() => renderHeatmap(ts));
+    safe(() => renderTimePatterns(ts));
 
     const upd = (() => { try { return new Date(summary.updatedAt).toLocaleString("es-PE"); } catch { return summary.updatedAt; } })();
     setStatus(`Periodo ${summary.period} · ${summary.range.start} → ${summary.range.end} · actualizado ${upd}${summary.partial ? " · ⚠️ datos parciales" : ""}`, summary.partial ? "warn" : "info");
