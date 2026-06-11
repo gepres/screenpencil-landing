@@ -35,6 +35,11 @@ cada sesión. Última actualización: **2026-06-11**.
       en `src/components/Download.astro` / `Hero.astro` y `src/data/site.ts`.
 - [ ] **Revisar densidad visual** ahora que está todo el contenido en una sola página (que no se sienta larga).
 - [ ] (Opcional) borrar la carpeta prototipo `screenpencil-landing-v2` (ya migrada aquí).
+- [x] ~~**Beacons de analítica** (GoatCounter + Cloudflare)~~ → **RESTAURADOS** en `Base.astro` (se
+      habían perdido en la migración → no se registraba nada nuevo; eventos/RUM vacíos). **No volver a
+      quitarlos.** Cloudflare token `957ed46…`; GoatCounter `screenpencil.goatcounter.com`. Mapa: GeoJSON
+      local en `public/assets/world.geo.json` (no CDN). Los eventos nuevos (scroll/sección/vitals) se
+      pueblan **hacia adelante**, no en el histórico.
 - [x] ~~Rebuild del panel `/admin` + instrumentación de navegación~~ → **hecho** (Astro/Tailwind, funnel,
       heatmap, dispositivos, acciones agrupadas; rutas neutras `/panel/*` anti-adblock).
 - [x] ~~Pase de rendimiento (jank de runtime)~~ → **hecho**: nav `backdrop-blur` xl→md sobre fondo animado,
