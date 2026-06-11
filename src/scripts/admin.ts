@@ -361,14 +361,37 @@ function renderEvents(ev: Events | null) {
 function placeholder(msg: string): string {
   return `<div class="rounded-xl border border-dashed border-white/12 bg-white/[0.015] p-5 text-sm text-ink-dim">${msg}</div>`;
 }
+const DONUT_COLORS = ["#22d3ee", "#3b82f6", "#8b5cf6", "#e0a060", "#22c55e", "#ef4444", "#93a0bd"];
+/** Donut (conic-gradient) con leyenda. */
+function donut(items: { name: string; count: number }[]): string {
+  const rows = items.filter((i) => i.count > 0).sort((a, b) => b.count - a.count).slice(0, 6);
+  if (!rows.length) return `<p class="text-sm text-ink-dim">Sin datos.</p>`;
+  const total = rows.reduce((a, i) => a + i.count, 0) || 1;
+  let acc = 0;
+  const stops = rows.map((r, i) => {
+    const from = (acc / total) * 100; acc += r.count; const to = (acc / total) * 100;
+    return `${DONUT_COLORS[i % DONUT_COLORS.length]} ${from.toFixed(1)}% ${to.toFixed(1)}%`;
+  }).join(", ");
+  const legend = rows.map((r, i) =>
+    `<li class="flex items-center justify-between gap-2 text-xs">
+      <span class="inline-flex min-w-0 items-center gap-1.5"><i class="size-2 shrink-0 rounded-full" style="background:${DONUT_COLORS[i % DONUT_COLORS.length]}"></i><span class="truncate text-ink-soft" title="${esc(r.name)}">${esc(r.name)}</span></span>
+      <span class="tabular-nums text-ink">${pct(r.count, total)}%</span>
+    </li>`).join("");
+  return `<div class="flex items-center gap-4">
+    <div class="relative size-24 shrink-0 rounded-full" style="background:conic-gradient(${stops})">
+      <div class="absolute inset-[24%] rounded-full bg-bg-1"></div>
+    </div>
+    <ul class="min-w-0 flex-1 space-y-1.5">${legend}</ul>
+  </div>`;
+}
 function renderDevices(d: Devices | null) {
   const el = $("[data-devices]");
   if (!el) return;
   if (!d) { el.innerHTML = placeholder("Requiere el endpoint <code class='text-ink-soft'>/panel/devices</code> en el backend (navegador · SO · tamaño de pantalla). Pendiente de desplegar."); return; }
-  el.innerHTML = `<div class="grid gap-4 sm:grid-cols-3">
-    <div><h4 class="mb-2 text-xs font-semibold uppercase tracking-wider text-ink-dim">Navegador</h4>${barList(d.browsers.map((x) => ({ label: x.name, views: x.count })), 5)}</div>
-    <div><h4 class="mb-2 text-xs font-semibold uppercase tracking-wider text-ink-dim">Sistema</h4>${barList(d.systems.map((x) => ({ label: x.name, views: x.count })), 5)}</div>
-    <div><h4 class="mb-2 text-xs font-semibold uppercase tracking-wider text-ink-dim">Pantalla</h4>${barList(d.sizes.map((x) => ({ label: x.name, views: x.count })), 5)}</div>
+  el.innerHTML = `<div class="grid gap-5 sm:grid-cols-2">
+    <div><h4 class="mb-3 text-xs font-semibold uppercase tracking-wider text-ink-dim">Navegador</h4>${donut(d.browsers)}</div>
+    <div><h4 class="mb-3 text-xs font-semibold uppercase tracking-wider text-ink-dim">Sistema</h4>${donut(d.systems)}</div>
+    <div class="sm:col-span-2"><h4 class="mb-2 text-xs font-semibold uppercase tracking-wider text-ink-dim">Tamaño de pantalla</h4>${barList(d.sizes.map((x) => ({ label: x.name, views: x.count })), 5)}</div>
   </div>`;
 }
 
