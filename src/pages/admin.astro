@@ -41,7 +41,7 @@ const base = import.meta.env.BASE_URL;
       </header>
 
       <!-- Configuración (URL backend + API key, en localStorage) -->
-      <form data-config class="mt-5 hidden gap-3 rounded-2xl border border-white/10 bg-bg-1 p-5 sm:grid sm:grid-cols-2" hidden>
+      <form data-config class="mt-5 hidden grid-cols-1 gap-3 rounded-2xl border border-white/10 bg-bg-1 p-5 sm:grid-cols-2">
         <label class="text-sm text-ink-soft">URL del backend (API)
           <input data-api-base type="url" placeholder="https://screenpencil-backend.onrender.com" autocomplete="off" class="mt-1 w-full rounded-lg border border-white/12 bg-bg-0 px-3 py-2 text-ink outline-none focus:border-amber/50" />
         </label>
@@ -54,9 +54,9 @@ const base = import.meta.env.BASE_URL;
         </div>
       </form>
 
-      <div data-status class="mt-5 hidden rounded-xl border px-4 py-3 text-sm" hidden></div>
+      <div data-status class="mt-5 hidden rounded-xl border px-4 py-3 text-sm"></div>
 
-      <main data-dashboard class="mt-6 hidden flex-col gap-6" hidden>
+      <main data-dashboard class="mt-6 hidden flex-col gap-6">
         <!-- KPIs -->
         <section data-kpis class="grid grid-cols-2 gap-3 lg:grid-cols-4"></section>
 

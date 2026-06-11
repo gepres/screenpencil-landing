@@ -60,7 +60,13 @@ function setStatus(msg: string, kind: "info" | "warn" | "err" = "info") {
   statusEl.textContent = msg;
   statusEl.hidden = !msg;
 }
-const showConfig = (show: boolean) => { if (cfgForm) cfgForm.hidden = !show; };
+// Alterna la CLASE Tailwind `hidden` (no el atributo): mezclar atributo + clase
+// dejaba el panel en display:none aunque hubiera datos.
+const showConfig = (show: boolean) => {
+  if (!cfgForm) return;
+  cfgForm.classList.toggle("hidden", !show);
+  cfgForm.classList.toggle("grid", show);
+};
 
 // --- Init formulario ---
 const apiBaseInput = $<HTMLInputElement>("[data-api-base]");
@@ -77,7 +83,7 @@ cfgForm?.addEventListener("submit", (e) => {
   showConfig(false);
   load();
 });
-$("[data-config-btn]")?.addEventListener("click", () => showConfig(!!cfgForm?.hidden));
+$("[data-config-btn]")?.addEventListener("click", () => showConfig(cfgForm?.classList.contains("hidden") ?? true));
 $("[data-refresh]")?.addEventListener("click", () => load());
 periodSel?.addEventListener("change", () => {
   localStorage.setItem(LS.period, periodSel.value);
@@ -381,7 +387,7 @@ async function load() {
   if (!key || !base) { setStatus("Configura la URL del backend y la API key (⚙) para empezar.", "warn"); showConfig(true); return; }
   const period = periodSel?.value || "7d";
   setStatus("Cargando…");
-  if (dashEl) dashEl.hidden = true;
+  if (dashEl) { dashEl.classList.add("hidden"); dashEl.classList.remove("flex"); }
   try {
     // Rutas neutras (/panel/*, "actions" en vez de "events"): los bloqueadores de anuncios
     // tumban cualquier URL con "analytics"/"events" (ERR_BLOCKED_BY_CLIENT).
@@ -397,15 +403,17 @@ async function load() {
     const dv = dvR.status === "fulfilled" ? dvR.value : null;
 
     setStatus("");
-    if (dashEl) { dashEl.hidden = false; dashEl.classList.add("flex"); }
-    renderKpis(summary, ts);
-    renderChart(ts);
-    renderFunnel(summary, ev);
-    renderCompare(summary);
-    renderGeo(summary);
-    renderEvents(ev);
-    renderDevices(dv);
-    renderHeatmap(ts);
+    if (dashEl) { dashEl.classList.remove("hidden"); dashEl.classList.add("flex"); }
+    // Cada render aislado: un fallo puntual con datos inesperados no tumba el resto.
+    const safe = (fn: () => void) => { try { fn(); } catch (err) { console.warn("[admin] render:", err); } };
+    safe(() => renderKpis(summary, ts));
+    safe(() => renderChart(ts));
+    safe(() => renderFunnel(summary, ev));
+    safe(() => renderCompare(summary));
+    safe(() => renderGeo(summary));
+    safe(() => renderEvents(ev));
+    safe(() => renderDevices(dv));
+    safe(() => renderHeatmap(ts));
 
     const upd = (() => { try { return new Date(summary.updatedAt).toLocaleString("es-PE"); } catch { return summary.updatedAt; } })();
     setStatus(`Periodo ${summary.period} · ${summary.range.start} → ${summary.range.end} · actualizado ${upd}${summary.partial ? " · ⚠️ datos parciales" : ""}`, summary.partial ? "warn" : "info");
