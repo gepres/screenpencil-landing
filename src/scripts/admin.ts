@@ -87,9 +87,19 @@ const showConfig = (show: boolean) => {
 const apiBaseInput = $<HTMLInputElement>("[data-api-base]");
 const apiKeyInput = $<HTMLInputElement>("[data-api-key]");
 const periodSel = $<HTMLSelectElement>("[data-period]");
+const startInput = $<HTMLInputElement>("[data-start]");
+const endInput = $<HTMLInputElement>("[data-end]");
 if (apiBaseInput) apiBaseInput.value = cfg().base;
 if (apiKeyInput) apiKeyInput.value = cfg().key;
 if (periodSel) periodSel.value = localStorage.getItem(LS.period) || "7d";
+
+/** Muestra/oculta los inputs de fecha según si el periodo es "custom". */
+function syncCustomInputs() {
+  const isCustom = periodSel?.value === "custom";
+  startInput?.classList.toggle("hidden", !isCustom);
+  endInput?.classList.toggle("hidden", !isCustom);
+}
+syncCustomInputs();
 
 cfgForm?.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -103,8 +113,14 @@ $("[data-refresh]")?.addEventListener("click", () => load());
 $("[data-export]")?.addEventListener("click", () => exportCsv());
 periodSel?.addEventListener("change", () => {
   localStorage.setItem(LS.period, periodSel.value);
-  load();
+  syncCustomInputs();
+  if (periodSel.value !== "custom") load();
 });
+[startInput, endInput].forEach((inp) =>
+  inp?.addEventListener("change", () => {
+    if (startInput?.value && endInput?.value) load();
+  }),
+);
 
 // --- Render: lista de barras ---
 function barList(items: Bar[], topN = 7): string {
@@ -327,6 +343,65 @@ function renderGeo(s: Summary) {
   const cEl = $("[data-countries]"), rEl = $("[data-referrers]");
   if (cEl) cEl.innerHTML = barList((countrySrc?.countries ?? []).map((c) => ({ label: flag(c.code) + (c.name || c.code || "?"), views: c.views })));
   if (rEl) rEl.innerHTML = barList((src?.referrers ?? []).map((r) => ({ label: r.host || "(directo)", views: r.views })));
+}
+
+// --- Mapa mundial (GeoJSON desde CDN + proyección equirectangular) ---
+interface GeoFeature { properties?: { name?: string }; geometry?: { type?: string; coordinates?: unknown } }
+interface GeoJson { features?: GeoFeature[] }
+let worldGeo: GeoJson | null = null;
+// Nombres del GeoJSON que difieren de los de Cloudflare/GoatCounter (geo → analítica).
+const GEO_ALIAS: Record<string, string> = {
+  "united states of america": "united states",
+  "republic of serbia": "serbia",
+  "czech republic": "czechia",
+  "united republic of tanzania": "tanzania",
+  "the bahamas": "bahamas",
+  "republic of korea": "south korea",
+  "russian federation": "russia",
+};
+async function renderMap(s: Summary) {
+  const el = $("[data-map]");
+  if (!el) return;
+  const src = s.cloudflare?.countries?.length ? s.cloudflare : s.goatcounter;
+  const countries = src?.countries ?? [];
+  if (!countries.length) { el.innerHTML = placeholder("Sin datos de países en este periodo."); return; }
+  const norm = (x: string) => x.toLowerCase().trim();
+  const views = new Map<string, number>();
+  let max = 1;
+  for (const c of countries) if (c.name) { views.set(norm(c.name), c.views); max = Math.max(max, c.views); }
+
+  el.innerHTML = `<p class="text-sm text-ink-dim">Cargando mapa…</p>`;
+  try {
+    if (!worldGeo) {
+      const r = await fetch("https://cdn.jsdelivr.net/gh/johan/world.geo.json@master/countries.geo.json");
+      if (!r.ok) throw new Error("geojson " + r.status);
+      worldGeo = (await r.json()) as GeoJson;
+    }
+  } catch {
+    el.innerHTML = placeholder("No se pudo cargar la geometría del mapa (CDN). Las barras de países de arriba siguen disponibles.");
+    return;
+  }
+
+  const W = 760, H = 380;
+  const px = (lon: number) => ((lon + 180) / 360) * W;
+  const py = (lat: number) => ((90 - lat) / 180) * H;
+  const ring = (r: number[][]) => "M" + r.map((p) => `${px(p[0]).toFixed(1)},${py(p[1]).toFixed(1)}`).join("L") + "Z";
+
+  const paths = (worldGeo.features ?? []).map((f) => {
+    const name = norm(f.properties?.name ?? "");
+    const v = views.get(name) ?? views.get(GEO_ALIAS[name] ?? "\0") ?? 0;
+    const a = v / max;
+    const fill = v > 0 ? `rgba(34,211,238,${(0.18 + a * 0.82).toFixed(2)})` : "rgba(255,255,255,0.05)";
+    const g = f.geometry;
+    let d = "";
+    if (g?.type === "Polygon") d = (g.coordinates as number[][][]).map(ring).join("");
+    else if (g?.type === "MultiPolygon") d = (g.coordinates as number[][][][]).map((poly) => poly.map(ring).join("")).join("");
+    if (!d) return "";
+    return `<path d="${d}" fill="${fill}" stroke="rgba(0,0,0,0.35)" stroke-width="0.3"><title>${esc(f.properties?.name ?? "")}: ${num(v)}</title></path>`;
+  }).join("");
+
+  el.innerHTML = `<div class="overflow-hidden rounded-xl bg-[#0a0f1e]"><svg viewBox="0 0 ${W} ${H}" class="w-full">${paths}</svg></div>
+    <p class="mt-2 text-xs text-ink-dim">Páginas vistas por país (más brillante = más). Pasa el cursor para ver el detalle.</p>`;
 }
 
 // --- Eventos agrupados ("acciones de los usuarios") ---
@@ -562,32 +637,45 @@ function exportCsv() {
 }
 
 // --- Carga ---
-async function fetchJson<T>(path: string, period: string): Promise<T | null> {
+async function fetchJson<T>(path: string, qs: string): Promise<T | null> {
   const { base, key } = cfg();
-  const url = `${base.replace(/\/+$/, "")}${path}?period=${encodeURIComponent(period)}`;
+  const url = `${base.replace(/\/+$/, "")}${path}?${qs}`;
   const res = await fetch(url, { headers: { "x-api-key": key } });
   if (res.status === 401) { const e = new Error("401"); (e as Error & { code?: number }).code = 401; throw e; }
   if (!res.ok) return null; // 404 (endpoint no desplegado) → degradación elegante
   return res.json() as Promise<T>;
 }
 
+/** Query string del periodo seleccionado: preset (`period=`) o rango (`start=&end=`). */
+function buildQuery(): string | null {
+  const p = periodSel?.value || "7d";
+  if (p === "custom") {
+    const s = startInput?.value, e = endInput?.value;
+    if (!s || !e) { setStatus("Elige las dos fechas (desde y hasta).", "warn"); return null; }
+    if (s > e) { setStatus("La fecha «desde» debe ser anterior a «hasta».", "warn"); return null; }
+    return `start=${encodeURIComponent(s)}&end=${encodeURIComponent(e)}`;
+  }
+  return `period=${encodeURIComponent(p)}`;
+}
+
 async function load() {
   const { base, key } = cfg();
   if (!key || !base) { setStatus("Configura la URL del backend y la API key (⚙) para empezar.", "warn"); showConfig(true); return; }
-  const period = periodSel?.value || "7d";
+  const qs = buildQuery();
+  if (qs === null) return;
   setStatus("Cargando…");
   if (dashEl) { dashEl.classList.add("hidden"); dashEl.classList.remove("flex"); }
   try {
     // Rutas neutras (/panel/*, "actions" en vez de "events"): los bloqueadores de anuncios
     // tumban cualquier URL con "analytics"/"events" (ERR_BLOCKED_BY_CLIENT).
-    const summary = await fetchJson<Summary>("/panel/summary", period);
+    const summary = await fetchJson<Summary>("/panel/summary", qs);
     if (!summary) throw new Error("summary vacío");
     const [tsR, evR, dvR, vtR, asR] = await Promise.allSettled([
-      fetchJson<Timeseries>("/panel/timeseries", period),
-      fetchJson<Events>("/panel/actions", period),
-      fetchJson<Devices>("/panel/devices", period),
-      fetchJson<Vitals>("/panel/vitals", period),
-      fetchJson<ActionSeries>("/panel/action-series", period),
+      fetchJson<Timeseries>("/panel/timeseries", qs),
+      fetchJson<Events>("/panel/actions", qs),
+      fetchJson<Devices>("/panel/devices", qs),
+      fetchJson<Vitals>("/panel/vitals", qs),
+      fetchJson<ActionSeries>("/panel/action-series", qs),
     ]);
     const ts = tsR.status === "fulfilled" ? tsR.value : null;
     const ev = evR.status === "fulfilled" ? evR.value : null;
@@ -605,6 +693,7 @@ async function load() {
     safe(() => renderFunnel(summary, ev));
     safe(() => renderCompare(summary));
     safe(() => renderGeo(summary));
+    safe(() => { void renderMap(summary); });
     safe(() => renderEvents(ev));
     safe(() => renderDevices(dv));
     safe(() => renderHeatmap(ts));
