@@ -5,19 +5,27 @@ El panel **`/admin`** es un **dashboard interno** que muestra la analítica del 
 solo en el navegador.
 
 ## Cómo funciona
-- **Archivos:** `src/pages/admin.astro` (página aislada) + `public/assets/css/{admin,styles}.css` +
-  `public/assets/js/admin.js` (heredados de la versión vanilla; el sitio de marketing no los carga).
-- **Acceso:** por URL directa `…/screenpencil-landing/admin` (no está enlazado en el nav público). `noindex,nofollow`.
-- **Config (⚙):** URL del backend + API key (`x-api-key`), guardadas en `localStorage`.
-  - URL por defecto: `https://screenpencil-backend.onrender.com` (producción).
-  - Para desarrollo local del backend, cámbiala a `http://localhost:3333`.
-- **Datos:** llama a 3 endpoints del backend (con `x-api-key`):
-  - `GET /analytics/summary?period=…` → KPIs + paneles (top páginas, países, fuentes) por fuente.
-  - `GET /analytics/timeseries?period=…` → gráfico de líneas SVG (GoatCounter + Cloudflare).
-  - `GET /analytics/events?period=…` → panel de eventos (descargas, donaciones, demo, showcase…).
+- **Archivos:** `src/pages/admin.astro` (página aislada, Tailwind + `global.css`) + `src/scripts/admin.ts`
+  (dependency-free; charts en SVG hechos a mano). `noindex,nofollow`.
+- **Acceso:** por URL directa `…/screenpencil-landing/admin` (no está enlazado en el nav público).
+- **Config (⚙):** URL del backend + API key (`x-api-key`), guardadas en `localStorage`
+  (claves `sp-admin-*`). Por defecto `https://screenpencil-backend.onrender.com`.
+- **Datos:** 4 endpoints del backend (con `x-api-key`), carga resiliente con `Promise.allSettled`:
+  - `GET /analytics/summary?period=…` → KPIs, comparación GoatCounter↔Cloudflare, países, fuentes.
+  - `GET /analytics/timeseries?period=…` → gráfica de área (GC+CF) y **heatmap** (campo `hourly`).
+  - `GET /analytics/events?period=…` → **funnel** y **acciones agrupadas** (descargas/donaciones/engagement/navegación).
+  - `GET /analytics/devices?period=…` → **dispositivos** (navegador · SO · pantalla). *(endpoint nuevo)*
   - `period`: `24h` / `7d` / `30d` / `90d`.
-- **Render:** KPIs, dos paneles (GoatCounter / Cloudflare) con barras CSS, gráfico SVG (sin librerías)
-  y lista de eventos. Carga resiliente: si serie/eventos fallan, el resumen igual se muestra.
+- **Visualizaciones:** KPIs con **sparkline + tendencia** del periodo · gráfica de área con **tooltip** ·
+  **funnel** visitas→demo→showcase→descarga · comparación por fuente · barras de países/fuentes ·
+  eventos **agrupados** por categoría · **dispositivos** y **heatmap día×hora**.
+- **Degradación elegante:** si `/devices` o el `hourly` no están (backend sin desplegar), esas dos
+  secciones muestran un aviso "requiere endpoint" en vez de romper.
+
+## Instrumentación (qué se mide en la landing)
+`src/scripts/main.ts` registra vía GoatCounter (`track()`): `download/*`, `github`, `donate/*`,
+`lang/*`, `demo/used`, `showcase/*`, **`section/<id>`** (qué secciones llega a ver) y
+**`scroll/25|50|75|100`** (profundidad). Esto alimenta el funnel y "acciones de los usuarios".
 
 ## Backend (resumen)
 - Repo: **`screenpencil-backend`** (NestJS 11 + PostgreSQL/Neon + Prisma). Desplegado en **Render**.

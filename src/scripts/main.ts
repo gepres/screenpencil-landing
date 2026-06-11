@@ -194,6 +194,58 @@ document.querySelectorAll<HTMLElement>("[data-donate]").forEach((b) =>
   }),
 );
 
+/* ---------- Navegación: qué secciones llega a ver el usuario ----------
+   Cada sección con id se registra UNA vez al entrar en viewport → evento
+   section/<id>. Alimenta el funnel y el mapa de "hasta dónde llegan". */
+const sections = document.querySelectorAll<HTMLElement>("main section[id]");
+if (sections.length && "IntersectionObserver" in window) {
+  const seen = new Set<string>();
+  const secObs = new IntersectionObserver(
+    (entries, obs) => {
+      for (const e of entries) {
+        const id = (e.target as HTMLElement).id;
+        if (e.isIntersecting && id && !seen.has(id)) {
+          seen.add(id);
+          track("section/" + id, "Vio la sección: " + id);
+          obs.unobserve(e.target);
+        }
+      }
+    },
+    { threshold: 0.4 },
+  );
+  sections.forEach((s) => secObs.observe(s));
+}
+
+/* ---------- Profundidad de scroll (25/50/75/100%), una vez cada hito ---------- */
+{
+  const marks = [25, 50, 75, 100];
+  const fired = new Set<number>();
+  let scrollQueued = false;
+  const checkDepth = () => {
+    scrollQueued = false;
+    const doc = document.documentElement;
+    const max = doc.scrollHeight - doc.clientHeight;
+    if (max <= 0) return;
+    const pct = (doc.scrollTop / max) * 100;
+    for (const m of marks) {
+      if (pct >= m && !fired.has(m)) {
+        fired.add(m);
+        track("scroll/" + m, "Scroll " + m + "%");
+      }
+    }
+    if (fired.size === marks.length) {
+      window.removeEventListener("scroll", onScroll);
+    }
+  };
+  const onScroll = () => {
+    if (!scrollQueued) {
+      scrollQueued = true;
+      requestAnimationFrame(checkDepth);
+    }
+  };
+  window.addEventListener("scroll", onScroll, { passive: true });
+}
+
 /* ---------- Badge de versión (API de GitHub) ---------- */
 const badge = document.querySelector<HTMLElement>("[data-release-tag]");
 if (badge) {

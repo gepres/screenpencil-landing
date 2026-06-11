@@ -76,12 +76,21 @@ const tabs = [
   const dialogImg = document.querySelector<HTMLImageElement>("[data-sc-lightbox-img]");
 
   if (root && img && title) {
+    const seen = new Set<string>();
     root.querySelectorAll<HTMLButtonElement>("[data-sc-tab]").forEach((btn) => {
       btn.addEventListener("click", () => {
         root.querySelectorAll("[data-sc-tab]").forEach((b) => b.setAttribute("aria-selected", "false"));
         btn.setAttribute("aria-selected", "true");
         img.src = btn.dataset.img || img.src;
         title.textContent = btn.dataset.title || "";
+        // Analítica: qué herramienta explora el usuario (una vez por herramienta)
+        const id = btn.dataset.scTab || "";
+        if (id && !seen.has(id)) {
+          seen.add(id);
+          try {
+            (window as any).goatcounter?.count({ path: "showcase/" + id, title: "Showcase: " + id, event: true });
+          } catch {}
+        }
       });
     });
   }

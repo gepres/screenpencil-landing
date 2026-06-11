@@ -1,11 +1,11 @@
 ---
 // Panel interno de analítica (consume el backend NestJS).
-// Aislado del sitio de marketing: usa su propio CSS/JS (assets/css|js).
-// noindex — no debe aparecer en buscadores.
+// Rebuild en Astro + Tailwind, dependency-free. noindex.
+import "../styles/global.css";
 const base = import.meta.env.BASE_URL;
 ---
 <!doctype html>
-<html lang="es">
+<html lang="es" data-lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -17,81 +17,110 @@ const base = import.meta.env.BASE_URL;
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
     />
-    <link rel="stylesheet" href={`${base}assets/css/styles.css`} />
-    <link rel="stylesheet" href={`${base}assets/css/admin.css`} />
   </head>
-  <body>
-    <div class="bg" aria-hidden="true">
-      <div class="bg__grid"></div>
-      <div class="bg__blob bg__blob--1"></div>
-      <div class="bg__blob bg__blob--2"></div>
-    </div>
-
-    <main class="dash">
-      <header class="dash__top">
+  <body class="min-h-screen">
+    <div class="mx-auto max-w-6xl px-5 py-8">
+      <!-- Cabecera -->
+      <header class="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <span class="eyebrow">Panel interno</span>
-          <h1>Analytics de <span class="grad-text">ScreenPencil</span></h1>
+          <span class="font-display text-xs font-semibold uppercase tracking-[0.18em] text-amber">Panel interno</span>
+          <h1 class="mt-1 font-display text-2xl font-bold sm:text-3xl">Analytics de <span class="grad-text">ScreenPencil</span></h1>
         </div>
-        <div class="dash__controls">
-          <select id="period" aria-label="Periodo">
+        <div class="flex items-center gap-2">
+          <select data-period aria-label="Periodo" class="rounded-lg border border-white/12 bg-bg-1 px-3 py-2 text-sm text-ink outline-none focus:border-amber/50">
             <option value="24h">Últimas 24 h</option>
             <option value="7d" selected>7 días</option>
             <option value="30d">30 días</option>
             <option value="90d">90 días</option>
           </select>
-          <button class="icon-btn" id="refresh" title="Actualizar" aria-label="Actualizar">↻</button>
-          <button class="icon-btn" id="cfgBtn" title="Configuración" aria-label="Configuración">⚙</button>
+          <button data-refresh title="Actualizar" aria-label="Actualizar" class="grid size-9 place-items-center rounded-lg border border-white/12 text-ink-soft transition hover:border-white/25 hover:text-ink">↻</button>
+          <button data-config-btn title="Configuración" aria-label="Configuración" class="grid size-9 place-items-center rounded-lg border border-white/12 text-ink-soft transition hover:border-white/25 hover:text-ink">⚙</button>
         </div>
       </header>
 
-      <form id="cfg" class="cfg" hidden>
-        <label>URL del backend (API)
-          <input id="apiBase" type="url" placeholder="https://screenpencil-backend.onrender.com" autocomplete="off" />
+      <!-- Configuración (URL backend + API key, en localStorage) -->
+      <form data-config class="mt-5 hidden gap-3 rounded-2xl border border-white/10 bg-bg-1 p-5 sm:grid sm:grid-cols-2" hidden>
+        <label class="text-sm text-ink-soft">URL del backend (API)
+          <input data-api-base type="url" placeholder="https://screenpencil-backend.onrender.com" autocomplete="off" class="mt-1 w-full rounded-lg border border-white/12 bg-bg-0 px-3 py-2 text-ink outline-none focus:border-amber/50" />
         </label>
-        <label>API key (cabecera x-api-key)
-          <input id="apiKey" type="password" placeholder="tu ADMIN_API_KEY" autocomplete="off" />
+        <label class="text-sm text-ink-soft">API key (cabecera x-api-key)
+          <input data-api-key type="password" placeholder="tu ADMIN_API_KEY" autocomplete="off" class="mt-1 w-full rounded-lg border border-white/12 bg-bg-0 px-3 py-2 text-ink outline-none focus:border-amber/50" />
         </label>
-        <button type="submit" class="btn btn--primary btn--sm">Guardar y cargar</button>
-        <p class="cfg__note">🔒 Se guardan solo en tu navegador (localStorage). No se envían a ningún sitio salvo a tu backend.</p>
+        <div class="sm:col-span-2 flex items-center gap-3">
+          <button type="submit" class="rounded-full bg-amber px-4 py-2 text-sm font-semibold text-bg-0 transition hover:bg-amber/90">Guardar y cargar</button>
+          <p class="text-xs text-ink-dim">🔒 Solo se guardan en tu navegador (localStorage); no salen salvo a tu backend.</p>
+        </div>
       </form>
 
-      <div id="status" class="status" hidden></div>
+      <div data-status class="mt-5 hidden rounded-xl border px-4 py-3 text-sm" hidden></div>
 
-      <section id="dashboard" hidden>
-        <div class="kpis" id="kpis"></div>
-        <div class="panels">
-          <article class="panel" id="panel-gc">
-            <h2>📊 GoatCounter</h2>
-            <div class="panel__body"></div>
-          </article>
-          <article class="panel" id="panel-cf">
-            <h2>🌐 Cloudflare</h2>
-            <div class="panel__body"></div>
-          </article>
-        </div>
+      <main data-dashboard class="mt-6 hidden flex-col gap-6" hidden>
+        <!-- KPIs -->
+        <section data-kpis class="grid grid-cols-2 gap-3 lg:grid-cols-4"></section>
 
-        <section class="panel panel--wide" id="panel-chart">
-          <h2>📈 Tendencia diaria <span class="muted" style="font-weight:400">(páginas vistas)</span></h2>
-          <div id="chart" class="chart"></div>
-          <div id="chartLegend" class="chart__legend"></div>
+        <!-- Serie + funnel -->
+        <section class="grid gap-4 lg:grid-cols-[1.6fr_1fr]">
+          <article class="rounded-2xl border border-white/8 bg-bg-1 p-5">
+            <div class="flex items-center justify-between">
+              <h2 class="font-display text-sm font-semibold uppercase tracking-wider text-ink-soft">Tendencia diaria</h2>
+              <div data-chart-legend class="flex flex-wrap items-center gap-3 text-xs text-ink-dim"></div>
+            </div>
+            <div data-chart class="mt-3"></div>
+          </article>
+          <article class="rounded-2xl border border-white/8 bg-bg-1 p-5">
+            <h2 class="font-display text-sm font-semibold uppercase tracking-wider text-ink-soft">Funnel de conversión</h2>
+            <div data-funnel class="mt-4"></div>
+          </article>
         </section>
 
-        <section class="panel panel--wide" id="panel-events">
-          <h2>🎯 Eventos</h2>
-          <div class="panel__body" id="eventsBody"></div>
+        <!-- Comparación GoatCounter vs Cloudflare -->
+        <section>
+          <h2 class="mb-3 font-display text-sm font-semibold uppercase tracking-wider text-ink-soft">GoatCounter vs Cloudflare</h2>
+          <div data-compare class="grid gap-4 md:grid-cols-2"></div>
         </section>
-      </section>
 
-      <footer class="dash__foot">
-        <a href="https://screenpencil.goatcounter.com" target="_blank" rel="noopener">Panel GoatCounter ↗</a>
-        <a href="https://dash.cloudflare.com/?to=/:account/web-analytics" target="_blank" rel="noopener">Panel Cloudflare ↗</a>
-        <a href={base}>← Volver al sitio</a>
+        <!-- Países + Fuentes -->
+        <section class="grid gap-4 md:grid-cols-2">
+          <article class="rounded-2xl border border-white/8 bg-bg-1 p-5">
+            <h2 class="font-display text-sm font-semibold uppercase tracking-wider text-ink-soft">🌍 Países</h2>
+            <div data-countries class="mt-4"></div>
+          </article>
+          <article class="rounded-2xl border border-white/8 bg-bg-1 p-5">
+            <h2 class="font-display text-sm font-semibold uppercase tracking-wider text-ink-soft">🔗 Fuentes</h2>
+            <div data-referrers class="mt-4"></div>
+          </article>
+        </section>
+
+        <!-- Eventos agrupados -->
+        <section class="rounded-2xl border border-white/8 bg-bg-1 p-5">
+          <h2 class="font-display text-sm font-semibold uppercase tracking-wider text-ink-soft">🎯 Acciones de los usuarios</h2>
+          <div data-events class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
+        </section>
+
+        <!-- Dispositivos + Heatmap -->
+        <section class="grid gap-4 lg:grid-cols-2">
+          <article class="rounded-2xl border border-white/8 bg-bg-1 p-5">
+            <h2 class="font-display text-sm font-semibold uppercase tracking-wider text-ink-soft">💻 Dispositivos y navegadores</h2>
+            <div data-devices class="mt-4"></div>
+          </article>
+          <article class="rounded-2xl border border-white/8 bg-bg-1 p-5">
+            <h2 class="font-display text-sm font-semibold uppercase tracking-wider text-ink-soft">🕑 Cuándo navegan (día × hora)</h2>
+            <div data-heatmap class="mt-4"></div>
+          </article>
+        </section>
+      </main>
+
+      <footer class="mt-10 flex flex-wrap gap-4 border-t border-white/8 pt-5 text-sm text-ink-dim">
+        <a href="https://screenpencil.goatcounter.com" target="_blank" rel="noopener" class="hover:text-ink">Panel GoatCounter ↗</a>
+        <a href="https://dash.cloudflare.com/?to=/:account/web-analytics" target="_blank" rel="noopener" class="hover:text-ink">Panel Cloudflare ↗</a>
+        <a href={base} class="ml-auto hover:text-ink">← Volver al sitio</a>
       </footer>
-    </main>
+    </div>
 
-    <script is:inline src={`${base}assets/js/admin.js`}></script>
+    <script>
+      import "../scripts/admin.ts";
+    </script>
   </body>
 </html>
