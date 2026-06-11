@@ -340,7 +340,7 @@ function placeholder(msg: string): string {
 function renderDevices(d: Devices | null) {
   const el = $("[data-devices]");
   if (!el) return;
-  if (!d) { el.innerHTML = placeholder("Requiere el endpoint <code class='text-ink-soft'>/analytics/devices</code> en el backend (navegador · SO · tamaño de pantalla). Pendiente de desplegar."); return; }
+  if (!d) { el.innerHTML = placeholder("Requiere el endpoint <code class='text-ink-soft'>/panel/devices</code> en el backend (navegador · SO · tamaño de pantalla). Pendiente de desplegar."); return; }
   el.innerHTML = `<div class="grid gap-4 sm:grid-cols-3">
     <div><h4 class="mb-2 text-xs font-semibold uppercase tracking-wider text-ink-dim">Navegador</h4>${barList(d.browsers.map((x) => ({ label: x.name, views: x.count })), 5)}</div>
     <div><h4 class="mb-2 text-xs font-semibold uppercase tracking-wider text-ink-dim">Sistema</h4>${barList(d.systems.map((x) => ({ label: x.name, views: x.count })), 5)}</div>
@@ -353,7 +353,7 @@ function renderHeatmap(ts: Timeseries | null) {
   const el = $("[data-heatmap]");
   if (!el) return;
   const days = (ts?.goatcounter ?? []).filter((p) => Array.isArray(p.hourly) && p.hourly!.length === 24);
-  if (!days.length) { el.innerHTML = placeholder("Requiere el campo <code class='text-ink-soft'>hourly</code> en <code class='text-ink-soft'>/analytics/timeseries</code> (GoatCounter ya lo envía; el backend lo colapsa a diario). Pendiente de exponer."); return; }
+  if (!days.length) { el.innerHTML = placeholder("Requiere el campo <code class='text-ink-soft'>hourly</code> en <code class='text-ink-soft'>/panel/timeseries</code> (GoatCounter ya lo envía; el backend lo colapsa a diario). Pendiente de exponer."); return; }
   const max = Math.max(1, ...days.flatMap((d) => d.hourly!));
   const cell = (v: number) => {
     const a = v / max;
@@ -383,12 +383,14 @@ async function load() {
   setStatus("Cargando…");
   if (dashEl) dashEl.hidden = true;
   try {
-    const summary = await fetchJson<Summary>("/analytics/summary", period);
+    // Rutas neutras (/panel/*, "actions" en vez de "events"): los bloqueadores de anuncios
+    // tumban cualquier URL con "analytics"/"events" (ERR_BLOCKED_BY_CLIENT).
+    const summary = await fetchJson<Summary>("/panel/summary", period);
     if (!summary) throw new Error("summary vacío");
     const [tsR, evR, dvR] = await Promise.allSettled([
-      fetchJson<Timeseries>("/analytics/timeseries", period),
-      fetchJson<Events>("/analytics/events", period),
-      fetchJson<Devices>("/analytics/devices", period),
+      fetchJson<Timeseries>("/panel/timeseries", period),
+      fetchJson<Events>("/panel/actions", period),
+      fetchJson<Devices>("/panel/devices", period),
     ]);
     const ts = tsR.status === "fulfilled" ? tsR.value : null;
     const ev = evR.status === "fulfilled" ? evR.value : null;

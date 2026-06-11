@@ -10,11 +10,14 @@ solo en el navegador.
 - **Acceso:** por URL directa `…/screenpencil-landing/admin` (no está enlazado en el nav público).
 - **Config (⚙):** URL del backend + API key (`x-api-key`), guardadas en `localStorage`
   (claves `sp-admin-*`). Por defecto `https://screenpencil-backend.onrender.com`.
-- **Datos:** 4 endpoints del backend (con `x-api-key`), carga resiliente con `Promise.allSettled`:
-  - `GET /analytics/summary?period=…` → KPIs, comparación GoatCounter↔Cloudflare, países, fuentes.
-  - `GET /analytics/timeseries?period=…` → gráfica de área (GC+CF) y **heatmap** (campo `hourly`).
-  - `GET /analytics/events?period=…` → **funnel** y **acciones agrupadas** (descargas/donaciones/engagement/navegación).
-  - `GET /analytics/devices?period=…` → **dispositivos** (navegador · SO · pantalla). *(endpoint nuevo)*
+- **Datos:** 4 endpoints del backend (con `x-api-key`), carga resiliente con `Promise.allSettled`.
+  ⚠️ El panel usa el prefijo **neutro `/panel/*`** (no `/analytics/*`) porque los bloqueadores de
+  anuncios/rastreo tumban cualquier URL con "analytics"/"events" → `ERR_BLOCKED_BY_CLIENT` (no carga
+  ningún dato). El backend sirve **ambos** prefijos (`analytics` y `panel`) como alias.
+  - `GET /panel/summary?period=…` → KPIs, comparación GoatCounter↔Cloudflare, países, fuentes.
+  - `GET /panel/timeseries?period=…` → gráfica de área (GC+CF) y **heatmap** (campo `hourly`).
+  - `GET /panel/actions?period=…` → **funnel** y **acciones agrupadas** (alias de `events`).
+  - `GET /panel/devices?period=…` → **dispositivos** (navegador · SO · pantalla).
   - `period`: `24h` / `7d` / `30d` / `90d`.
 - **Visualizaciones:** KPIs con **sparkline + tendencia** del periodo · gráfica de área con **tooltip** ·
   **funnel** visitas→demo→showcase→descarga · comparación por fuente · barras de países/fuentes ·
