@@ -10,18 +10,20 @@ solo en el navegador.
 - **Acceso:** por URL directa `…/screenpencil-landing/admin` (no está enlazado en el nav público).
 - **Config (⚙):** URL del backend + API key (`x-api-key`), guardadas en `localStorage`
   (claves `sp-admin-*`). Por defecto `https://screenpencil-backend.onrender.com`.
-- **Datos:** 4 endpoints del backend (con `x-api-key`), carga resiliente con `Promise.allSettled`.
+- **Datos:** 5 endpoints del backend (con `x-api-key`), carga resiliente con `Promise.allSettled`.
   ⚠️ El panel usa el prefijo **neutro `/panel/*`** (no `/analytics/*`) porque los bloqueadores de
   anuncios/rastreo tumban cualquier URL con "analytics"/"events" → `ERR_BLOCKED_BY_CLIENT` (no carga
   ningún dato). El backend sirve **ambos** prefijos (`analytics` y `panel`) como alias.
   - `GET /panel/summary?period=…` → KPIs, comparación GoatCounter↔Cloudflare, países, fuentes.
-  - `GET /panel/timeseries?period=…` → gráfica de área (GC+CF) y **heatmap** (campo `hourly`).
-  - `GET /panel/actions?period=…` → **funnel** y **acciones agrupadas** (alias de `events`).
+  - `GET /panel/timeseries?period=…` → gráfica de área (GC+CF), **heatmap** y **patrones de tiempo** (campo `hourly`).
+  - `GET /panel/actions?period=…` → **funnel**, **acciones agrupadas** y **profundidad de lectura** (alias de `events`).
   - `GET /panel/devices?period=…` → **dispositivos** (navegador · SO · pantalla).
+  - `GET /panel/vitals?period=…` → **rendimiento** (FCP, tiempo de carga; Cloudflare RUM).
   - `period`: `24h` / `7d` / `30d` / `90d`.
-- **Visualizaciones:** KPIs con **sparkline + tendencia** del periodo · gráfica de área con **tooltip** ·
-  **funnel** visitas→demo→showcase→descarga · comparación por fuente · barras de países/fuentes ·
-  eventos **agrupados** por categoría · **dispositivos** y **heatmap día×hora**.
+- **Visualizaciones:** KPIs con **sparkline + tendencia** · gráfica de área con **tooltip** · **funnel**
+  visitas→demo→showcase→descarga · comparación por fuente · países (con banderas)/fuentes · eventos
+  **agrupados** · **dispositivos** · **heatmap día×hora** · **por hora del día** y **por día de la
+  semana** · **profundidad de lectura** (scroll 25→100%) · **rendimiento** (FCP/carga) · **export CSV**.
 - **Degradación elegante:** si `/devices` o el `hourly` no están (backend sin desplegar), esas dos
   secciones muestran un aviso "requiere endpoint" en vez de romper.
 

@@ -73,13 +73,16 @@ cada sesión. Última actualización: **2026-06-11**.
       el panel en el primer fetch.
 
 **Más datos / gráficas**
-- [ ] **Web Vitals** desde Cloudflare RUM (`rumPerformanceEventsAdaptiveGroups`): LCP, tiempo de carga,
-      por país/página. El dataset ya los expone; añadir un endpoint `/panel/vitals`.
+- [x] ~~Web Vitals / rendimiento (Cloudflare RUM)~~ → **hecho**: `/panel/vitals` con FCP y tiempo de
+      carga (p50/p75). ⚠️ Verificar los nombres de campo `quantiles` contra la API real (`firstContentfulPaint*`,
+      `pageLoadTime*`); si una métrica sale vacía, revisar el log de Render y ajustar el campo.
+- [x] ~~Patrones de tiempo~~ → **hecho**: "por hora del día" + "por día de la semana" (columnas).
+- [x] ~~Profundidad de lectura~~ → **hecho**: funnel scroll 25→50→75→100% desde los eventos instrumentados.
+- [x] ~~Export CSV~~ → **hecho** (botón ⤓) · banderas de país en el ranking.
 - [ ] **Serie temporal por evento** (p. ej. descargas/día), no solo el total. GoatCounter `/stats/hits`
-      con desglose diario por evento, o explotar el **historial de `MetricSnapshot`** (ya se guarda cada
-      snapshot → permite crecimiento real más allá de la ventana del proveedor).
+      con desglose diario por evento, o explotar el **historial de `MetricSnapshot`**.
 - [ ] **Rango de fechas personalizado** (date picker) además de los presets 24h/7d/30d/90d.
-- [ ] **Mapa mundial** de países (en vez de barras) y **export CSV/copiar** de las tablas.
+- [ ] **Mapa mundial** de países (en vez de barras).
 
 ## Repos
 - Landing: `github.com/gepres/screenpencil-landing` → `https://gepres.github.io/screenpencil-landing/`
