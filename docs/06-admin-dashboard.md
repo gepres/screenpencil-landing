@@ -19,11 +19,13 @@ solo en el navegador.
   - `GET /panel/actions?period=…` → **funnel**, **acciones agrupadas** y **profundidad de lectura** (alias de `events`).
   - `GET /panel/devices?period=…` → **dispositivos** (navegador · SO · pantalla).
   - `GET /panel/vitals?period=…` → **rendimiento** (FCP, tiempo de carga; Cloudflare RUM).
+  - `GET /panel/action-series?period=…` → **acciones en el tiempo** (serie diaria por evento).
   - `period`: `24h` / `7d` / `30d` / `90d`.
 - **Visualizaciones:** KPIs con **sparkline + tendencia** · gráfica de área con **tooltip** · **funnel**
   visitas→demo→showcase→descarga · comparación por fuente · países (con banderas)/fuentes · eventos
   **agrupados** · **dispositivos** · **heatmap día×hora** · **por hora del día** y **por día de la
-  semana** · **profundidad de lectura** (scroll 25→100%) · **rendimiento** (FCP/carga) · **export CSV**.
+  semana** · **profundidad de lectura** (scroll 25→100%) · **rendimiento** (FCP/carga) · **acciones en
+  el tiempo** (serie diaria por evento) · **donuts** de navegador/SO · **export CSV**.
 - **Degradación elegante:** si `/devices` o el `hourly` no están (backend sin desplegar), esas dos
   secciones muestran un aviso "requiere endpoint" en vez de romper.
 

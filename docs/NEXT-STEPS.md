@@ -79,10 +79,13 @@ cada sesión. Última actualización: **2026-06-11**.
 - [x] ~~Patrones de tiempo~~ → **hecho**: "por hora del día" + "por día de la semana" (columnas).
 - [x] ~~Profundidad de lectura~~ → **hecho**: funnel scroll 25→50→75→100% desde los eventos instrumentados.
 - [x] ~~Export CSV~~ → **hecho** (botón ⤓) · banderas de país en el ranking.
-- [ ] **Serie temporal por evento** (p. ej. descargas/día), no solo el total. GoatCounter `/stats/hits`
-      con desglose diario por evento, o explotar el **historial de `MetricSnapshot`**.
-- [ ] **Rango de fechas personalizado** (date picker) además de los presets 24h/7d/30d/90d.
-- [ ] **Mapa mundial** de países (en vez de barras).
+- [x] ~~Serie temporal por evento~~ → **hecho**: `/panel/action-series` (GoatCounter `daily=true`),
+      small-multiples con sparkline por acción. ⚠️ Verificar la forma de `stats[]` (daily vs hourly).
+- [x] ~~Donuts de dispositivos~~ → **hecho** (navegador y SO con conic-gradient + leyenda).
+- [ ] **Rango de fechas personalizado** (date picker). Pendiente: requiere aceptar `start`/`end` en los
+      6 endpoints (refactor backward-compatible de `period` → rango/clave). Valor medio (los presets cubren casi todo).
+- [ ] **Mapa mundial** de países. **Bloqueado sin un asset de geometría** (geojson/topojson): no se puede
+      dibujar a mano. Plan: incluir un topojson simplificado en `public/` y proyectarlo a SVG. Hoy hay barras + banderas.
 
 ## Repos
 - Landing: `github.com/gepres/screenpencil-landing` → `https://gepres.github.io/screenpencil-landing/`
