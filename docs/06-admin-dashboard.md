@@ -40,5 +40,12 @@ solo en el navegador.
 ## Notas / limitaciones
 - La API key vive en el navegador (limitación de un panel estático). Endurecer en el futuro con
   **auth real** (JWT) o **Cloudflare Access** delante del backend.
+- Las KPIs muestran **tendencia interna** del periodo (último tercio vs primero), **no** un delta real
+  vs el periodo anterior (eso requeriría que el backend devuelva también el resumen del periodo previo).
+- **Dispositivos** y **heatmap** dependen de `/panel/devices` y del campo `hourly`; si el backend no los
+  expone, esas dos secciones muestran un aviso "requiere endpoint" en vez de romper.
+- Visibilidad del panel: se alterna la **clase** Tailwind `hidden` (no el atributo) — mezclarlos dejaba
+  el dashboard en `display:none` aunque hubiera datos.
 - `GOATCOUNTER_SITE`/tokens y el `CLOUDFLARE_SITE_TAG` (¡que NO es el token del beacon!) se configuran
   en el backend, no aquí.
+- Más ideas de mejora (auth, deltas reales, Web Vitals, serie por evento…): ver [NEXT-STEPS](NEXT-STEPS.md).

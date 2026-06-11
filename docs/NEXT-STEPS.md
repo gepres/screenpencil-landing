@@ -1,7 +1,7 @@
 # NEXT-STEPS — Mejoras pendientes (próxima sesión)
 
 Estado y pendientes del **ecosistema ScreenPencil** (landing + backend + app). Actualizar al cerrar
-cada sesión. Última actualización: **2026-06-10**.
+cada sesión. Última actualización: **2026-06-11**.
 
 ## Estado actual (hecho)
 - **Landing** (`screenpencil-landing`, GitHub Pages): **migrada a Astro 5 + Tailwind v4** (antes
@@ -12,9 +12,17 @@ cada sesión. Última actualización: **2026-06-10**.
   sitemap, robots) y **banner social** propio (`og-banner.png`). **Descargas conectadas:** botón de
   Windows → release real **v0.2.1**; badge de versión vía API de GitHub. **Deploy con build de Astro en
   GitHub Actions** (base path automático de Pages).
+- **Panel `/admin`** (en la landing): **reescrito en Astro + Tailwind** (dependency-free), reemplazando
+  el vanilla heredado. KPIs con **sparkline + tendencia**, gráfica de **área con tooltip** (GoatCounter
+  vs Cloudflare), **funnel** (visitas→demo→showcase→descarga), comparación por fuente, países/fuentes,
+  **acciones agrupadas**, **dispositivos** y **heatmap día×hora**. Llama al backend por el prefijo
+  **neutro `/panel/*`** (los adblockers bloquean `/analytics`/`events` → `ERR_BLOCKED_BY_CLIENT`).
+- **Instrumentación** (landing, `main.ts`): además de `download/github/donate/lang/demo`, ahora registra
+  `section/<id>` (qué secciones ve), `scroll/25·50·75·100` y `showcase/<id>` → alimenta el funnel.
 - **Backend** (`screenpencil-backend`, NestJS + Neon + Prisma): **desplegado en Render**
-  (`https://screenpencil-backend.onrender.com`). Endpoints `/health`, `/analytics/summary|events|timeseries`
-  con API key, agregación GoatCounter + Cloudflare y caché en Postgres. `partial:false` con datos reales.
+  (`https://screenpencil-backend.onrender.com`). Endpoints `/health` y **4** de analítica
+  (`summary`, `events`/`actions`, `timeseries` con `hourly[24]`, `devices`), servidos bajo `/analytics`
+  **y** `/panel`. API key, agregación GoatCounter + Cloudflare y caché en Postgres.
 - **App de escritorio** (`screenbrush-windown` / `screenpencil-app`): **v0.2.1**. Windows estable (Fases 1-7,
   48 tests): overlay, dibujo completo, multi-monitor, Ajustes, 7 idiomas, captura. **Instalador** (Inno Setup) +
   **release automatizado** (CI) al repo público de vitrina **`gepres/screenpencil-releases`**. **App macOS
@@ -27,6 +35,8 @@ cada sesión. Última actualización: **2026-06-10**.
       en `src/components/Download.astro` / `Hero.astro` y `src/data/site.ts`.
 - [ ] **Revisar densidad visual** ahora que está todo el contenido en una sola página (que no se sienta larga).
 - [ ] (Opcional) borrar la carpeta prototipo `screenpencil-landing-v2` (ya migrada aquí).
+- [x] ~~Rebuild del panel `/admin` + instrumentación de navegación~~ → **hecho** (Astro/Tailwind, funnel,
+      heatmap, dispositivos, acciones agrupadas; rutas neutras `/panel/*` anti-adblock).
 - [x] ~~Pase de rendimiento (jank de runtime)~~ → **hecho**: nav `backdrop-blur` xl→md sobre fondo animado,
       blobs `blur` 64→44px + `contain:layout paint`, quitado `backdrop-filter` de float-cards,
       glow del cursor con rect cacheado + rAF (sin reflujo), `content-visibility:auto` en 9 secciones.
@@ -36,7 +46,7 @@ cada sesión. Última actualización: **2026-06-10**.
 - [x] ~~Imagen Open Graph 1200×630 propia~~ → **hecha** (`og-banner.png`).
 
 ## Pendientes — Backend
-- [ ] **Tests** unitarios para `getEvents` y `getTimeseries` (hoy solo `getSummary`; los endpoints ya funcionan).
+- [ ] **Tests** unitarios para `getEvents`, `getTimeseries` y `getDevices` (hoy solo `getSummary`).
 - [ ] **`DATABASE_URL` directa** (sin `-pooler`) en Render para futuras migraciones (evitar locks de PgBouncer).
 - [ ] **Mantener "caliente"** el free tier de Render (cron de ping) para evitar cold start ~50 s.
 - [ ] **F4 — Auth real** del `/admin` (JWT o Cloudflare Access) en vez de API key en el navegador.
@@ -50,6 +60,26 @@ cada sesión. Última actualización: **2026-06-10**.
       (badges, ghost mode y cursor halo ya están).
 - [ ] **macOS:** firma **Developer ID** + **notarización** + `.dmg`, y QA en Mac real (Fases 5/6 de `docs/18`).
 - [ ] **Linux:** planificado (reutiliza la cabeza Avalonia ya madura en Mac + interop X11; `docs/19`).
+
+## Recomendaciones — Analítica / panel `/admin`
+
+**Alto valor**
+- [ ] **Auth real** del `/admin` (JWT o **Cloudflare Access** delante del backend) en vez de API key en
+      `localStorage`. Es la mayor mejora de seguridad: hoy quien abra el navegador ve la clave.
+- [ ] **Deltas reales vs periodo anterior.** Las KPIs muestran *tendencia interna* del periodo (último
+      tercio vs primero). Para un % real "vs los 7 días anteriores", el backend debe aceptar un rango/offset
+      y devolver también el resumen del periodo previo (un `range`/`compare=prev` en la query).
+- [ ] **Mantener Render caliente** (cron de ping cada ~10 min) → mata el cold-start de ~50 s que sufre
+      el panel en el primer fetch.
+
+**Más datos / gráficas**
+- [ ] **Web Vitals** desde Cloudflare RUM (`rumPerformanceEventsAdaptiveGroups`): LCP, tiempo de carga,
+      por país/página. El dataset ya los expone; añadir un endpoint `/panel/vitals`.
+- [ ] **Serie temporal por evento** (p. ej. descargas/día), no solo el total. GoatCounter `/stats/hits`
+      con desglose diario por evento, o explotar el **historial de `MetricSnapshot`** (ya se guarda cada
+      snapshot → permite crecimiento real más allá de la ventana del proveedor).
+- [ ] **Rango de fechas personalizado** (date picker) además de los presets 24h/7d/30d/90d.
+- [ ] **Mapa mundial** de países (en vez de barras) y **export CSV/copiar** de las tablas.
 
 ## Repos
 - Landing: `github.com/gepres/screenpencil-landing` → `https://gepres.github.io/screenpencil-landing/`
