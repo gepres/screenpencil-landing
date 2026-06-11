@@ -24,6 +24,8 @@ interface SeriesPoint { date: string; views: number; visits?: number; hourly?: n
 interface Timeseries { goatcounter: SeriesPoint[] | null; cloudflare: SeriesPoint[] | null; partial: boolean }
 interface DeviceRow { name: string; count: number }
 interface Devices { browsers: DeviceRow[]; systems: DeviceRow[]; sizes: DeviceRow[]; partial: boolean }
+interface VitalMetric { p50: number; p75: number }
+interface Vitals { fcp: VitalMetric | null; loadTime: VitalMetric | null; partial: boolean }
 
 // --- Helpers DOM/formato ---
 const $ = <T extends Element = HTMLElement>(s: string): T | null => document.querySelector<T>(s);
@@ -431,6 +433,56 @@ function renderTimePatterns(ts: Timeseries | null) {
   }
 }
 
+// --- Profundidad de lectura (eventos scroll/25·50·75·100) ---
+function renderReadDepth(ev: Events | null) {
+  const el = $("[data-readdepth]");
+  if (!el) return;
+  const events = ev?.events ?? [];
+  const get = (m: number) => events.find((e) => e.name === `scroll/${m}`)?.count ?? 0;
+  const marks = [25, 50, 75, 100].map((m) => ({ m, v: get(m) }));
+  const top = Math.max(marks[0].v, 1);
+  if (marks.every((x) => x.v === 0)) {
+    el.innerHTML = placeholder("Aún sin datos de scroll. Se registran <code class='text-ink-soft'>scroll/25·50·75·100</code> a medida que los visitantes bajan por la página.");
+    return;
+  }
+  el.innerHTML = marks.map((x, i) => {
+    const w = Math.max(2, Math.round((x.v / top) * 100));
+    const ret = i === 0 ? 100 : pct(x.v, marks[0].v);
+    return `<div class="mb-3">
+      <div class="flex items-center justify-between text-sm">
+        <span class="text-ink-soft">Bajó ≥ ${x.m}%</span>
+        <span class="tabular-nums text-ink">${num(x.v)} <span class="text-xs ${ret >= 50 ? "text-emerald-400" : "text-ink-dim"}">${ret}%</span></span>
+      </div>
+      <div class="mt-1 h-6 overflow-hidden rounded-lg bg-white/5"><div class="h-full rounded-lg bg-gradient-to-r from-cyan/70 to-blue-bright/70" style="width:${w}%"></div></div>
+    </div>`;
+  }).join("") + `<p class="mt-2 text-xs text-ink-dim">% relativo a quienes empezaron a bajar (scroll 25%).</p>`;
+}
+
+// --- Rendimiento / Web Vitals (Cloudflare RUM) ---
+function vitalCard(label: string, m: VitalMetric | null, goodMs: number, poorMs: number): string {
+  if (!m) return `<div class="rounded-xl border border-white/8 bg-white/[0.02] p-4"><div class="text-xs text-ink-dim">${label}</div><div class="mt-1 text-ink-dim">—</div></div>`;
+  const v = m.p75;
+  const color = v <= goodMs ? "text-emerald-400" : v <= poorMs ? "text-amber" : "text-red-400";
+  const s = (ms: number) => (ms >= 1000 ? (ms / 1000).toFixed(2) + " s" : Math.round(ms) + " ms");
+  return `<div class="rounded-xl border border-white/8 bg-white/[0.02] p-4">
+    <div class="text-xs text-ink-dim">${label} <span class="opacity-60">(p75)</span></div>
+    <div class="mt-1 font-display text-2xl font-bold ${color}">${s(v)}</div>
+    <div class="text-xs text-ink-dim">mediana ${s(m.p50)}</div>
+  </div>`;
+}
+function renderVitals(v: Vitals | null) {
+  const el = $("[data-vitals]");
+  if (!el) return;
+  if (!v || (!v.fcp && !v.loadTime)) {
+    el.innerHTML = placeholder("Requiere el endpoint <code class='text-ink-soft'>/panel/vitals</code> (Cloudflare RUM). Si está desplegado y sigue vacío, puede que los nombres de campo del GraphQL difieran — revisar el log de Render.");
+    return;
+  }
+  el.innerHTML = `<div class="grid gap-3 sm:grid-cols-2">
+    ${vitalCard("First Contentful Paint", v.fcp, 1800, 3000)}
+    ${vitalCard("Tiempo de carga", v.loadTime, 2500, 4000)}
+  </div><p class="mt-3 text-xs text-ink-dim">Umbrales: verde = bueno · ámbar = mejorable · rojo = lento. Datos reales de usuarios (RUM).</p>`;
+}
+
 // --- Export CSV ---
 function toCsv(rows: (string | number)[][]): string {
   return rows.map((r) => r.map((c) => {
@@ -478,14 +530,16 @@ async function load() {
     // tumban cualquier URL con "analytics"/"events" (ERR_BLOCKED_BY_CLIENT).
     const summary = await fetchJson<Summary>("/panel/summary", period);
     if (!summary) throw new Error("summary vacío");
-    const [tsR, evR, dvR] = await Promise.allSettled([
+    const [tsR, evR, dvR, vtR] = await Promise.allSettled([
       fetchJson<Timeseries>("/panel/timeseries", period),
       fetchJson<Events>("/panel/actions", period),
       fetchJson<Devices>("/panel/devices", period),
+      fetchJson<Vitals>("/panel/vitals", period),
     ]);
     const ts = tsR.status === "fulfilled" ? tsR.value : null;
     const ev = evR.status === "fulfilled" ? evR.value : null;
     const dv = dvR.status === "fulfilled" ? dvR.value : null;
+    const vt = vtR.status === "fulfilled" ? vtR.value : null;
     last = { summary, events: ev, ts, devices: dv };
 
     setStatus("");
@@ -501,6 +555,8 @@ async function load() {
     safe(() => renderDevices(dv));
     safe(() => renderHeatmap(ts));
     safe(() => renderTimePatterns(ts));
+    safe(() => renderReadDepth(ev));
+    safe(() => renderVitals(vt));
 
     const upd = (() => { try { return new Date(summary.updatedAt).toLocaleString("es-PE"); } catch { return summary.updatedAt; } })();
     setStatus(`Periodo ${summary.period} · ${summary.range.start} → ${summary.range.end} · actualizado ${upd}${summary.partial ? " · ⚠️ datos parciales" : ""}`, summary.partial ? "warn" : "info");
