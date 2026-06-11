@@ -190,7 +190,8 @@ const GEO_ALIAS: Record<string, string> = {
 export async function renderMap(s: Summary) {
   const el = $("[data-map]");
   if (!el) return;
-  const src = s.cloudflare?.countries?.length ? s.cloudflare : s.goatcounter;
+  // MISMA fuente que las barras de países: GoatCounter primero (es lo que se ve arriba).
+  const src = s.goatcounter?.countries?.length ? s.goatcounter : s.cloudflare;
   const countries = src?.countries ?? [];
   if (!countries.length) { el.innerHTML = placeholder("Sin datos de países en este periodo."); return; }
   const norm = (x: string) => x.toLowerCase().trim();
@@ -201,36 +202,38 @@ export async function renderMap(s: Summary) {
   el.innerHTML = `<p class="text-sm text-ink-dim">Cargando mapa…</p>`;
   try {
     if (!worldGeo) {
-      // Geometría servida desde el mismo origen (public/assets) — no depende de CDN ni de adblockers.
+      // Geometría desde el mismo origen (public/assets) — no depende de CDN ni de adblockers.
       const r = await fetch(`${import.meta.env.BASE_URL}assets/world.geo.json`);
-      if (!r.ok) throw new Error("geojson " + r.status);
+      if (!r.ok) throw new Error("geojson HTTP " + r.status);
       worldGeo = (await r.json()) as GeoJson;
     }
-  } catch {
-    el.innerHTML = placeholder("No se pudo cargar la geometría del mapa. Las barras de países de arriba siguen disponibles.");
-    return;
+
+    const W = 760, H = 380;
+    const px = (lon: number) => ((lon + 180) / 360) * W;
+    const py = (lat: number) => ((90 - lat) / 180) * H;
+    const ring = (r: number[][]) => "M" + r.map((p) => `${px(p[0]).toFixed(1)},${py(p[1]).toFixed(1)}`).join("L") + "Z";
+
+    let matched = 0;
+    const paths = (worldGeo.features ?? []).map((f) => {
+      const name = norm(f.properties?.name ?? "");
+      const v = views.get(name) ?? views.get(GEO_ALIAS[name] ?? "\0") ?? 0;
+      if (v > 0) matched++;
+      const a = v / max;
+      // Países con datos: cian visible (mín 0.4). Sin datos: gris tenue + borde para ver la silueta.
+      const fill = v > 0 ? `rgba(34,211,238,${(0.4 + a * 0.6).toFixed(2)})` : "rgba(255,255,255,0.07)";
+      const g = f.geometry;
+      let d = "";
+      if (g?.type === "Polygon") d = (g.coordinates as number[][][]).map(ring).join("");
+      else if (g?.type === "MultiPolygon") d = (g.coordinates as number[][][][]).map((poly) => poly.map(ring).join("")).join("");
+      if (!d) return "";
+      return `<path d="${d}" fill="${fill}" stroke="rgba(255,255,255,0.12)" stroke-width="0.3"><title>${esc(f.properties?.name ?? "")}: ${num(v)}</title></path>`;
+    }).join("");
+
+    el.innerHTML = `<div class="overflow-hidden rounded-xl bg-[#0a0f1e]"><svg viewBox="0 0 ${W} ${H}" class="w-full">${paths}</svg></div>
+      <p class="mt-2 text-xs text-ink-dim">${matched} de ${countries.length} países con datos coloreados · más brillante = más tráfico. Pasa el cursor para el detalle.</p>`;
+  } catch (err) {
+    el.innerHTML = placeholder("No se pudo dibujar el mapa: " + esc(err instanceof Error ? err.message : "error") + ". Las barras de países de arriba siguen disponibles.");
   }
-
-  const W = 760, H = 380;
-  const px = (lon: number) => ((lon + 180) / 360) * W;
-  const py = (lat: number) => ((90 - lat) / 180) * H;
-  const ring = (r: number[][]) => "M" + r.map((p) => `${px(p[0]).toFixed(1)},${py(p[1]).toFixed(1)}`).join("L") + "Z";
-
-  const paths = (worldGeo.features ?? []).map((f) => {
-    const name = norm(f.properties?.name ?? "");
-    const v = views.get(name) ?? views.get(GEO_ALIAS[name] ?? "\0") ?? 0;
-    const a = v / max;
-    const fill = v > 0 ? `rgba(34,211,238,${(0.18 + a * 0.82).toFixed(2)})` : "rgba(255,255,255,0.05)";
-    const g = f.geometry;
-    let d = "";
-    if (g?.type === "Polygon") d = (g.coordinates as number[][][]).map(ring).join("");
-    else if (g?.type === "MultiPolygon") d = (g.coordinates as number[][][][]).map((poly) => poly.map(ring).join("")).join("");
-    if (!d) return "";
-    return `<path d="${d}" fill="${fill}" stroke="rgba(0,0,0,0.35)" stroke-width="0.3"><title>${esc(f.properties?.name ?? "")}: ${num(v)}</title></path>`;
-  }).join("");
-
-  el.innerHTML = `<div class="overflow-hidden rounded-xl bg-[#0a0f1e]"><svg viewBox="0 0 ${W} ${H}" class="w-full">${paths}</svg></div>
-    <p class="mt-2 text-xs text-ink-dim">Páginas vistas por país (más brillante = más). Pasa el cursor para ver el detalle.</p>`;
 }
 
 // --- Acciones agrupadas por categoría ---
