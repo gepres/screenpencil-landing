@@ -195,9 +195,16 @@ export async function renderMap(s: Summary) {
   const countries = src?.countries ?? [];
   if (!countries.length) { el.innerHTML = placeholder("Sin datos de países en este periodo."); return; }
   const norm = (x: string) => x.toLowerCase().trim();
-  const views = new Map<string, number>();
+  const total = countries.reduce((a, c) => a + c.views, 0) || 1;
+  // Info por país (rank, %, código para la bandera), indexada por nombre normalizado.
+  const info = new Map<string, { name: string; views: number; code?: string; share: number; rank: number }>();
   let max = 1;
-  for (const c of countries) if (c.name) { views.set(norm(c.name), c.views); max = Math.max(max, c.views); }
+  [...countries].sort((a, b) => b.views - a.views).forEach((c, i) => {
+    if (c.name) {
+      info.set(norm(c.name), { name: c.name, views: c.views, code: c.code, share: pct(c.views, total), rank: i + 1 });
+      max = Math.max(max, c.views);
+    }
+  });
 
   el.innerHTML = `<p class="text-sm text-ink-dim">Cargando mapa…</p>`;
   try {
@@ -215,22 +222,56 @@ export async function renderMap(s: Summary) {
 
     let matched = 0;
     const paths = (worldGeo.features ?? []).map((f) => {
-      const name = norm(f.properties?.name ?? "");
-      const v = views.get(name) ?? views.get(GEO_ALIAS[name] ?? "\0") ?? 0;
+      const gname = f.properties?.name ?? "";
+      const nm = norm(gname);
+      const data = info.get(nm) ?? info.get(GEO_ALIAS[nm] ?? "\0");
+      const v = data?.views ?? 0;
       if (v > 0) matched++;
       const a = v / max;
-      // Países con datos: cian visible (mín 0.4). Sin datos: gris tenue + borde para ver la silueta.
       const fill = v > 0 ? `rgba(34,211,238,${(0.4 + a * 0.6).toFixed(2)})` : "rgba(255,255,255,0.07)";
       const g = f.geometry;
       let d = "";
       if (g?.type === "Polygon") d = (g.coordinates as number[][][]).map(ring).join("");
       else if (g?.type === "MultiPolygon") d = (g.coordinates as number[][][][]).map((poly) => poly.map(ring).join("")).join("");
       if (!d) return "";
-      return `<path d="${d}" fill="${fill}" stroke="rgba(255,255,255,0.12)" stroke-width="0.3"><title>${esc(f.properties?.name ?? "")}: ${num(v)}</title></path>`;
+      // Datos para el tooltip (en data-*; el handler los lee al pasar el cursor).
+      const meta = data ? `${num(v)} páginas vistas · ${data.share}% del total · #${data.rank}` : "Sin datos en este periodo";
+      const fl = data?.code ? flag(data.code) : "";
+      return `<path d="${d}" fill="${fill}" stroke="rgba(255,255,255,0.12)" stroke-width="0.3" class="cursor-pointer hover:brightness-150" data-n="${esc(data?.name ?? gname)}" data-f="${fl}" data-meta="${esc(meta)}"></path>`;
     }).join("");
 
-    el.innerHTML = `<div class="overflow-hidden rounded-xl bg-[#0a0f1e]"><svg viewBox="0 0 ${W} ${H}" class="w-full">${paths}</svg></div>
-      <p class="mt-2 text-xs text-ink-dim">${matched} de ${countries.length} países con datos coloreados · más brillante = más tráfico. Pasa el cursor para el detalle.</p>`;
+    el.innerHTML = `<div data-map-wrap class="relative overflow-hidden rounded-xl bg-[#0a0f1e]">
+      <svg viewBox="0 0 ${W} ${H}" class="w-full">${paths}</svg>
+      <div data-map-tip class="pointer-events-none absolute z-10 hidden max-w-[200px] rounded-lg border border-white/12 bg-bg-2/95 px-3 py-2 text-xs shadow-lg backdrop-blur"></div>
+    </div>
+    <p class="mt-2 text-xs text-ink-dim">${matched} de ${countries.length} países con datos coloreados · pasa el cursor por un país.</p>`;
+
+    // Tooltip interactivo: muestra país + datos al pasar sobre cada path.
+    const wrap = el.querySelector<HTMLElement>("[data-map-wrap]");
+    const svg = wrap?.querySelector("svg");
+    const tip = wrap?.querySelector<HTMLElement>("[data-map-tip]");
+    if (wrap && svg && tip) {
+      let lastN = "";
+      svg.addEventListener("mousemove", (ev) => {
+        const t = ev.target as HTMLElement;
+        if (t?.tagName === "path" && t.dataset.n) {
+          if (t.dataset.n !== lastN) {
+            lastN = t.dataset.n;
+            tip.innerHTML = `<div class="font-semibold text-ink">${t.dataset.f || ""}${esc(t.dataset.n)}</div><div class="mt-0.5 text-ink-soft">${esc(t.dataset.meta || "")}</div>`;
+          }
+          tip.style.display = "block";
+          const r = wrap.getBoundingClientRect();
+          const x = Math.min(ev.clientX - r.left + 12, r.width - tip.offsetWidth - 8);
+          const y = Math.min(ev.clientY - r.top + 12, r.height - tip.offsetHeight - 8);
+          tip.style.left = Math.max(4, x) + "px";
+          tip.style.top = Math.max(4, y) + "px";
+        } else {
+          tip.style.display = "none";
+          lastN = "";
+        }
+      });
+      svg.addEventListener("mouseleave", () => { tip.style.display = "none"; lastN = ""; });
+    }
   } catch (err) {
     el.innerHTML = placeholder("No se pudo dibujar el mapa: " + esc(err instanceof Error ? err.message : "error") + ". Las barras de países de arriba siguen disponibles.");
   }
