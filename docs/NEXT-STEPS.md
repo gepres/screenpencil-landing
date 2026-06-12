@@ -35,6 +35,10 @@ cada sesión. Última actualización: **2026-06-11**.
       en `src/components/Download.astro` / `Hero.astro` y `src/data/site.ts`.
 - [ ] **Revisar densidad visual** ahora que está todo el contenido en una sola página (que no se sienta larga).
 - [ ] (Opcional) borrar la carpeta prototipo `screenpencil-landing-v2` (ya migrada aquí).
+- [x] ~~**Página `/bug`** (reporte de bugs por email)~~ → **hecha**: `src/pages/bug.astro` + `src/scripts/bug.ts`,
+      bilingüe, con `@emailjs/browser` (`sendForm` adjunta la imagen). Credenciales públicas en `src/data/site.ts`.
+      **Pendiente de config en el panel de EmailJS:** (1) permitir el dominio `gepres.github.io`; (2) que la
+      plantilla `template_uhhyjuu` use `{{message}}` y `{{reply_to}}`; (3) habilitar **adjuntos** para la captura.
 - [x] ~~**Beacons de analítica** (GoatCounter + Cloudflare)~~ → **RESTAURADOS** en `Base.astro` (se
       habían perdido en la migración → no se registraba nada nuevo; eventos/RUM vacíos). **No volver a
       quitarlos.** Cloudflare token `957ed46…`; GoatCounter `screenpencil.goatcounter.com`. Mapa: GeoJSON
