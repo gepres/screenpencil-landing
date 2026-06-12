@@ -21,3 +21,14 @@ export const site = {
   // Backend de analítica (panel /admin)
   analyticsApi: "https://screenpencil-backend.onrender.com",
 } as const;
+
+/**
+ * EmailJS — envío del formulario de reporte de bugs (/bug) al correo.
+ * La PUBLIC KEY es pública por diseño (va en el cliente); EmailJS protege con
+ * restricción de dominio + rate limit en su panel. Si rotas las claves, cámbialas aquí.
+ */
+export const emailjs = {
+  serviceId: "service_dqlpk5p",
+  templateId: "template_uhhyjuu",
+  publicKey: "nSpjNZtZ189Z_HGpH",
+} as const;
