@@ -19,6 +19,7 @@ const base = import.meta.env.BASE_URL;
       <a href="#showcase" class="transition hover:text-ink"><T es="En acción" en="In action" /></a>
       <a href="#demo" class="transition hover:text-ink">Demo</a>
       <a href="#faq" class="transition hover:text-ink">FAQ</a>
+      <a href={`${base}bug`} class="transition hover:text-ink">🐞 <T es="Reportar bug" en="Report a bug" /></a>
     </div>
 
     <div class="flex items-center gap-2">
@@ -64,5 +65,6 @@ const base = import.meta.env.BASE_URL;
     <a href="#showcase" class="py-2"><T es="En acción" en="In action" /></a>
     <a href="#demo" class="py-2">Demo</a>
     <a href="#faq" class="py-2">FAQ</a>
+    <a href={`${base}bug`} class="py-2">🐞 <T es="Reportar bug" en="Report a bug" /></a>
   </div>
 </header>
