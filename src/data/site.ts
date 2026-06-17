@@ -11,6 +11,8 @@ export const site = {
   releasesLatest: "https://github.com/gepres/screenpencil-releases/releases/latest",
   downloadWindows:
     "https://github.com/gepres/screenpencil-releases/releases/download/v0.2.1/ScreenPencil-Setup-0.2.1.exe",
+  // macOS — Mac App Store
+  downloadMac: "https://apps.apple.com/app/screenpencil/id6778615274?mt=12",
   // GitHub API para el badge de versión
   releasesApi:
     "https://api.github.com/repos/gepres/screenpencil-releases/releases/latest",

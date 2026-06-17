@@ -61,6 +61,17 @@ const perks = [
         </a>
 
         <a
+          href={site.downloadMac}
+          target="_blank"
+          rel="noopener"
+          data-download="mac"
+          class="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 px-6 py-3.5 font-semibold text-ink transition hover:border-white/30 hover:bg-white/5"
+        >
+          <Icon name="apple" class="size-5" />
+          <T es="Descargar en la Mac App Store" en="Download on the Mac App Store" />
+        </a>
+
+        <a
           href={site.releasesRepo}
           target="_blank"
           rel="noopener"
@@ -72,13 +83,12 @@ const perks = [
         </a>
 
         <div class="mt-1 flex items-center justify-center gap-4 text-xs text-ink-dim">
-          <span class="inline-flex items-center gap-1.5"><Icon name="apple" class="size-3.5" /> macOS <T es="· pronto" en="· soon" /></span>
           <span class="inline-flex items-center gap-1.5"><Icon name="linux" class="size-3.5" /> Linux <T es="· pronto" en="· soon" /></span>
         </div>
         <p class="text-center text-xs text-ink-dim">
           <T
-            es="¿Otra plataforma? macOS y Linux están en camino — <a href='#faq' class='text-ink-soft underline underline-offset-2 hover:text-ink'>entérate aquí</a>."
-            en="Another platform? macOS and Linux are on the way — <a href='#faq' class='text-ink-soft underline underline-offset-2 hover:text-ink'>find out here</a>."
+            es="¿En Linux? La versión está en camino — <a href='#faq' class='text-ink-soft underline underline-offset-2 hover:text-ink'>entérate aquí</a>."
+            en="On Linux? The version is on the way — <a href='#faq' class='text-ink-soft underline underline-offset-2 hover:text-ink'>find out here</a>."
           />
         </p>
       </div>
