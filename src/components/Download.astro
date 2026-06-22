@@ -72,6 +72,16 @@ const perks = [
         </a>
 
         <a
+          href={site.downloadLinux}
+          data-download="linux"
+          class="inline-flex items-center justify-center gap-2 rounded-full bg-amber px-6 py-3.5 font-semibold text-bg-0 transition hover:bg-amber/90"
+        >
+          <Icon name="linux" class="size-5" />
+          <T es="Descargar para Linux" en="Download for Linux" />
+          <span class="rounded-full border border-bg-0/25 bg-bg-0/10 px-2 py-0.5 text-[11px] font-semibold text-bg-0">experimental</span>
+        </a>
+
+        <a
           href={site.releasesRepo}
           target="_blank"
           rel="noopener"
@@ -80,16 +90,6 @@ const perks = [
         >
           <Icon name="github" class="size-5" />
           <T es="Ver en GitHub" en="View on GitHub" />
-        </a>
-
-        <a
-          href={site.downloadLinux}
-          data-download="linux"
-          class="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 px-6 py-3.5 font-semibold text-ink transition hover:border-white/30 hover:bg-white/5"
-        >
-          <Icon name="linux" class="size-5" />
-          <T es="Descargar para Linux" en="Download for Linux" />
-          <span class="rounded-full border border-amber/40 bg-amber/10 px-2 py-0.5 text-[11px] font-medium text-amber">experimental</span>
         </a>
 
         <div class="mt-1 flex items-center justify-center gap-4 text-xs text-ink-dim">
