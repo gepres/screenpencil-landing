@@ -21,8 +21,15 @@ const platforms = [
   {
     icon: "linux" as const,
     name: "Linux",
-    dEs: "Para creadores y educadores en GNOME, KDE y más. Wayland y X11 en el horizonte.",
-    dEn: "For creators and educators on GNOME, KDE and more. Wayland and X11 on the horizon.",
+    dEs: "Overlay, dibujo y atajos sobre X11 (GNOME, KDE, XFCE). Descarga self-contained; la captura está en fase experimental.",
+    dEn: "Overlay, drawing and shortcuts on X11 (GNOME, KDE, XFCE). Self-contained download; capture is in an experimental stage.",
+    tagEs: "Experimental", tagEn: "Experimental", available: false,
+  },
+  {
+    icon: "android" as const,
+    name: "Android",
+    dEs: "Anotar sobre la pantalla del móvil. En evaluación: prototipo de overlay nativo ya funcionando.",
+    dEn: "Annotate over your phone screen. Under evaluation: native overlay prototype already working.",
     tagEs: "Próximamente", tagEn: "Coming soon", available: false,
   },
 ];
@@ -32,11 +39,11 @@ const platforms = [
     eyebrowEs="Multiplataforma" eyebrowEn="Cross-platform"
     titleEs="Funciona donde <span class='grad-text'>trabajas tú</span>"
     titleEn="Works where <span class='grad-text'>you work</span>"
-    subEs="El mismo lienzo, la misma sensación, en tus tres sistemas favoritos."
-    subEn="The same canvas, the same feel, on your three favorite systems."
+    subEs="El mismo lienzo, la misma sensación, en todos tus sistemas."
+    subEn="The same canvas, the same feel, on every system you use."
   />
 
-  <div class="mt-14 grid gap-4 md:grid-cols-3">
+  <div class="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
     {platforms.map((p, i) => (
       <article
         class="reveal flex flex-col rounded-2xl border border-white/8 bg-white/[0.02] p-7"
