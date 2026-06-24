@@ -1,0 +1,161 @@
+---
+import Base from "../layouts/Base.astro";
+import Footer from "../components/Footer.astro";
+import T from "../components/T.astro";
+import { site } from "../data/site";
+const base = import.meta.env.BASE_URL;
+const updated = "2026-06-24";
+const contactEmail = "luislara.dev@gmail.com";
+---
+<Base
+  title="Política de privacidad — ScreenPencil"
+  titleEn="Privacy Policy — ScreenPencil"
+  description="ScreenPencil funciona en tu dispositivo y no recopila datos personales. Aquí explicamos qué hace cada permiso."
+  descriptionEn="ScreenPencil runs on your device and collects no personal data. Here we explain what each permission does."
+>
+  <!-- Header mínimo -->
+  <header class="fixed inset-x-0 top-0 z-50 border-b border-white/8 bg-bg-0/85 backdrop-blur-md">
+    <nav class="mx-auto flex h-16 max-w-3xl items-center justify-between gap-4 px-5">
+      <a href={base} class="flex items-center gap-2.5" aria-label="ScreenPencil — inicio">
+        <img src={`${base}assets/img/logo-white.png`} alt="" width="28" height="28" class="size-7" />
+        <span class="font-display text-lg font-semibold tracking-tight">Screen<span class="grad-text">Pencil</span></span>
+      </a>
+      <div class="flex items-center gap-2">
+        <button data-lang-toggle class="rounded-full border border-white/10 px-3 py-1.5 text-xs font-semibold text-ink-soft transition hover:border-white/25 hover:text-ink" aria-label="Cambiar idioma / Switch language">
+          <span data-lang-label>EN</span>
+        </button>
+        <a href={base} class="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-ink transition hover:border-white/30 hover:bg-white/5">
+          <T es="← Volver" en="← Back" />
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="mx-auto max-w-2xl px-5 pb-24 pt-28 md:pt-32">
+    <span class="font-display text-sm font-semibold uppercase tracking-[0.18em] text-amber">
+      <T es="Legal" en="Legal" />
+    </span>
+    <h1 class="mt-3 text-3xl font-bold sm:text-4xl">
+      <T es="Política de privacidad" en="Privacy Policy" />
+    </h1>
+    <p class="mt-3 text-sm text-ink-dim">
+      <T es="Última actualización:" en="Last updated:" /> {updated}
+    </p>
+
+    <!-- TL;DR -->
+    <div class="mt-8 rounded-2xl border border-amber/25 bg-amber/5 p-5">
+      <p class="text-ink-soft">
+        <T
+          es="En resumen: ScreenPencil funciona por completo en tu dispositivo. No tiene cuentas, no envía nada a internet y NO recopila, almacena ni comparte ningún dato personal. Tus dibujos y capturas se quedan solo en tu teléfono."
+          en="In short: ScreenPencil runs entirely on your device. It has no accounts, sends nothing to the internet, and does NOT collect, store or share any personal data. Your drawings and screenshots stay only on your phone."
+        />
+      </p>
+    </div>
+
+    <div class="prose-custom mt-10 space-y-8 text-ink-soft">
+      <!-- 1 -->
+      <section>
+        <h2 class="text-xl font-semibold text-ink"><T es="1. Datos que no recopilamos" en="1. Data we do not collect" /></h2>
+        <p class="mt-2">
+          <T
+            es="ScreenPencil no recopila tu nombre, correo, ubicación, contactos, ni identificadores del dispositivo. No hay registro ni inicio de sesión, y la app no incluye SDKs de publicidad ni de analítica."
+            en="ScreenPencil does not collect your name, email, location, contacts, or device identifiers. There is no sign-up or login, and the app contains no advertising or analytics SDKs."
+          />
+        </p>
+      </section>
+
+      <!-- 2 -->
+      <section>
+        <h2 class="text-xl font-semibold text-ink"><T es="2. Permisos y para qué se usan" en="2. Permissions and how they're used" /></h2>
+        <ul class="mt-2 space-y-3 list-none">
+          <li>
+            <strong class="text-ink"><T es="Mostrar sobre otras apps" en="Display over other apps" /></strong> —
+            <T
+              es="dibuja la capa de anotación transparente sobre la pantalla. Solo pinta encima; no lee ni accede al contenido de otras apps."
+              en="draws the transparent annotation layer over your screen. It only paints on top; it does not read or access other apps' content."
+            />
+          </li>
+          <li>
+            <strong class="text-ink"><T es="Captura de pantalla" en="Screen capture" /></strong> —
+            <T
+              es="se usa SOLO cuando tú pulsas el botón de captura. Toma una imagen de la pantalla en ese instante y la guarda en tu galería. No graba en segundo plano y la imagen nunca se envía a ningún servidor."
+              en="used ONLY when you tap the capture button. It takes a single image of the screen at that moment and saves it to your gallery. It never records in the background and the image is never sent to any server."
+            />
+          </li>
+          <li>
+            <strong class="text-ink"><T es="Notificaciones" en="Notifications" /></strong> —
+            <T
+              es="muestra la notificación de control del overlay (detener / dejar pasar los toques) mientras el modo dibujo está activo."
+              en="shows the overlay's control notification (stop / pass-through) while drawing mode is active."
+            />
+          </li>
+          <li>
+            <strong class="text-ink"><T es="Almacenamiento / galería" en="Storage / gallery" /></strong> —
+            <T
+              es="para guardar en tu dispositivo las capturas que tú generas."
+              en="to save the screenshots you generate to your device."
+            />
+          </li>
+        </ul>
+      </section>
+
+      <!-- 3 -->
+      <section>
+        <h2 class="text-xl font-semibold text-ink"><T es="3. Dónde se guardan tus dibujos y capturas" en="3. Where your drawings and screenshots are stored" /></h2>
+        <p class="mt-2">
+          <T
+            es="Únicamente en tu dispositivo (en la galería / carpeta de imágenes). No se suben a la nube ni salen de tu teléfono. Tú decides qué hacer con ellas."
+            en="Only on your device (in your gallery / pictures folder). They are not uploaded to any cloud and never leave your phone. You decide what to do with them."
+          />
+        </p>
+      </section>
+
+      <!-- 4 -->
+      <section>
+        <h2 class="text-xl font-semibold text-ink"><T es="4. Terceros" en="4. Third parties" /></h2>
+        <p class="mt-2">
+          <T
+            es="La aplicación no comparte datos con terceros porque no recopila ninguno. (Este sitio web puede usar analítica anónima de visitas, pero la aplicación móvil no.)"
+            en="The app shares no data with third parties because it collects none. (This website may use anonymous visit analytics, but the mobile app does not.)"
+          />
+        </p>
+      </section>
+
+      <!-- 5 -->
+      <section>
+        <h2 class="text-xl font-semibold text-ink"><T es="5. Menores" en="5. Children" /></h2>
+        <p class="mt-2">
+          <T
+            es="ScreenPencil no está dirigida a menores y no recopila datos de ninguna persona, incluidos menores de edad."
+            en="ScreenPencil is not directed at children and does not collect data from anyone, including minors."
+          />
+        </p>
+      </section>
+
+      <!-- 6 -->
+      <section>
+        <h2 class="text-xl font-semibold text-ink"><T es="6. Cambios en esta política" en="6. Changes to this policy" /></h2>
+        <p class="mt-2">
+          <T
+            es="Si actualizamos esta política, cambiaremos la fecha de “última actualización” de arriba. Te recomendamos revisarla de vez en cuando."
+            en="If we update this policy, we'll change the “last updated” date above. We recommend reviewing it from time to time."
+          />
+        </p>
+      </section>
+
+      <!-- 7 -->
+      <section>
+        <h2 class="text-xl font-semibold text-ink"><T es="7. Contacto" en="7. Contact" /></h2>
+        <p class="mt-2">
+          <T es="¿Dudas sobre tu privacidad? Escríbenos a" en="Questions about your privacy? Email us at" />
+          <a href={`mailto:${contactEmail}`} class="text-amber underline underline-offset-2 hover:text-amber/80">{contactEmail}</a>
+          <T es="o usa el" en="or use the" />
+          <a href={`${base}bug`} class="text-amber underline underline-offset-2 hover:text-amber/80"><T es="formulario de contacto" en="contact form" /></a>.
+        </p>
+        <p class="mt-2 text-sm text-ink-dim">ScreenPencil · {site.url}</p>
+      </section>
+    </div>
+  </main>
+
+  <Footer />
+</Base>
