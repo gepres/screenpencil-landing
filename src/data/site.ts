@@ -16,6 +16,12 @@ export const site = {
   // Linux — tar.gz self-contained (X11; captura experimental)
   downloadLinux:
     "https://github.com/gepres/screenpencil-releases/releases/download/v0.2.1/ScreenPencil-0.2.1-linux-x64.tar.gz",
+  // Android — Google Play (producción). Ficha: v1.0.2, requiere Android 8.0+.
+  downloadAndroid:
+    "https://play.google.com/store/apps/details?id=com.gepres.screenpencil",
+  androidPackage: "com.gepres.screenpencil",
+  androidVersion: "1.0.2",
+  androidMinOs: "Android 8.0",
   // GitHub API para el badge de versión
   releasesApi:
     "https://api.github.com/repos/gepres/screenpencil-releases/releases/latest",

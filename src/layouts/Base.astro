@@ -14,26 +14,47 @@ interface Props {
 const {
   title = "ScreenPencil — Dibuja sobre toda tu pantalla. Gratis.",
   titleEn = "ScreenPencil — Draw over your entire screen. Free.",
-  description = "Anota y dibuja sobre toda tu pantalla en presentaciones, clases y demos. App gratis para Windows, macOS y Linux — sin cuenta, sin marca de agua. Android en camino.",
-  descriptionEn = "Annotate and draw over your entire screen during presentations, classes and demos. Free app for Windows, macOS and Linux — no account, no watermark. Android on the way.",
+  description = "Anota y dibuja sobre toda tu pantalla en presentaciones, clases y demos. App gratis para Windows, macOS, Android y Linux — sin cuenta, sin marca de agua.",
+  descriptionEn = "Annotate and draw over your entire screen during presentations, classes and demos. Free app for Windows, macOS, Android and Linux — no account, no watermark.",
 } = Astro.props;
 
 const base = import.meta.env.BASE_URL;
 const ogImage = new URL(`${base}assets/img/og-banner.png`, site.url).href;
 const canonical = new URL(Astro.url.pathname, site.url).href;
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  name: "ScreenPencil",
-  description,
-  url: site.url,
-  applicationCategory: "DesignApplication",
-  operatingSystem: "Windows 10, Windows 11, macOS, Linux",
-  softwareVersion: site.version,
-  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-  author: { "@type": "Organization", name: "gepres", url: "https://github.com/gepres" },
-};
+const author = { "@type": "Organization", name: "gepres", url: "https://github.com/gepres" };
+const freeOffer = { "@type": "Offer", price: "0", priceCurrency: "USD" };
+
+// Dos fichas: la app de escritorio (descarga directa) y la de Android (Google Play).
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "ScreenPencil",
+    description,
+    url: site.url,
+    applicationCategory: "DesignApplication",
+    operatingSystem: "Windows 10, Windows 11, macOS, Linux",
+    softwareVersion: site.version,
+    downloadUrl: site.releasesLatest,
+    offers: freeOffer,
+    author,
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "MobileApplication",
+    name: "ScreenPencil",
+    description:
+      "Dibuja y anota sobre cualquier app de tu móvil: lápiz, marcador, láser, figuras, texto, pizarra y captura a la galería. Gratis y sin anuncios.",
+    url: site.downloadAndroid,
+    installUrl: site.downloadAndroid,
+    applicationCategory: "UtilitiesApplication",
+    operatingSystem: `Android ${site.androidMinOs.replace("Android ", "")}+`,
+    softwareVersion: site.androidVersion,
+    offers: freeOffer,
+    author,
+  },
+];
 ---
 <!doctype html>
 <html lang="es" data-lang="es">

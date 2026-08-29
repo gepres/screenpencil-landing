@@ -15,13 +15,13 @@ dónde sale el copy. Si una función de la app cambia, actualiza aquí y en el c
 | 6 | **Cómo funciona** | `#flow` | Flujo en 4 pasos: bandeja → activar → anotar → capturar. |
 | 7 | **Demo** | `#demo` | Mini-pizarra interactiva en canvas (probar la sensación). |
 | 8 | **Atajos** | `#hotkeys` | Tabla de atajos globales / herramientas / edición. |
-| 9 | **Plataformas** | `#platforms` | Windows (disponible), macOS y Linux (próximamente). |
-| 10 | **Precio** | `#download` | $0 para siempre + lista de incluido + CTAs de descarga. |
+| 9 | **Plataformas** | `#platforms` | Windows, macOS y Android (disponibles), Linux (experimental). |
+| 10 | **Precio** | `#download` | $0 para siempre + lista de incluido + CTAs de descarga (Windows, Mac App Store, Linux, Google Play, GitHub). |
 | 11 | **Donaciones** | `#donate` | Apoyo opcional: Buy Me a Coffee, Ko-fi, GitHub Sponsors, PayPal. |
-| 12 | **FAQ** | `#faq` | 7 preguntas frecuentes (acordeón `<details>`). |
-| 13 | **En camino** | `#roadmap` | Roadmap "próximamente" (6 ítems). |
+| 12 | **FAQ** | `#faq` | 9 preguntas frecuentes (acordeón `<details>`), 2 de ellas sobre Android. |
+| 13 | **En camino** | `#roadmap` | Roadmap "próximamente" (8 ítems). |
 | 14 | **CTA final** | — | Repite la llamada a descargar. |
-| 15 | **Footer** | — | Enlaces, plataformas, recursos (incl. Donar), copyright. |
+| 15 | **Footer** | — | Enlaces, plataformas, recursos (incl. Donar y **política de privacidad**), copyright. |
 
 > **Donaciones:** la app es y seguirá siendo gratis; las donaciones son **opcionales** y se presentan
 > sin presión ("usar y compartir también apoya"). Hay un botón "Donar" en el nav y enlace en el footer.
@@ -36,7 +36,8 @@ Reflejan la app real (repo `screenbrush-windown`, fases 1–7):
 - Color y grosor (paleta + HSV + opacidad) · Deshacer/rehacer · Atajos globales reasignables
 
 > Mantener honesto: lo que esté solo "en camino" en la app no debe presentarse como disponible.
-> macOS/Linux van marcados explícitamente como **Próximamente**.
+> Linux va marcado explícitamente como **Experimental** (su captura aún lo es), y la FAQ dice qué
+> funciones del escritorio (spotlight, lupa, freeze) todavía **no** están en Android.
 
 ## Atajos mostrados (sección 7)
 

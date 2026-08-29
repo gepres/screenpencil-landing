@@ -22,7 +22,7 @@ el porqué, el qué y el cómo del sitio. Mantén estos documentos **concisos y 
 1. **Rápido y accesible.** Astro envía ~0 JS salvo las islas necesarias; lazy reveal; respeta `prefers-reduced-motion`.
 2. **Componetizado.** Una sección por componente Astro; copy y enlaces centralizados (`<T>`, `src/data/site.ts`).
 3. **Fiel al producto.** Las funciones y atajos mostrados reflejan la app real (ver repo `screenbrush-windown`).
-4. **Mensaje central.** *Gratis, sin trucos, para todos* — Windows, macOS y Linux.
+4. **Mensaje central.** *Gratis, sin trucos, para todos* — Windows, macOS, Android y Linux.
 5. **Bilingüe ES/EN.** Español por defecto (público LATAM / España) + inglés con el componente `<T es en />` y un conmutador en el nav que autodetecta y recuerda el idioma.
 6. **Minimalista en el diseño, completo en el contenido.** Calma visual (sin fondo ruidoso ni fullpage forzado) sin recortar datos.
 

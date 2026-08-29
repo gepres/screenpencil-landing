@@ -15,6 +15,25 @@ const btn = document.querySelector<HTMLButtonElement>("[data-bug-submit]");
 const btnLabel = document.querySelector<HTMLElement>("[data-bug-btn-label]");
 const statusEl = document.querySelector<HTMLElement>("[data-bug-status]");
 
+/* Al cambiar de sistema, la versión sugerida cambia (escritorio ≠ Android),
+   salvo que el usuario ya la haya escrito a mano. */
+{
+  const platform = form?.querySelector<HTMLSelectElement>('select[name="platform"]');
+  const version = form?.querySelector<HTMLInputElement>('input[name="version"]');
+  if (platform && version) {
+    const desktop = version.dataset.versionDesktop || version.value;
+    const android = version.dataset.versionAndroid || version.value;
+    let touched = false;
+    version.addEventListener("input", () => {
+      touched = true;
+    });
+    platform.addEventListener("change", () => {
+      if (touched) return;
+      version.value = platform.value === "Android" ? android : desktop;
+    });
+  }
+}
+
 /** Texto según el idioma activo del documento. */
 const lang = () => (document.documentElement.getAttribute("data-lang") === "en" ? "en" : "es");
 const t = (es: string, en: string) => (lang() === "en" ? en : es);

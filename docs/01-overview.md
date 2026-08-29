@@ -2,13 +2,14 @@
 
 ## Qué es ScreenPencil
 
-**ScreenPencil** es una aplicación de escritorio para **dibujar y anotar sobre toda la pantalla**:
+**ScreenPencil** es una aplicación para **dibujar y anotar sobre toda la pantalla** (escritorio y móvil):
 resaltar, dibujar flechas, escribir texto, hacer zoom, enfocar con spotlight y capturar — encima
 de **cualquier aplicación**. Pensada para presentaciones, clases en vivo, tutoriales, demos de
 producto y soporte remoto.
 
 - **Modelo:** 100% **gratis**, sin paywall, sin marca de agua, sin cuenta.
-- **Plataformas:** **Windows 10/11** disponible; **macOS** y **Linux** en desarrollo.
+- **Plataformas:** **Windows 10/11**, **macOS** (Mac App Store) y **Android 8.0+** (Google Play)
+  disponibles; **Linux** con descarga self-contained sobre X11 y la captura aún experimental.
 - **Filosofía:** software libre y accesible para quien enseña, presenta o crea.
 
 > El nombre del producto es **ScreenPencil** (no confundir con la app de macOS *ScreenBrush*,
@@ -45,9 +46,10 @@ Idiomas: **español** (principal, LATAM y España) e **inglés** (conmutador en 
 ## Fuera de alcance (de la landing)
 
 - No es la app ni su documentación técnica (eso vive en `screenbrush-windown/docs/`).
-- **Descargas conectadas:** el botón de Windows apunta al **release real** (v0.2.1, repo público de
-  vitrina `gepres/screenpencil-releases`); macOS y Linux figuran como *Próximamente*. Las donaciones
-  también están conectadas (PayPal/Coffee/GitHub Sponsors). Detalle en [04 — Desarrollo](04-development.md).
+- **Descargas conectadas:** Windows y Linux apuntan al **release real** (v0.2.1, repo público de
+  vitrina `gepres/screenpencil-releases`), macOS a la **Mac App Store** y Android a **Google Play**
+  (v1.0.2, `com.gepres.screenpencil`). Las donaciones también están conectadas
+  (PayPal/Coffee/GitHub Sponsors). Detalle en [04 — Desarrollo](04-development.md).
 - Incluye **i18n ES/EN** ligero (componente `<T es en />` + CSS), pero **no** blog ni más idiomas.
   El sitio ya está sobre **Astro** (migrado desde vanilla), así que añadir más idiomas, MDX o
   contenido dinámico es directo si hiciera falta.

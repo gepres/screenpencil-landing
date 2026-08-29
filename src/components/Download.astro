@@ -47,7 +47,7 @@ const perks = [
           class="inline-flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-ink-soft transition hover:border-white/25"
         >
           <span class="size-1.5 animate-pulse rounded-full bg-emerald-400"></span>
-          <T es="Última versión" en="Latest version" />
+          <T es="Última versión · escritorio" en="Latest version · desktop" />
           <strong class="text-ink" data-release-tag>{site.version}</strong>
         </a>
 
@@ -82,6 +82,17 @@ const perks = [
         </a>
 
         <a
+          href={site.downloadAndroid}
+          target="_blank"
+          rel="noopener"
+          data-download="android"
+          class="inline-flex items-center justify-center gap-2 rounded-full bg-amber px-6 py-3.5 font-semibold text-bg-0 transition hover:bg-amber/90"
+        >
+          <Icon name="googleplay" class="size-5" />
+          <T es="Descargar en Google Play" en="Get it on Google Play" />
+        </a>
+
+        <a
           href={site.releasesRepo}
           target="_blank"
           rel="noopener"
@@ -92,9 +103,12 @@ const perks = [
           <T es="Ver en GitHub" en="View on GitHub" />
         </a>
 
-        <div class="mt-1 flex items-center justify-center gap-4 text-xs text-ink-dim">
-          <span class="inline-flex items-center gap-1.5"><Icon name="android" class="size-3.5" /> Android <T es="· pronto" en="· soon" /></span>
-        </div>
+        <p class="mt-1 text-center text-xs text-ink-dim">
+          <T
+            es={`Android ${site.androidVersion} en Google Play · requiere ${site.androidMinOs} o superior.`}
+            en={`Android ${site.androidVersion} on Google Play · requires ${site.androidMinOs} or later.`}
+          />
+        </p>
         <p class="text-center text-xs text-ink-dim">
           <T
             es="Linux es self-contained (X11). La <strong>captura</strong> aún es experimental; el resto funciona. <a href='#platforms' class='text-ink-soft underline underline-offset-2 hover:text-ink'>Más detalles</a>."

@@ -1,16 +1,17 @@
 # NEXT-STEPS — Mejoras pendientes (próxima sesión)
 
 Estado y pendientes del **ecosistema ScreenPencil** (landing + backend + app). Actualizar al cerrar
-cada sesión. Última actualización: **2026-06-11**.
+cada sesión. Última actualización: **2026-08-28**.
 
 ## Estado actual (hecho)
 - **Landing** (`screenpencil-landing`, GitHub Pages): **migrada a Astro 5 + Tailwind v4** (antes
   HTML/CSS/JS vanilla) con rediseño minimalista — todo el contenido intacto (15 funciones, 20 atajos,
-  3 plataformas, FAQ, roadmap). Bilingüe ES/EN (componente `<T>`), hero con captura real, showcase con
+  4 plataformas, FAQ, roadmap). Bilingüe ES/EN (componente `<T>`), hero con captura real, showcase con
   pestañas, donaciones conectadas (PayPal/Coffee/GitHub Sponsors), capturas WebP, analítica (Cloudflare
   + GoatCounter), **panel `/admin`** conectado al backend, **SEO** (structured data, canonical, OG/Twitter,
-  sitemap, robots) y **banner social** propio (`og-banner.png`). **Descargas conectadas:** botón de
-  Windows → release real **v0.2.1**; badge de versión vía API de GitHub. **Deploy con build de Astro en
+  sitemap, robots) y **banner social** propio (`og-banner.png`). **Descargas conectadas:** Windows y Linux →
+  release real **v0.2.1**, macOS → Mac App Store, **Android → Google Play (v1.0.2)**; badge de versión
+  (escritorio) vía API de GitHub. **Deploy con build de Astro en
   GitHub Actions** (base path automático de Pages).
 - **Panel `/admin`** (en la landing): **reescrito en Astro + Tailwind** (dependency-free), reemplazando
   el vanilla heredado. KPIs con **sparkline + tendencia**, gráfica de **área con tooltip** (GoatCounter
@@ -31,8 +32,12 @@ cada sesión. Última actualización: **2026-06-11**.
 ## Pendientes — Landing
 - [ ] **Optimizar fuentes** (self-host `.woff2`) para no depender de Google Fonts.
 - [ ] **Recomprimir `og-banner.png`** (hoy ~1.2 MB) a < 300 KB para previews sociales más rápidos.
-- [ ] Cuando exista build de **macOS/Linux**, activar sus botones de descarga (hoy *Próximamente*)
-      en `src/components/Download.astro` / `Hero.astro` y `src/data/site.ts`.
+- [x] ~~Cuando exista build de **macOS/Linux**, activar sus botones de descarga~~ → **hecho**; y
+      **Android** publicado en Google Play (28-ago-2026): botón en `Download.astro`, tarjeta
+      "Disponible" en `Platforms.astro`, 2 FAQ nuevas, JSON-LD `MobileApplication` y enlaces en el
+      footer. Datos en `src/data/site.ts` (`downloadAndroid`, `androidVersion`, `androidMinOs`).
+- [ ] **Actualizar la ficha de Play** cuando cambie la versión: `androidVersion` en `src/data/site.ts`
+      es el único punto de verdad (lo usan la sección de descargas, el JSON-LD y el formulario `/bug`).
 - [ ] **Revisar densidad visual** ahora que está todo el contenido en una sola página (que no se sienta larga).
 - [ ] (Opcional) borrar la carpeta prototipo `screenpencil-landing-v2` (ya migrada aquí).
 - [x] ~~**Página `/bug`** (reporte de bugs por email)~~ → **hecha**: `src/pages/bug.astro` + `src/scripts/bug.ts`,
