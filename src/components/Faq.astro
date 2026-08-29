@@ -1,5 +1,6 @@
 ---
 import SectionHead from "./SectionHead.astro";
+import Icon from "./Icon.astro";
 import T from "./T.astro";
 const base = import.meta.env.BASE_URL;
 
@@ -27,7 +28,9 @@ const faqs = [
       <details class="group px-6">
         <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 font-medium marker:hidden">
           <span><T es={f.qEs} en={f.qEn} /></span>
-          <span class="grid size-6 shrink-0 place-items-center rounded-full border border-white/15 text-ink-dim transition group-open:rotate-45">+</span>
+          <span class="grid size-6 shrink-0 place-items-center rounded-full border border-white/15 text-ink-dim transition group-open:rotate-45">
+            <Icon name="plus" class="size-3.5 [stroke-width:2.5]" />
+          </span>
         </summary>
         <p class="-mt-1 pb-5 pr-10 text-sm leading-relaxed text-ink-soft">
           <T es={f.aEs} en={f.aEn} />
