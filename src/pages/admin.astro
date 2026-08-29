@@ -19,14 +19,50 @@ const base = import.meta.env.BASE_URL;
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
     />
+
+    <!-- ============================================================
+         TEMA DEL PANEL — se cambia aquí y cambia TODO el /admin.
+         Los tokens `--color-*` son los de Tailwind, redefinidos SOLO en
+         esta página: tocarlos recolorea las clases (`text-amber`,
+         `bg-bg-1`, `border-amber/50`…) sin afectar a la landing pública.
+         Los `--admin-*` los leen los gráficos, que se pintan desde JS
+         (ver src/scripts/admin/theme.ts).
+         ============================================================ -->
+    <style is:global>
+      :root {
+        /* Acento del panel: botones, foco de los campos, títulos */
+        --color-amber: #e0a060;
+
+        /* Fondos y texto */
+        --color-bg-0: #060912; /* fondo de la página */
+        --color-bg-1: #0a0e1c; /* tarjetas y paneles */
+        --color-bg-2: #0f1424; /* tooltips */
+        --color-ink: #e8edf7;
+        --color-ink-soft: #93a0bd;
+        --color-ink-dim: #5e6a86; /* también los ejes y etiquetas de los gráficos */
+
+        /* Colores de los gráficos */
+        --admin-chart-1: #22d3ee; /* GoatCounter · demo */
+        --admin-chart-2: #3b82f6; /* Cloudflare · navegación */
+        --admin-chart-3: #60a5fa; /* visitas */
+        --admin-chart-4: #8b5cf6; /* donaciones */
+        --admin-chart-5: #22c55e; /* descargas */
+        --admin-chart-6: #ef4444;
+        --admin-chart-7: #93a0bd;
+        --admin-map-bg: #0a0f1e; /* fondo del mapa de visitantes */
+      }
+    </style>
   </head>
   <body class="min-h-screen">
     <div class="mx-auto max-w-6xl px-5 py-8">
       <!-- Cabecera -->
       <header class="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <span class="font-display text-xs font-semibold uppercase tracking-[0.18em] text-amber">Panel interno</span>
-          <h1 class="mt-1 font-display text-2xl font-bold sm:text-3xl">Analytics de <span class="grad-text">ScreenPencil</span></h1>
+          <div class="flex items-center gap-2.5">
+            <img src={`${base}assets/img/logo-white.png`} alt="" width="28" height="28" class="size-7" />
+            <span class="font-display text-xs font-semibold uppercase tracking-[0.18em] text-amber">Panel interno</span>
+          </div>
+          <h1 class="mt-1.5 font-display text-2xl font-bold sm:text-3xl">Analytics de <span class="grad-text">ScreenPencil</span></h1>
         </div>
         <div class="flex items-center gap-2">
           <select data-period aria-label="Periodo" class="rounded-lg border border-white/12 bg-bg-1 px-3 py-2 text-sm text-ink outline-none focus:border-amber/50">

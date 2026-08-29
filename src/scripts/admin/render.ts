@@ -5,6 +5,7 @@ import type {
 } from "./types";
 import { $, esc, fmtShort, flag, num, pct } from "./format";
 import { barList, columns, donut, niceScale, placeholder, sparkline, trend } from "./charts";
+import { axis, chart, eventColor, mapBg, series as seriesColor } from "./theme";
 
 // --- KPIs (con sparkline + tendencia) ---
 export function renderKpis(s: Summary, ts: Timeseries | null) {
@@ -18,9 +19,9 @@ export function renderKpis(s: Summary, ts: Timeseries | null) {
   const visitsSeries = (ts?.cloudflare ?? []).map((p) => p.visits ?? 0);
 
   const cards = [
-    { k: "GoatCounter", v: gcViews, s: "páginas vistas", series: gcSeries, color: "#22d3ee" },
-    { k: "Cloudflare", v: cfViews, s: "páginas vistas", series: cfSeries, color: "#3b82f6" },
-    { k: "Cloudflare", v: cfVisits, s: "visitas", series: visitsSeries, color: "#60a5fa" },
+    { k: "GoatCounter", v: gcViews, s: "páginas vistas", series: gcSeries, color: seriesColor.goatcounter },
+    { k: "Cloudflare", v: cfViews, s: "páginas vistas", series: cfSeries, color: seriesColor.cloudflare },
+    { k: "Cloudflare", v: cfVisits, s: "visitas", series: visitsSeries, color: seriesColor.visits },
   ];
 
   el.innerHTML = cards.map((c) => {
@@ -45,8 +46,8 @@ export function renderChart(ts: Timeseries | null) {
   const legend = $("[data-chart-legend]");
   if (!el || !legend) return;
   const series = [
-    { name: "GoatCounter", color: "#22d3ee", data: ts?.goatcounter ?? [] },
-    { name: "Cloudflare", color: "#3b82f6", data: ts?.cloudflare ?? [] },
+    { name: "GoatCounter", color: seriesColor.goatcounter, data: ts?.goatcounter ?? [] },
+    { name: "Cloudflare", color: seriesColor.cloudflare, data: ts?.cloudflare ?? [] },
   ].filter((s) => s.data.length);
 
   const dates = [...new Set(series.flatMap((s) => s.data.map((p) => p.date)))].sort();
@@ -64,7 +65,7 @@ export function renderChart(ts: Timeseries | null) {
   const grid = ns.ticks.map((t) => {
     const yy = y(t).toFixed(1);
     return `<line x1="${padL}" y1="${yy}" x2="${W - padR}" y2="${yy}" stroke="rgba(255,255,255,0.06)"/>
-      <text x="${padL - 6}" y="${yy}" text-anchor="end" dominant-baseline="middle" fill="#5e6a86" font-size="10">${fmtShort(t)}</text>`;
+      <text x="${padL - 6}" y="${yy}" text-anchor="end" dominant-baseline="middle" fill="${axis}" font-size="10">${fmtShort(t)}</text>`;
   }).join("");
 
   const dots = dates.length <= 31;
@@ -81,7 +82,7 @@ export function renderChart(ts: Timeseries | null) {
   const xIdx = dates.length === 1 ? [0] : Array.from({ length: nX }, (_, k) => Math.round((k * (dates.length - 1)) / (nX - 1)));
   const xlabels = [...new Set(xIdx)].map((i) => {
     const anchor = i === 0 ? "start" : i === dates.length - 1 ? "end" : "middle";
-    return `<text x="${x(i).toFixed(1)}" y="${H - 6}" text-anchor="${anchor}" fill="#5e6a86" font-size="10">${esc(dates[i].slice(5))}</text>`;
+    return `<text x="${x(i).toFixed(1)}" y="${H - 6}" text-anchor="${anchor}" fill="${axis}" font-size="10">${esc(dates[i].slice(5))}</text>`;
   }).join("");
 
   el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" class="w-full" role="img" aria-label="Tendencia diaria">
@@ -240,7 +241,7 @@ export async function renderMap(s: Summary) {
       return `<path d="${d}" fill="${fill}" stroke="rgba(255,255,255,0.12)" stroke-width="0.3" class="cursor-pointer hover:brightness-150" data-n="${esc(data?.name ?? gname)}" data-f="${fl}" data-meta="${esc(meta)}"></path>`;
     }).join("");
 
-    el.innerHTML = `<div data-map-wrap class="relative overflow-hidden rounded-xl bg-[#0a0f1e]">
+    el.innerHTML = `<div data-map-wrap class="relative overflow-hidden rounded-xl" style="background:${mapBg}">
       <svg viewBox="0 0 ${W} ${H}" class="w-full">${paths}</svg>
       <div data-map-tip class="pointer-events-none absolute z-10 hidden max-w-[200px] rounded-lg border border-white/12 bg-bg-2/95 px-3 py-2 text-xs shadow-lg backdrop-blur"></div>
     </div>
@@ -360,7 +361,7 @@ export function renderTimePatterns(ts: Timeseries | null) {
       }
       const order = [1, 2, 3, 4, 5, 6, 0];
       const labels = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
-      wdEl.innerHTML = columns(order.map((wd, i) => ({ label: labels[i], value: acc[wd] })), "#3b82f6") +
+      wdEl.innerHTML = columns(order.map((wd, i) => ({ label: labels[i], value: acc[wd] })), chart[1]) +
         `<p class="mt-2 text-xs text-ink-dim">Páginas vistas acumuladas por día de la semana.</p>`;
     }
   }
@@ -426,10 +427,10 @@ export function renderActionSeries(d: ActionSeries | null) {
     return;
   }
   const colorFor = (n: string) =>
-    n.startsWith("download") ? "#22c55e" :
-    n.startsWith("donate") ? "#8b5cf6" :
-    n.startsWith("demo") || n.startsWith("showcase") ? "#22d3ee" :
-    n.startsWith("section") || n.startsWith("scroll") ? "#3b82f6" : "#e0a060";
+    n.startsWith("download") ? eventColor.download :
+    n.startsWith("donate") ? eventColor.donate :
+    n.startsWith("demo") || n.startsWith("showcase") ? eventColor.demo :
+    n.startsWith("section") || n.startsWith("scroll") ? eventColor.nav : eventColor.other;
   el.innerHTML = events.map((e) => {
     const vals = e.series.map((s) => s.count);
     const short = e.name.length > 22 ? e.name.slice(0, 21) + "…" : e.name;

@@ -1,6 +1,9 @@
 /* Primitivas de visualización reutilizables (dependency-free, devuelven HTML/SVG). */
 import type { Bar } from "./types";
 import { esc, num, pct, avg } from "./format";
+import { DONUT_COLORS, chart } from "./theme";
+
+export { DONUT_COLORS };
 
 /** Aviso para secciones que dependen de un endpoint aún no disponible. */
 export function placeholder(msg: string): string {
@@ -64,7 +67,7 @@ export function niceScale(max: number, ticks: number) {
 }
 
 /** Gráfico de columnas verticales. */
-export function columns(items: { label: string; value: number }[], color = "#22d3ee"): string {
+export function columns(items: { label: string; value: number }[], color = chart[0]): string {
   if (!items.length || items.every((i) => i.value === 0)) return `<p class="text-sm text-ink-dim">Sin datos.</p>`;
   const max = Math.max(...items.map((i) => i.value), 1);
   return `<div class="flex items-end gap-1" style="height:120px">` +
@@ -76,8 +79,6 @@ export function columns(items: { label: string; value: number }[], color = "#22d
       </div>`;
     }).join("") + `</div>`;
 }
-
-export const DONUT_COLORS = ["#22d3ee", "#3b82f6", "#8b5cf6", "#e0a060", "#22c55e", "#ef4444", "#93a0bd"];
 
 /** Donut (conic-gradient) con leyenda de porcentajes. */
 export function donut(items: { name: string; count: number }[]): string {
