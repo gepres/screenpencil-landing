@@ -1,7 +1,8 @@
 # ScreenPencil — Landing
 
 Sitio de presentación de **ScreenPencil**, la app gratuita para **dibujar y anotar sobre toda tu
-pantalla** (Windows · macOS · Android · Linux). Diseño minimalista, **calmado y componetizado**.
+pantalla** (Windows · macOS · Android · Linux), publicada en Microsoft Store, Mac App Store y
+Google Play. Diseño minimalista, **calmado y componetizado**.
 
 **🌐 Sitio en vivo:** <https://gepres.github.io/screenpencil-landing/>
 

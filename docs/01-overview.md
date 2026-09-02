@@ -8,8 +8,9 @@ de **cualquier aplicación**. Pensada para presentaciones, clases en vivo, tutor
 producto y soporte remoto.
 
 - **Modelo:** 100% **gratis**, sin paywall, sin marca de agua, sin cuenta.
-- **Plataformas:** **Windows 10/11**, **macOS** (Mac App Store) y **Android 8.0+** (Google Play)
-  disponibles; **Linux** con descarga self-contained sobre X11 y la captura aún experimental.
+- **Plataformas:** **Windows 10/11** (Microsoft Store, y también instalador `.exe`), **macOS**
+  (Mac App Store) y **Android 8.0+** (Google Play) disponibles; **Linux** con descarga
+  self-contained sobre X11 y la captura aún experimental.
 - **Filosofía:** software libre y accesible para quien enseña, presenta o crea.
 
 > El nombre del producto es **ScreenPencil** (no confundir con la app de macOS *ScreenBrush*,
@@ -46,9 +47,10 @@ Idiomas: **español** (principal, LATAM y España) e **inglés** (conmutador en 
 ## Fuera de alcance (de la landing)
 
 - No es la app ni su documentación técnica (eso vive en `screenbrush-windown/docs/`).
-- **Descargas conectadas:** Windows y Linux apuntan al **release real** (v0.2.1, repo público de
-  vitrina `gepres/screenpencil-releases`), macOS a la **Mac App Store** y Android a **Google Play**
-  (v1.0.2, `com.gepres.screenpencil`). Las donaciones también están conectadas
+- **Descargas conectadas:** Windows a la **Microsoft Store** (ficha `9NVFDSFR5Z7G`, paquete
+  0.2.1.0 x64) con el instalador `.exe` como alternativa, Linux al **release real** (v0.2.1, repo
+  público de vitrina `gepres/screenpencil-releases`), macOS a la **Mac App Store** y Android a
+  **Google Play** (v1.0.2, `com.gepres.screenpencil`). Las donaciones también están conectadas
   (PayPal/Coffee/GitHub Sponsors). Detalle en [04 — Desarrollo](04-development.md).
 - Incluye **i18n ES/EN** ligero (componente `<T es en />` + CSS), pero **no** blog ni más idiomas.
   El sitio ya está sobre **Astro** (migrado desde vanilla), así que añadir más idiomas, MDX o

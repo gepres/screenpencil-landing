@@ -60,6 +60,8 @@ Todo vive en `src/data/site.ts` (no hay que tocar el markup):
 ```ts
 export const site = {
   version: "v0.2.1",
+  downloadStore: "https://apps.microsoft.com/detail/9NVFDSFR5Z7G",  // vía recomendada en Windows
+  storeProductId: "9NVFDSFR5Z7G", storeMinOs: "Windows 10 (build 17763)", storeArch: "x64",
   downloadWindows: "https://github.com/gepres/screenpencil-releases/releases/download/v0.2.1/…exe",
   releasesRepo: "https://github.com/gepres/screenpencil-releases",
   coffee: "…", sponsors: "…", paypal: "…",
@@ -67,7 +69,8 @@ export const site = {
 };
 ```
 
-Al sacar versión nueva, actualiza `version` y `downloadWindows`. El badge además consulta
+Al sacar versión nueva, actualiza `version` y `downloadWindows` (la Microsoft Store no lleva la
+versión en la URL: `downloadStore` es estable y no hay que tocarlo). El badge además consulta
 `releases/latest` de la API de GitHub en `main.ts` y sobreescribe el tag si responde.
 
 ### Cambiar las capturas del showcase

@@ -52,12 +52,23 @@ const perks = [
         </a>
 
         <a
-          href={site.downloadWindows}
-          data-download="windows"
+          href={site.downloadStore}
+          target="_blank"
+          rel="noopener"
+          data-download="store"
           class="inline-flex items-center justify-center gap-2 rounded-full bg-amber px-6 py-3.5 font-semibold text-bg-0 transition hover:bg-amber/90"
         >
+          <Icon name="microsoftstore" class="size-5" />
+          <T es="Descargar en la Microsoft Store" en="Get it from the Microsoft Store" />
+        </a>
+
+        <a
+          href={site.downloadWindows}
+          data-download="windows"
+          class="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 px-6 py-3.5 font-semibold text-ink transition hover:border-white/30 hover:bg-white/5"
+        >
           <Icon name="windows" class="size-5" />
-          <T es="Descargar para Windows" en="Download for Windows" />
+          <T es="Windows · instalador .exe" en="Windows · .exe installer" />
         </a>
 
         <a
@@ -104,6 +115,12 @@ const perks = [
         </a>
 
         <p class="mt-1 text-center text-xs text-ink-dim">
+          <T
+            es={`En la Microsoft Store el paquete lo firma Microsoft: se instala sin el aviso de SmartScreen y se actualiza solo. Requiere ${site.storeMinOs} o superior, ${site.storeArch}. El .exe trae la misma versión ${site.version}.`}
+            en={`On the Microsoft Store the package is signed by Microsoft: it installs with no SmartScreen warning and updates itself. Requires ${site.storeMinOs} or later, ${site.storeArch}. The .exe ships the same ${site.version} build.`}
+          />
+        </p>
+        <p class="text-center text-xs text-ink-dim">
           <T
             es={`Android ${site.androidVersion} en Google Play · requiere ${site.androidMinOs} o superior.`}
             en={`Android ${site.androidVersion} on Google Play · requires ${site.androidMinOs} or later.`}

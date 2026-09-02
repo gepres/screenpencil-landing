@@ -15,10 +15,10 @@ dónde sale el copy. Si una función de la app cambia, actualiza aquí y en el c
 | 6 | **Cómo funciona** | `#flow` | Flujo en 4 pasos: bandeja → activar → anotar → capturar. |
 | 7 | **Demo** | `#demo` | Mini-pizarra interactiva en canvas (probar la sensación). |
 | 8 | **Atajos** | `#hotkeys` | Tabla de atajos globales / herramientas / edición. |
-| 9 | **Plataformas** | `#platforms` | Windows, macOS y Android (disponibles), Linux (experimental). |
-| 10 | **Precio** | `#download` | $0 para siempre + lista de incluido + CTAs de descarga (Windows, Mac App Store, Linux, Google Play, GitHub). |
+| 9 | **Plataformas** | `#platforms` | Windows (Microsoft Store o `.exe`), macOS y Android (disponibles), Linux (experimental). |
+| 10 | **Precio** | `#download` | $0 para siempre + lista de incluido + CTAs de descarga (Microsoft Store, Windows `.exe`, Mac App Store, Linux, Google Play, GitHub). |
 | 11 | **Donaciones** | `#donate` | Apoyo opcional: Buy Me a Coffee, Ko-fi, GitHub Sponsors, PayPal. |
-| 12 | **FAQ** | `#faq` | 9 preguntas frecuentes (acordeón `<details>`), 2 de ellas sobre Android. |
+| 12 | **FAQ** | `#faq` | 10 preguntas frecuentes (acordeón `<details>`): 2 sobre Android y 1 sobre Microsoft Store vs `.exe`. |
 | 13 | **En camino** | `#roadmap` | Roadmap "próximamente" (8 ítems). |
 | 14 | **CTA final** | — | Repite la llamada a descargar. |
 | 15 | **Footer** | — | Enlaces, plataformas, recursos (incl. Donar y **política de privacidad**), copyright. |

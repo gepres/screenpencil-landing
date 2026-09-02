@@ -9,7 +9,8 @@ cada sesión. Última actualización: **2026-08-28**.
   4 plataformas, FAQ, roadmap). Bilingüe ES/EN (componente `<T>`), hero con captura real, showcase con
   pestañas, donaciones conectadas (PayPal/Coffee/GitHub Sponsors), capturas WebP, analítica (Cloudflare
   + GoatCounter), **panel `/admin`** conectado al backend, **SEO** (structured data, canonical, OG/Twitter,
-  sitemap, robots) y **banner social** propio (`og-banner.png`). **Descargas conectadas:** Windows y Linux →
+  sitemap, robots) y **banner social** propio (`og-banner.png`). **Descargas conectadas:** **Windows →
+  Microsoft Store** (`9NVFDSFR5Z7G`, paquete 0.2.1.0 x64) + instalador `.exe`, Linux →
   release real **v0.2.1**, macOS → Mac App Store, **Android → Google Play (v1.0.2)**; badge de versión
   (escritorio) vía API de GitHub. **Deploy con build de Astro en
   GitHub Actions** (base path automático de Pages).
@@ -36,6 +37,12 @@ cada sesión. Última actualización: **2026-08-28**.
       **Android** publicado en Google Play (28-ago-2026): botón en `Download.astro`, tarjeta
       "Disponible" en `Platforms.astro`, 2 FAQ nuevas, JSON-LD `MobileApplication` y enlaces en el
       footer. Datos en `src/data/site.ts` (`downloadAndroid`, `androidVersion`, `androidMinOs`).
+- [x] ~~Publicar la cabeza Windows en la **Microsoft Store** y enlazarla desde la landing~~ →
+      **hecho** (2-sep-2026): botón principal de Windows a la Store en `Download.astro` con el `.exe`
+      como alternativa, icono `microsoftstore` en `Icon.astro`, evento `download/store`, FAQ nueva
+      (Store vs `.exe`), sello "Firmado por Microsoft", enlaces en hero y footer, y JSON-LD partido en
+      cuatro fichas (una por cabeza) con `installUrl` y `sameAs` a las tres tiendas. Datos en
+      `src/data/site.ts` (`downloadStore`, `storeProductId`, `storeMinOs`, `storeArch`).
 - [ ] **Actualizar la ficha de Play** cuando cambie la versión: `androidVersion` en `src/data/site.ts`
       es el único punto de verdad (lo usan la sección de descargas, el JSON-LD y el formulario `/bug`).
 - [ ] **Revisar densidad visual** ahora que está todo el contenido en una sola página (que no se sienta larga).
@@ -68,8 +75,10 @@ cada sesión. Última actualización: **2026-08-28**.
 
 ## Pendientes — App de escritorio
 - [ ] Confirmación **multi-pantalla** del usuario (Windows).
-- [ ] **Firma de código** (Windows): el instalador y el release automatizado ya están; falta el certificado
-      para evitar el aviso de SmartScreen. Ver `screenbrush-windown/docs/12`.
+- [ ] **Firma de código** (Windows) para el `.exe`: el instalador y el release automatizado ya están;
+      falta el certificado para evitar el aviso de SmartScreen. La vía de la **Microsoft Store** ya lo
+      resuelve (Microsoft firma el MSIX), así que esto solo afecta a la descarga directa.
+      Ver `screenbrush-windown/docs/12`.
 - [ ] Fase 7 restante: **snapshots + export PDF**, **quick-arrow / `Ctrl+1..0`**, edición posterior de texto
       (badges, ghost mode y cursor halo ya están).
 - [ ] **macOS:** firma **Developer ID** + **notarización** + `.dmg`, y QA en Mac real (Fases 5/6 de `docs/18`).

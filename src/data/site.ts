@@ -9,6 +9,14 @@ export const site = {
   // Releases (repo público de vitrina)
   releasesRepo: "https://github.com/gepres/screenpencil-releases",
   releasesLatest: "https://github.com/gepres/screenpencil-releases/releases/latest",
+  // Windows — Microsoft Store (vía recomendada). El MSIX lo firma Microsoft: sin aviso de
+  // SmartScreen y con actualización automática. Ficha: paquete 0.2.1.0 x64, gratis,
+  // categoría "Utilidades y herramientas".
+  downloadStore: "https://apps.microsoft.com/detail/9NVFDSFR5Z7G",
+  storeProductId: "9NVFDSFR5Z7G",
+  storeMinOs: "Windows 10 (build 17763)",
+  storeArch: "x64",
+  // Windows — instalador .exe directo (alternativa a la Store, misma versión)
   downloadWindows:
     "https://github.com/gepres/screenpencil-releases/releases/download/v0.2.1/ScreenPencil-Setup-0.2.1.exe",
   // macOS — Mac App Store

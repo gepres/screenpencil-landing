@@ -14,8 +14,9 @@ interface Props {
 const {
   title = "ScreenPencil — Dibuja sobre toda tu pantalla. Gratis.",
   titleEn = "ScreenPencil — Draw over your entire screen. Free.",
-  description = "Anota y dibuja sobre toda tu pantalla en presentaciones, clases y demos. App gratis para Windows, macOS, Android y Linux — sin cuenta, sin marca de agua.",
-  descriptionEn = "Annotate and draw over your entire screen during presentations, classes and demos. Free app for Windows, macOS, Android and Linux — no account, no watermark.",
+  // ≤ 160 caracteres: es lo que Google muestra sin recortar.
+  description = "Anota y dibuja sobre toda tu pantalla en clases, demos y presentaciones. Gratis para Windows (Microsoft Store), macOS, Android y Linux, sin marca de agua.",
+  descriptionEn = "Annotate and draw over your entire screen in classes, demos and presentations. Free for Windows (Microsoft Store), macOS, Android and Linux, no watermark.",
 } = Astro.props;
 
 const base = import.meta.env.BASE_URL;
@@ -25,25 +26,50 @@ const canonical = new URL(Astro.url.pathname, site.url).href;
 const author = { "@type": "Organization", name: "gepres", url: "https://github.com/gepres" };
 const freeOffer = { "@type": "Offer", price: "0", priceCurrency: "USD" };
 
-// Dos fichas: la app de escritorio (descarga directa) y la de Android (Google Play).
+// Una ficha por cabeza, cada una con su vía real de instalación: Windows (Microsoft Store),
+// macOS (Mac App Store), Linux (tar.gz del repo de vitrina) y Android (Google Play).
+// `sameAs` cruza las cuatro para que los buscadores las lean como la misma app.
+const stores = [site.downloadStore, site.downloadMac, site.downloadAndroid, site.releasesRepo];
+const appBase = { "@context": "https://schema.org", name: "ScreenPencil", offers: freeOffer, author, sameAs: stores };
+
 const jsonLd = [
   {
-    "@context": "https://schema.org",
+    ...appBase,
     "@type": "SoftwareApplication",
-    name: "ScreenPencil",
-    description,
-    url: site.url,
+    description:
+      "Dibuja y anota sobre cualquier cosa que tengas en pantalla: diapositivas, hojas de cálculo, páginas web, videollamadas. Lápiz, flechas, texto, foco, puntero láser y pizarra, a un atajo de distancia. Gratis, sin conexión y sin marca de agua.",
+    url: site.downloadStore,
+    installUrl: site.downloadStore,
+    downloadUrl: site.downloadStore,
     applicationCategory: "DesignApplication",
-    operatingSystem: "Windows 10, Windows 11, macOS, Linux",
+    operatingSystem: "Windows 10, Windows 11",
     softwareVersion: site.version,
-    downloadUrl: site.releasesLatest,
-    offers: freeOffer,
-    author,
+    softwareRequirements: `${site.storeMinOs} o superior`,
+    processorRequirements: site.storeArch,
   },
   {
-    "@context": "https://schema.org",
+    ...appBase,
+    "@type": "SoftwareApplication",
+    description,
+    url: site.downloadMac,
+    installUrl: site.downloadMac,
+    applicationCategory: "DesignApplication",
+    operatingSystem: "macOS",
+    softwareVersion: site.version,
+  },
+  {
+    ...appBase,
+    "@type": "SoftwareApplication",
+    description,
+    url: site.url,
+    downloadUrl: site.downloadLinux,
+    applicationCategory: "DesignApplication",
+    operatingSystem: "Linux (X11)",
+    softwareVersion: site.version,
+  },
+  {
+    ...appBase,
     "@type": "MobileApplication",
-    name: "ScreenPencil",
     description:
       "Dibuja y anota sobre cualquier app de tu móvil: lápiz, marcador, láser, figuras, texto, pizarra y captura a la galería. Gratis y sin anuncios.",
     url: site.downloadAndroid,
@@ -51,8 +77,6 @@ const jsonLd = [
     applicationCategory: "UtilitiesApplication",
     operatingSystem: `Android ${site.androidMinOs.replace("Android ", "")}+`,
     softwareVersion: site.androidVersion,
-    offers: freeOffer,
-    author,
   },
 ];
 ---
