@@ -13,9 +13,9 @@ import { site } from "../data/site";
 import type { ActionSeries, Devices, Events, Summary, Timeseries, Vitals } from "./admin/types";
 import { $, toCsv } from "./admin/format";
 import {
-  renderActionSeries, renderChart, renderCompare, renderDevices, renderEvents,
-  renderFunnel, renderGeo, renderHeatmap, renderKpis, renderMap, renderReadDepth,
-  renderTimePatterns, renderVitals,
+  renderActionSeries, renderChart, renderCompare, renderConversion, renderDevices,
+  renderEvents, renderFunnel, renderGeo, renderHeatmap, renderKpis, renderMap,
+  renderReadDepth, renderTimePatterns, renderVitals, sumEvents,
 } from "./admin/render";
 
 // --- Configuración (localStorage; solo en este navegador) ---
@@ -97,10 +97,13 @@ function exportCsv() {
   if (!last.summary) { setStatus("Carga datos antes de exportar.", "warn"); return; }
   const src = last.summary.cloudflare ?? last.summary.goatcounter;
   const rows: (string | number)[][] = [["seccion", "etiqueta", "valor"]];
+  const evs = last.events?.events ?? [];
+  rows.push(["total", "clics en descargar", sumEvents(evs, "download")]);
+  rows.push(["total", "clics en donar", sumEvents(evs, "donate")]);
   (src?.topPages ?? []).forEach((p) => rows.push(["pagina", p.path, p.views]));
   (src?.countries ?? []).forEach((c) => rows.push(["pais", c.name || c.code || "?", c.views]));
   (src?.referrers ?? []).forEach((r) => rows.push(["fuente", r.host || "(directo)", r.views]));
-  (last.events?.events ?? []).forEach((e) => rows.push(["accion", e.name, e.count]));
+  evs.forEach((e) => rows.push(["accion", e.name, e.count]));
   (last.devices?.browsers ?? []).forEach((d) => rows.push(["navegador", d.name, d.count]));
   (last.devices?.systems ?? []).forEach((d) => rows.push(["sistema", d.name, d.count]));
   (last.devices?.sizes ?? []).forEach((d) => rows.push(["pantalla", d.name, d.count]));
@@ -162,9 +165,10 @@ async function load() {
     if (dashEl) { dashEl.classList.remove("hidden"); dashEl.classList.add("flex"); }
     // Cada render aislado: un fallo puntual con datos inesperados no tumba el resto.
     const safe = (fn: () => void) => { try { fn(); } catch (err) { console.warn("[admin] render:", err); } };
-    safe(() => renderKpis(summary, ts));
+    safe(() => renderKpis(summary, ts, ev, as));
     safe(() => renderChart(ts));
     safe(() => renderFunnel(summary, ev));
+    safe(() => renderConversion(summary, ev, as));
     safe(() => renderCompare(summary));
     safe(() => renderGeo(summary));
     safe(() => { void renderMap(summary); });

@@ -7,8 +7,41 @@ import { $, esc, fmtShort, flag, num, pct } from "./format";
 import { barList, columns, donut, niceScale, placeholder, sparkline, trend } from "./charts";
 import { axis, chart, eventColor, mapBg, series as seriesColor } from "./theme";
 
+/* ---------- Helpers de eventos (los comparten KPIs, funnel y conversión) ---------- */
+
+/** ¿El evento pertenece a la familia? (`download` y `download/*`). */
+const inFamily = (name: string, prefix: string) => name === prefix || name.startsWith(prefix + "/");
+
+/** Total de clics de una familia de eventos en el periodo. */
+export function sumEvents(events: EventItem[], prefix: string): number {
+  return events.filter((e) => inFamily(e.name, prefix)).reduce((a, e) => a + e.count, 0);
+}
+
+/** Serie diaria de una familia, sumando todos sus eventos (`/panel/action-series`). */
+function familySeries(as: ActionSeries | null, prefix: string): number[] {
+  const byDate = new Map<string, number>();
+  for (const e of as?.events ?? []) {
+    if (!inFamily(e.name, prefix)) continue;
+    for (const p of e.series) byDate.set(p.date, (byDate.get(p.date) ?? 0) + p.count);
+  }
+  return [...byDate.keys()].sort().map((d) => byDate.get(d) ?? 0);
+}
+
+/** Días que cubre el periodo (para las medias diarias: cuenta también los días a cero). */
+function periodDays(s: Summary): number {
+  const d = Math.round((Date.parse(s.range.end + "T00:00:00Z") - Date.parse(s.range.start + "T00:00:00Z")) / 86400000) + 1;
+  return Number.isFinite(d) && d > 0 ? d : 1;
+}
+
+/** Insignia de tendencia (último tercio del periodo vs el primero). */
+function trendBadge(series: number[]): string {
+  const t = trend(series);
+  if (t === null) return "";
+  return `<span class="text-xs font-semibold ${t >= 0 ? "text-emerald-400" : "text-red-400"}">${t >= 0 ? "▲" : "▼"} ${Math.abs(t)}%</span>`;
+}
+
 // --- KPIs (con sparkline + tendencia) ---
-export function renderKpis(s: Summary, ts: Timeseries | null) {
+export function renderKpis(s: Summary, ts: Timeseries | null, ev: Events | null, as: ActionSeries | null) {
   const el = $("[data-kpis]");
   if (!el) return;
   const gcViews = s.goatcounter?.totals.pageviews ?? 0;
@@ -18,16 +51,19 @@ export function renderKpis(s: Summary, ts: Timeseries | null) {
   const cfSeries = (ts?.cloudflare ?? []).map((p) => p.views);
   const visitsSeries = (ts?.cloudflare ?? []).map((p) => p.visits ?? 0);
 
+  // Las dos acciones que importan: cuántas veces se pulsa descargar y cuántas donar.
+  const events = ev?.events ?? [];
+
   const cards = [
     { k: "GoatCounter", v: gcViews, s: "páginas vistas", series: gcSeries, color: seriesColor.goatcounter },
     { k: "Cloudflare", v: cfViews, s: "páginas vistas", series: cfSeries, color: seriesColor.cloudflare },
     { k: "Cloudflare", v: cfVisits, s: "visitas", series: visitsSeries, color: seriesColor.visits },
+    { k: "⬇️ Descargas", v: sumEvents(events, "download"), s: "clics en descargar", series: familySeries(as, "download"), color: eventColor.download },
+    { k: "💜 Donaciones", v: sumEvents(events, "donate"), s: "clics en donar", series: familySeries(as, "donate"), color: eventColor.donate },
   ];
 
   el.innerHTML = cards.map((c) => {
-    const t = trend(c.series);
-    const tHtml = t === null ? "" :
-      `<span class="text-xs font-semibold ${t >= 0 ? "text-emerald-400" : "text-red-400"}">${t >= 0 ? "▲" : "▼"} ${Math.abs(t)}%</span>`;
+    const tHtml = trendBadge(c.series);
     return `
       <article class="rounded-2xl border border-white/8 bg-bg-1 p-4">
         <div class="flex items-center justify-between">
@@ -115,9 +151,6 @@ export function renderChart(ts: Timeseries | null) {
 }
 
 // --- Funnel de conversión ---
-function sumEvents(events: EventItem[], prefix: string): number {
-  return events.filter((e) => e.name === prefix || e.name.startsWith(prefix + "/")).reduce((a, e) => a + e.count, 0);
-}
 export function renderFunnel(s: Summary, ev: Events | null) {
   const el = $("[data-funnel]");
   if (!el) return;
@@ -145,6 +178,113 @@ export function renderFunnel(s: Summary, ev: Events | null) {
         </div>
       </div>`;
   }).join("") + `<p class="mt-2 text-xs text-ink-dim">Visitas = Cloudflare · pasos = eventos GoatCounter.</p>`;
+}
+
+// --- Descargas y donaciones: cuántas veces se va a descargar o a donar ---
+
+/** Nombre legible de cada destino. La clave es la del `data-download` / `data-donate` del enlace. */
+const DEST_LABEL: Record<string, string> = {
+  store: "Microsoft Store",
+  windows: "Windows · instalador .exe",
+  mac: "Mac App Store",
+  linux: "Linux · tar.gz",
+  android: "Google Play",
+  coffee: "Buy me a coffee",
+  github: "GitHub Sponsors",
+  paypal: "PayPal",
+  app: "Sin destino declarado",
+  otro: "Sin destino declarado",
+};
+
+/** Las dos intenciones que mide el panel, con su vocabulario y su color. */
+const INTENTS = [
+  {
+    key: "download",
+    title: "⬇️ Descargas",
+    unit: "clics en descargar",
+    cta: "Pulsó un CTA «Descargar»",
+    color: eventColor.download,
+    note: "Clics de salida a la tienda o al instalador — no instalaciones: las tiendas no las exponen.",
+  },
+  {
+    key: "donate",
+    title: "💜 Donaciones",
+    unit: "clics en donar",
+    cta: "Pulsó «Donar / Apóyanos»",
+    color: eventColor.donate,
+    note: "Clics de salida a la pasarela — no donaciones cobradas: eso solo lo sabe PayPal / Coffee / Sponsors.",
+  },
+];
+
+export function renderConversion(s: Summary, ev: Events | null, as: ActionSeries | null) {
+  const el = $("[data-conversion]");
+  if (!el) return;
+  const events = ev?.events ?? [];
+  const visits = s.cloudflare?.totals.visits || s.cloudflare?.totals.pageviews || s.goatcounter?.totals.pageviews || 0;
+  const days = periodDays(s);
+
+  const stat = (label: string, value: string) => `
+    <div class="rounded-xl border border-white/8 bg-white/[0.02] px-3 py-2">
+      <dt class="text-[11px] text-ink-dim">${label}</dt>
+      <dd class="font-display text-lg font-semibold tabular-nums text-ink">${value}</dd>
+    </div>`;
+
+  const step = (label: string, v: number, extra = "") => `
+    <li class="flex items-center justify-between gap-2">
+      <span class="text-ink-soft">${esc(label)}</span>
+      <span class="tabular-nums text-ink">${num(v)}${extra}</span>
+    </li>`;
+
+  el.innerHTML = INTENTS.map((it) => {
+    const total = sumEvents(events, it.key);          // download/*  ·  donate/*
+    const cta = sumEvents(events, "cta/" + it.key);   // intención (enlaces internos)
+    const seen = sumEvents(events, "section/" + it.key); // llegó a ver la sección
+    const series = familySeries(as, it.key);
+    const perDay = total / days;
+    const rate = pct(total, seen);
+    // Un evento por destino: download/store, donate/paypal…
+    const dests = events.filter((e) => e.name.startsWith(it.key + "/")).map((e) => {
+      const k = e.name.slice(it.key.length + 1);
+      return { label: DEST_LABEL[k] ?? k, views: e.count };
+    });
+    const conv = seen
+      ? ` <span class="text-xs ${rate >= 10 ? "text-emerald-400" : "text-ink-dim"}">${rate}% de quienes la vieron</span>`
+      : "";
+
+    return `
+      <article class="flex flex-col rounded-2xl border border-white/8 bg-bg-1 p-5">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <h3 class="font-display text-sm font-semibold uppercase tracking-wider text-ink-soft">${it.title}</h3>
+            <div class="mt-2 flex items-baseline gap-2">
+              <span class="font-display text-4xl font-bold tabular-nums" style="color:${it.color}">${num(total)}</span>
+              <span class="text-xs text-ink-dim">${it.unit}</span>
+            </div>
+          </div>
+          ${trendBadge(series)}
+        </div>
+
+        <dl class="mt-4 grid grid-cols-3 gap-2.5">
+          ${stat("de las visitas", visits ? pct(total, visits) + "%" : "—")}
+          ${stat("al día", perDay >= 10 ? String(Math.round(perDay)) : perDay.toFixed(1))}
+          ${stat("mejor día", series.length ? num(Math.max(...series)) : "—")}
+        </dl>
+
+        <div class="mt-3">${sparkline(series, it.color) || `<div class="h-8"></div>`}</div>
+
+        <h4 class="mt-4 mb-2 text-xs font-semibold uppercase tracking-wider text-ink-dim">Cómo llegan</h4>
+        <ul class="space-y-1.5 text-sm">
+          ${step(it.cta, cta)}
+          ${step("Llegó a la sección", seen)}
+          ${step("Hizo clic", total, conv)}
+        </ul>
+
+        <h4 class="mt-4 mb-2 text-xs font-semibold uppercase tracking-wider text-ink-dim">Destino</h4>
+        ${barList(dests, 6, it.color)}
+
+        <p class="mt-auto pt-3 text-xs text-ink-dim">${it.note}</p>
+      </article>`;
+  }).join("");
 }
 
 // --- Comparación GoatCounter vs Cloudflare ---
@@ -282,6 +422,7 @@ export async function renderMap(s: Summary) {
 const GROUPS: { title: string; match: (n: string) => boolean }[] = [
   { title: "⬇️ Descargas", match: (n) => n.startsWith("download") },
   { title: "💜 Donaciones", match: (n) => n.startsWith("donate") },
+  { title: "👆 Intención (CTA)", match: (n) => n.startsWith("cta") },
   { title: "✨ Engagement", match: (n) => n.startsWith("demo") || n.startsWith("showcase") || n === "github" },
   { title: "🧭 Navegación", match: (n) => n.startsWith("section") || n.startsWith("scroll") },
   { title: "🌐 Idioma", match: (n) => n.startsWith("lang") },

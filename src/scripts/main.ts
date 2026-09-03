@@ -189,8 +189,19 @@ document.querySelectorAll<HTMLElement>("[data-github]").forEach((b) =>
 );
 document.querySelectorAll<HTMLElement>("[data-donate]").forEach((b) =>
   b.addEventListener("click", () => {
-    const k = b.dataset.donate || "";
+    const k = b.dataset.donate || "otro";
     track("donate/" + k, "Click donar: " + k);
+  }),
+);
+
+/* Intención: los enlaces internos que llevan a la sección de descargas o de
+   donación (hero, nav, demo, cierre, footer). El clic de SALIDA a la tienda ya
+   se mide con [data-download] / [data-donate]; esto mide cuántos lo intentaron
+   → en /admin se ve como "pulsó un CTA" frente a "clic de salida". */
+document.querySelectorAll<HTMLElement>("[data-cta]").forEach((b) =>
+  b.addEventListener("click", () => {
+    const k = b.dataset.cta || "otro";
+    track("cta/" + k, "Clic en CTA: " + k);
   }),
 );
 

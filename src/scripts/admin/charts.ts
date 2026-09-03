@@ -10,8 +10,8 @@ export function placeholder(msg: string): string {
   return `<div class="rounded-xl border border-dashed border-white/12 bg-white/[0.015] p-5 text-sm text-ink-dim">${msg}</div>`;
 }
 
-/** Lista de barras horizontales (top N + "Otros"). */
-export function barList(items: Bar[], topN = 7): string {
+/** Lista de barras horizontales (top N + "Otros"). `color` sustituye el degradado por defecto. */
+export function barList(items: Bar[], topN = 7, color?: string): string {
   const rows = items.filter((i) => i.views > 0).sort((a, b) => b.views - a.views);
   if (!rows.length) return `<p class="text-sm text-ink-dim">Sin datos.</p>`;
   const total = rows.reduce((a, i) => a + i.views, 0) || 1;
@@ -28,7 +28,7 @@ export function barList(items: Bar[], topN = 7): string {
         <span class="min-w-0 truncate text-ink-soft" title="${esc(i.label)}">${esc(i.label)}</span>
         <span class="tabular-nums text-ink">${num(i.views)} <span class="text-xs text-ink-dim">${pct(i.views, total)}%</span></span>
         <span class="col-span-2 h-1.5 overflow-hidden rounded-full bg-white/8">
-          <span class="block h-full rounded-full bg-gradient-to-r from-amber to-cyan" style="width:${Math.round((i.views / max) * 100)}%"></span>
+          <span class="block h-full rounded-full ${color ? "" : "bg-gradient-to-r from-amber to-cyan"}" style="width:${Math.round((i.views / max) * 100)}%${color ? `;background:${color}` : ""}"></span>
         </span>
       </li>`).join("") +
     `</ul>`

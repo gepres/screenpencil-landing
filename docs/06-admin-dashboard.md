@@ -23,18 +23,33 @@ solo en el navegador.
   - `GET /panel/vitals?period=…` → **rendimiento** (FCP, tiempo de carga; Cloudflare RUM).
   - `GET /panel/action-series?period=…` → **acciones en el tiempo** (serie diaria por evento).
   - `period`: `24h` / `7d` / `30d` / `90d`.
-- **Visualizaciones:** KPIs con **sparkline + tendencia** · gráfica de área con **tooltip** · **funnel**
+- **Visualizaciones:** KPIs con **sparkline + tendencia** (5: páginas vistas GC, páginas vistas CF,
+  visitas CF y **clics en descargar / en donar**) · gráfica de área con **tooltip** · **funnel**
   visitas→demo→showcase→descarga · comparación por fuente · países (con banderas)/fuentes · eventos
   **agrupados** · **dispositivos** · **heatmap día×hora** · **por hora del día** y **por día de la
   semana** · **profundidad de lectura** (scroll 25→100%) · **rendimiento** (FCP/carga) · **acciones en
   el tiempo** (serie diaria por evento) · **donuts** de navegador/SO · **export CSV**.
+- **Descargas y donaciones** (sección propia, justo tras el funnel): una tarjeta por intención con el
+  total de clics, el **% sobre las visitas**, la media diaria, el mejor día, la **serie diaria** de toda
+  la familia de eventos, la **ruta hasta el clic** (pulsó un CTA → llegó a la sección → hizo clic, con
+  el % de conversión sobre quienes vieron la sección) y el **desglose por destino** con nombres
+  legibles (Microsoft Store, instalador de Windows, Mac App Store, Linux, Google Play · Buy me a
+  coffee, GitHub Sponsors, PayPal). Cuenta **clics de intención, no instalaciones ni donaciones
+  cobradas**: eso no lo expone ninguna tienda ni pasarela.
 - **Degradación elegante:** si `/devices` o el `hourly` no están (backend sin desplegar), esas dos
   secciones muestran un aviso "requiere endpoint" en vez de romper.
 
 ## Instrumentación (qué se mide en la landing)
 `src/scripts/main.ts` registra vía GoatCounter (`track()`): `download/*`, `github`, `donate/*`,
-`lang/*`, `demo/used`, `showcase/*`, **`section/<id>`** (qué secciones llega a ver) y
-**`scroll/25|50|75|100`** (profundidad). Esto alimenta el funnel y "acciones de los usuarios".
+`lang/*`, `demo/used`, `showcase/*`, **`section/<id>`** (qué secciones llega a ver),
+**`scroll/25|50|75|100`** (profundidad) y **`cta/download` · `cta/donate`** (los enlaces internos
+que llevan a esas secciones: hero, nav, demo, cierre y footer, marcados con `data-cta`). Esto
+alimenta el funnel, "acciones de los usuarios" y "descargas y donaciones".
+
+> Dos familias distintas, no las confundas: `cta/*` es la **intención** (pulsó el botón de la
+> landing) y `download/*` / `donate/*` es el **clic de salida** (se fue a la tienda o a la pasarela).
+> La clave del evento es el valor del `data-download` / `data-donate` / `data-cta` del enlace, así
+> que al añadir un botón nuevo basta con marcarlo.
 
 ## Backend (resumen)
 - Repo: **`screenpencil-backend`** (NestJS 11 + PostgreSQL/Neon + Prisma). Desplegado en **Render**.

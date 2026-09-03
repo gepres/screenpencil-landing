@@ -1,7 +1,7 @@
 # NEXT-STEPS — Mejoras pendientes (próxima sesión)
 
 Estado y pendientes del **ecosistema ScreenPencil** (landing + backend + app). Actualizar al cerrar
-cada sesión. Última actualización: **2026-08-28**.
+cada sesión. Última actualización: **2026-09-03**.
 
 ## Estado actual (hecho)
 - **Landing** (`screenpencil-landing`, GitHub Pages): **migrada a Astro 5 + Tailwind v4** (antes
@@ -20,7 +20,9 @@ cada sesión. Última actualización: **2026-08-28**.
   **acciones agrupadas**, **dispositivos** y **heatmap día×hora**. Llama al backend por el prefijo
   **neutro `/panel/*`** (los adblockers bloquean `/analytics`/`events` → `ERR_BLOCKED_BY_CLIENT`).
 - **Instrumentación** (landing, `main.ts`): además de `download/github/donate/lang/demo`, ahora registra
-  `section/<id>` (qué secciones ve), `scroll/25·50·75·100` y `showcase/<id>` → alimenta el funnel.
+  `section/<id>` (qué secciones ve), `scroll/25·50·75·100`, `showcase/<id>` y **`cta/download` ·
+  `cta/donate`** (la intención: los enlaces internos al bloque de descargas o de donación) → alimenta
+  el funnel y la sección "Descargas y donaciones".
 - **Backend** (`screenpencil-backend`, NestJS + Neon + Prisma): **desplegado en Render**
   (`https://screenpencil-backend.onrender.com`). Endpoints `/health` y **4** de analítica
   (`summary`, `events`/`actions`, `timeseries` con `hourly[24]`, `devices`), servidos bajo `/analytics`
@@ -96,6 +98,12 @@ cada sesión. Última actualización: **2026-08-28**.
       el panel en el primer fetch.
 
 **Más datos / gráficas**
+- [x] ~~Cuántas veces se pulsa **descargar** y **donar**~~ → **hecho** (3-sep-2026): dos KPI arriba
+      (clics en descargar / en donar, con sparkline y tendencia) y una sección propia **"Descargas y
+      donaciones"** tras el funnel: total, % sobre las visitas, media diaria, mejor día, serie diaria,
+      ruta `cta/*` → `section/*` → clic de salida, y desglose por destino con nombres legibles. Todo en
+      el cliente, sin tocar el backend. ⚠️ Los eventos `cta/*` se pueblan **hacia adelante**: en
+      periodos anteriores al despliegue esa fila sale a 0.
 - [x] ~~Web Vitals / rendimiento (Cloudflare RUM)~~ → **hecho**: `/panel/vitals` con FCP y tiempo de
       carga (p50/p75). ⚠️ Verificar los nombres de campo `quantiles` contra la API real (`firstContentfulPaint*`,
       `pageLoadTime*`); si una métrica sale vacía, revisar el log de Render y ajustar el campo.
